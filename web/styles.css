@@ -57,3 +57,6 @@ i {
 form {
     user-select: none;
 }
+#nameTitle{
+    margin-right: 30px;
+}

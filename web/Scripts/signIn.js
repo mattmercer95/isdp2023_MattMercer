@@ -2,8 +2,7 @@ window.onload = function () {
     // add event handlers for buttons
     document.querySelector("#signIn").addEventListener("submit", signIn);
     //add event for visable password toggle
-    let x = document.querySelector("#togglePassword").addEventListener("click", toggleVisiblePassword);
-    console.log(x);
+    document.querySelector("#togglePassword").addEventListener("click", toggleVisiblePassword);
 };
 
 function toggleVisiblePassword(){
@@ -35,11 +34,15 @@ async function signIn(e){
             body: JSON.stringify(obj)
         });
         let login = await resp.json();
+        
         if(login.errorMessage){
+            //display error message if there is one
             alert(login.errorMessage);
         }
         else {
-            console.log(login.employee);
+            //successfull login, store emp info in storage and direct user to dashboard
+            sessionStorage.setItem("employeeInfo", JSON.stringify(login.employee));
+            window.location.href = "dashboard.html";
         }
     }
     catch(err){
