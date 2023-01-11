@@ -1,3 +1,10 @@
+/**
+Run this script after running the main bullseyedb2023_X.X.sql script
+**/
+
+/*
+Retrieves relevent information for the Employee.java object
+*/
 drop procedure if exists GetEmployeeInfo;
 DELIMITER //
 create procedure GetEmployeeInfo(in user varchar(32))
@@ -8,6 +15,9 @@ BEGIN
 END //
 DELIMITER ;
 
+/*
+Retrieves relevent permissions based on employeeID. Helper procedure for creating Employee.java objects
+*/
 drop procedure if exists GetPermissionsByID;
 DELIMITER //
 create procedure GetPermissionsByID(in id int)
