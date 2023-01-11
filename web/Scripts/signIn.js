@@ -1,8 +1,20 @@
 window.onload = function () {
     // add event handlers for buttons
     document.querySelector("#signIn").addEventListener("submit", signIn);
+    //add event for visable password toggle
+    let x = document.querySelector("#togglePassword").addEventListener("click", toggleVisiblePassword);
+    console.log(x);
 };
 
+function toggleVisiblePassword(){
+    let password = document.querySelector("#password");
+    // toggle the type attribute
+    let type = password.getAttribute("type") === "password" ? "text" : "password";
+    password.setAttribute("type", type);
+
+    // toggle the icon
+    this.classList.toggle("bi-eye");
+}
 async function signIn(e){
     e.preventDefault();
     let data; 

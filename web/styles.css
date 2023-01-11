@@ -49,4 +49,11 @@
 }
 .wrongAnswer {
     color: red;
-}    
+}   
+i {
+    margin-left: -30px;
+    cursor: pointer;
+}
+form {
+    user-select: none;
+}
