@@ -1,0 +1,52 @@
+#logo {
+    margin-left: 50px;
+}
+
+#navAccountActions {
+    margin-right: 50px;
+}
+
+.errorHighlighting {
+    border-color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.formLabel {
+    width: 100px;
+    float: left;
+}
+
+.btn-success{
+    width: 150px; 
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.btn-primary{
+    width: 150px; 
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.card-body{
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.card{
+    margin-bottom: 10px;
+}
+.container{
+    margin-top: 100px;
+}
+
+.row{
+    margin-bottom: 35px
+}
+
+.highlighted {
+    background-color: yellow;
+}
+.wrongAnswer {
+    color: red;
+}    
