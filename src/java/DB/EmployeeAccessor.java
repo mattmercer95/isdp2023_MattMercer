@@ -4,6 +4,7 @@
  */
 package DB;
 
+import Entity.Employee;
 import Entity.LogIn;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +20,7 @@ import java.util.List;
 public class EmployeeAccessor {
     private static Connection conn = null;
     private static PreparedStatement selectAllStatement = null;
+    private static PreparedStatement getEmployeeInfoStatement = null;
 
     private EmployeeAccessor(){
         //no instantiation
@@ -32,6 +34,7 @@ public class EmployeeAccessor {
             try {
                 System.out.println("Connection was not null");
                 selectAllStatement = conn.prepareStatement("select * from employee");
+                getEmployeeInfoStatement = conn.prepareStatement("call GetEmployeeInfo(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -75,5 +78,46 @@ public class EmployeeAccessor {
         }
         
         return logIns;
+    }
+    
+    public static Employee getEmployeeInfo(String username) {
+        Employee result = null;
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            getEmployeeInfoStatement.setString(1, username);
+            rs = getEmployeeInfoStatement.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Employee Info");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        try {
+            while (rs.next()) {
+                int employeeID = rs.getInt("employeeID");
+                username = rs.getString("username");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                String email = rs.getString("email");
+                boolean active = rs.getBoolean("active");
+                boolean locked = rs.getBoolean("locked");
+                String position = rs.getString("position");
+                String site = rs.getString("site");
+                result = new Employee(employeeID, username, firstName, lastName,
+                    email, active, locked, position, site);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Records");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return result;
     }
 }

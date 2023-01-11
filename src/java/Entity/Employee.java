@@ -4,6 +4,7 @@
  */
 package Entity;
 
+import DB.PermissionAccessor;
 import java.util.ArrayList;
 
 /**
@@ -13,18 +14,22 @@ import java.util.ArrayList;
 public class Employee {
     private int employeeID;
     private String username, firstName, lastName, email, position, site;
+    private boolean active, locked;
     private ArrayList<String> permissions;
     
     public Employee(int employeeID, String username, String firstName, String lastName, 
-            String email, String position, String site){
+            String email, boolean active, boolean locked, String position, String site){
         this.employeeID = employeeID;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.active = active;
+        this.locked = locked;
         this.position = position;
         this.site = site;
         //get permission list from the permission accessor
+        this.permissions = PermissionAccessor.getPermissionList(employeeID);
     }
     
     public int getEmployeeID(){
@@ -50,5 +55,11 @@ public class Employee {
     }
     public ArrayList<String> getPermissions(){
         return this.permissions;
+    }
+    public boolean getActive(){
+        return this.active;
+    }
+    public boolean getLocked(){
+        return this.locked;
     }
 }

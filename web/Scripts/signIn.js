@@ -23,15 +23,12 @@ async function signIn(e){
             body: JSON.stringify(obj)
         });
         let login = await resp.json();
-        console.log(login);
-//        if(login.validUsername === false || login.validPassword === false){
-//            alert(login.Message);
-//            return;
-//        }
-//        else {
-//            sessionStorage.setItem("currentUser", login.username);
-//            window.location.href = "userLandingPage.html";
-//        }     
+        if(login.errorMessage){
+            alert(login.errorMessage);
+        }
+        else {
+            console.log(login.employee);
+        }
     }
     catch(err){
         alert("Error Connecting to Database");

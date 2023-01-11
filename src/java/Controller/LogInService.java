@@ -5,7 +5,9 @@
 package Controller;
 
 import DB.EmployeeAccessor;
+import Entity.Employee;
 import Entity.LogIn;
+import Entity.LogInResponse;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -46,19 +48,65 @@ public class LogInService extends HttpServlet {
             //get all logins and compare to submitted log in
             List<LogIn> logIns = new ArrayList();
             logIns = EmployeeAccessor.getAllLogIns();
-            out.println(g.toJson(logIns));
+            LogInResponse validationResponse = validateLogIn(logIns, logInToVerify);
+            out.println(g.toJson(validationResponse));
         }
     }
 
-    private LogIn validateLogIn(List<LogIn> allLogIns, LogIn logInToVerify){
-        LogIn result = null;
+    /**
+     * Validates a log in attempt and returns a Log in Response.
+     * If valid log in, Employee will contain data and errorMessage will be null.
+     * If not valid log in, Employee will be null and errorMessage will contain data
+     * @param allLogIns
+     * @param logInToVerify
+     * @return LogInResponse
+     */
+    private LogInResponse validateLogIn(List<LogIn> allLogIns, LogIn logInToVerify){
+        LogInResponse response = null;
+        //find if there exists a user with the entered username
+        LogIn usernameMatch = null;
         for(LogIn l : allLogIns){
             if(l.getUsername().equals(logInToVerify.getUsername())){
-                
+                usernameMatch = l;
             }
         }
-        return result;
+        //check if a match was found, return error Message if not
+        if(usernameMatch == null){
+            String errorMessage = "No user named " + logInToVerify.getUsername() + " exists";
+            response = new LogInResponse(null, errorMessage);
+            return response;
+        }
+        //check if passwords match
+        String password = usernameMatch.getPassword();
+        if(password.equals(logInToVerify.getPassword())){
+            String username = logInToVerify.getUsername();
+            //get Employee info from accessor
+            Employee emp = EmployeeAccessor.getEmployeeInfo(username);
+            response = new LogInResponse(emp, null);
+        }
+        else {
+            //return incorrect password message
+            String errorMessage = "Password is incorrect";
+            response = new LogInResponse(null, errorMessage);
+            return response;
+        }
+        //Check for active employee
+        Employee emp = response.getEmployee();
+        if(!emp.getActive()){
+            String errorMessage = "Employee account is not currently active";
+            response = new LogInResponse(null, errorMessage);
+            return response;
+        }
+        //Check for locked account
+        if(emp.getLocked()){
+            String errorMessage = "Employee account currently locked, please contact admin";
+            response = new LogInResponse(null, errorMessage);
+            return response;
+        }
+        //Response has met all checks and log in is valid, return employee info
+        return response;
     }
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

@@ -12,4 +12,15 @@ public class LogInResponse {
     private Employee employee;
     private String errorMessage;
     
+    public LogInResponse(Employee emp, String errorMessage){
+        this.employee = emp;
+        this.errorMessage = errorMessage;
+    }
+    
+    public Employee getEmployee(){
+        return this.employee;
+    }
+    public String getErrorMessage(){
+        return this.errorMessage;
+    }
 }
