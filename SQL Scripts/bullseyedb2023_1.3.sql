@@ -1,6 +1,6 @@
 -- Bullseye DB SQL Script
--- version 1.1
--- January 10, 2023
+-- version 1.3
+-- January 11, 2023
 -- 
 
 -- ********************************************
@@ -9,6 +9,8 @@
 -- 
 drop database if exists bullseyedb2023;
 create database bullseyedb2023;
+ALTER database bullseyedb2023 CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 use bullseyedb2023;
 
 -- ********************************************
@@ -128,7 +130,7 @@ CREATE TABLE `permission` (
 CREATE TABLE `user_permission` (
   `employeeID`int(11), 
   `permissionID` varchar(20),
-  PRIMARY KEY (`employeeID`, `permissionID`),  
+  PRIMARY KEY (`employeeID`, `permissionID`), 
   FOREIGN KEY(`employeeID`) REFERENCES employee(`employeeID`),
   FOREIGN KEY(`permissionID`) REFERENCES permission(`permissionID`)
 );
@@ -210,7 +212,7 @@ CREATE TABLE `txnaudit` (
   `txnAuditID` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `txnID` int(11),
   `txnType` varchar(20),
-  `status` varchar(20) NOT NULL,
+  `status` varchar(20),
   `txnDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `SiteID` int(11) NOT NULL,
   `deliveryID` int(11),
@@ -423,7 +425,9 @@ INSERT INTO `txntype` (`txnType`) VALUES
 ('Supplier Order'),
 ('Correction'),
 ('Curbside'),
-('Online');
+('Online'),
+('Login'),
+('Logout');
 
 --
 -- Insert data for table `txnstatus`
