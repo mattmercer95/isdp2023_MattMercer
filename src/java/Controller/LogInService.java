@@ -17,8 +17,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -51,13 +49,10 @@ public class LogInService extends HttpServlet {
             System.out.println(jsonData);
             LogIn logInToVerify = g.fromJson(jsonData, LogIn.class);
             //get all logins and compare to submitted log in
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             List<LogIn> logIns = new ArrayList();
             logIns = EmployeeAccessor.getAllLogIns();
             LogInResponse validationResponse = validateLogIn(logIns, logInToVerify);
             out.println(g.toJson(validationResponse));
-        } catch (NoSuchAlgorithmException ex) {
-            System.out.println("Hashing algorithm not found");
         }
     }
 
