@@ -11,6 +11,7 @@ import Entity.LogInResponse;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -85,7 +86,8 @@ public class LogInService extends HttpServlet {
         }
         //check if passwords match
         String password = usernameMatch.getPassword();
-        if(password.equals(logInToVerify.getPassword())){
+        boolean validPassword = verifyPassword(password, logInToVerify.getPassword());
+        if(validPassword){
             String username = logInToVerify.getUsername();
             //get Employee info from accessor
             Employee emp = EmployeeAccessor.getEmployeeInfo(username);
@@ -114,6 +116,31 @@ public class LogInService extends HttpServlet {
         return response;
     }
     
+    private boolean verifyPassword(String password, String passwordToVerify){
+        boolean result = false;
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(
+                    passwordToVerify.getBytes(StandardCharsets.UTF_8));
+                String hashedPassToVerify = bytesToHex(encodedhash);
+                result = password.equals(hashedPassToVerify);
+        } catch (NoSuchAlgorithmException ex) {
+            System.out.println("Error with hashing algorithm");
+        }
+         
+        return result;
+    }
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
