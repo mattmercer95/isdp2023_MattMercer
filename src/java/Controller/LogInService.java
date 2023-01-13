@@ -5,9 +5,11 @@
 package Controller;
 
 import DB.EmployeeAccessor;
+import DB.TxnAuditAccessor;
 import Entity.Employee;
 import Entity.LogIn;
 import Entity.LogInResponse;
+import Entity.TxnAudit;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -107,8 +109,23 @@ public class LogInService extends HttpServlet {
             response = new LogInResponse(null, errorMessage);
             return response;
         }
-        //Response has met all checks and log in is valid, return employee info
+        //Response has met all checks and log in is valid
+        //Make transcation audit record for logging in
+        String timestamp = getCurrentTimeStamp();
+        TxnAudit transaction = new TxnAudit(timestamp, emp.getSiteID(), emp.getEmployeeID());
+        if(!TxnAuditAccessor.insertLogInTransaction(transaction)){
+            System.out.println("Error logging the login transaction");
+        }
+        //Return employee info
         return response;
+    }
+    
+    //Helper function for getting the current time in the MySQL datetime format
+    private String getCurrentTimeStamp(){
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = 
+             new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(dt);
     }
     
     private boolean verifyPassword(String password, String passwordToVerify){

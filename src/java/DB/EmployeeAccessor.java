@@ -108,8 +108,9 @@ public class EmployeeAccessor {
                 boolean locked = rs.getBoolean("locked");
                 String position = rs.getString("position");
                 String site = rs.getString("site");
+                int siteID = rs.getInt("siteID");
                 result = new Employee(employeeID, username, firstName, lastName,
-                    email, active, locked, position, site);
+                    email, active, locked, position, site, siteID);
             }
         } catch(SQLException ex) {
             System.err.println("************************");

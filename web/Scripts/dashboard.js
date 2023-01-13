@@ -11,26 +11,19 @@ window.onload = function () {
     nameTitle.innerHTML = `${currentEmployee.firstName} ${currentEmployee.lastName}, ${currentEmployee.position}`;
     //add event for logout button
     document.querySelector("#logoutLink").addEventListener("click", logout);
-    console.log(currentEmployee);
-    document.querySelector("#testingButton").addEventListener("click", testing);
     //reset idleTimeouts for clicking, moving the mouse, or typing
     document.addEventListener('click', resetIdleTimeout, false);
     document.addEventListener('mousemove', resetIdleTimeout, false);
     document.addEventListener('keydown', resetIdleTimeout, false);
     //initialize idle timeout
     resetIdleTimeout();
+    console.log(new Date().toISOString().slice(0, 19).replace('T', ' '));
 };
 
-function testing(){
-    console.log("Testing button clicked");
-}
-
 function resetIdleTimeout(){
-    console.log("idle timer reset");
     //clears current timeout
     if(idleTimeout) clearTimeout(idleTimeout);
     //set new timeout which will redirect after x amount of minutes
-    //idleTimeout = setTimeout(() => location.href = redirectUrl, idleDurationMins * 60000);
     idleTimeout = setTimeout(logout, idleDurationMins * 60 * 1000);
 }
 

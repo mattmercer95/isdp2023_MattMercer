@@ -12,13 +12,13 @@ import java.util.ArrayList;
  * @author Matt
  */
 public class Employee {
-    private int employeeID;
+    private int employeeID, siteID;
     private String username, firstName, lastName, email, position, site;
     private boolean active, locked;
     private ArrayList<String> permissions;
     
     public Employee(int employeeID, String username, String firstName, String lastName, 
-            String email, boolean active, boolean locked, String position, String site){
+            String email, boolean active, boolean locked, String position, String site, int siteID){
         this.employeeID = employeeID;
         this.username = username;
         this.firstName = firstName;
@@ -28,12 +28,16 @@ public class Employee {
         this.locked = locked;
         this.position = position;
         this.site = site;
+        this.siteID = siteID;
         //get permission list from the permission accessor
         this.permissions = PermissionAccessor.getPermissionList(employeeID);
     }
     
     public int getEmployeeID(){
         return this.employeeID;
+    }
+    public int getSiteID(){
+        return this.siteID;
     }
     public String getUsername(){
         return this.username;
