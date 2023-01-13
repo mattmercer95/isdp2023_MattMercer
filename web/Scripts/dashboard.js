@@ -7,8 +7,11 @@ window.onload = function () {
     //set current employee global to the user that logged in
     currentEmployee = JSON.parse(sessionStorage.getItem("employeeInfo"));
     //load name and title on the nav bar
-    let nameTitle = document.querySelector("#nameTitle");
-    nameTitle.innerHTML = `${currentEmployee.firstName} ${currentEmployee.lastName}, ${currentEmployee.position}`;
+    let nameTitleElement = document.querySelector("#nameTitle");
+    let nameTitle = (currentEmployee.employeeID === 1) ? "System Admin" : 
+            `${currentEmployee.firstName} ${currentEmployee.lastName}, 
+            ${currentEmployee.position}`;
+    nameTitleElement.innerHTML = nameTitle;
     //add event for logout button
     document.querySelector("#logoutLink").addEventListener("click", logout);
     //reset idleTimeouts for clicking, moving the mouse, or typing
@@ -28,7 +31,12 @@ function resetIdleTimeout(){
 }
 
 //removes current employee from session storage and redirects user to sign-in page
-function logout(){
+async function logout(){
+    let url = `LogOutService/logout`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(currentEmployee)
+    });
     sessionStorage.setItem("employeeInfo", null);
     window.location.href = "index.html";
 }

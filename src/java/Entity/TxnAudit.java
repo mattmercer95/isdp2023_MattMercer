@@ -24,10 +24,8 @@ public class TxnAudit {
         this.employeeID = employeeID;
         this.notes = notes;
     }
-    //constructor for Log-In Transactions
+    //constructor for Log-In/Out Transactions
     public TxnAudit(String txnDate, int siteID, int employeeID){
-        this.txnType = "Login";
-        this.status = "Successful log in";
         this.txnDate = txnDate;
         this.siteID = siteID;
         this.employeeID = employeeID;
