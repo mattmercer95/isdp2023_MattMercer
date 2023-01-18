@@ -4,7 +4,13 @@ window.onload = function () {
     document.querySelector("#togglePassword").addEventListener("click", toggleVisiblePassword);
     document.querySelector("#togglePasswordConfirm").addEventListener("click", toggleVisiblePasswordConfirm);
     document.querySelector("#cancel").addEventListener("click", cancel);
+    document.querySelector("#resetPasswordForm").addEventListener("submit", resetPassword);
 };
+
+function resetPassword(e){
+    e.preventDefault();
+    alert("Reset");
+}
 
 function toggleVisiblePassword(){
     let password = document.querySelector("#password");
