@@ -1,0 +1,1 @@
+insert into txntype(txnType) values('Password Reset');

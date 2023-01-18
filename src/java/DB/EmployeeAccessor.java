@@ -22,6 +22,7 @@ public class EmployeeAccessor {
     private static PreparedStatement selectAllStatement = null;
     private static PreparedStatement getEmployeeInfoStatement = null;
     private static PreparedStatement validateUsernameStatement = null;
+    private static PreparedStatement resetPasswordStatement = null;
 
     private EmployeeAccessor(){
         //no instantiation
@@ -37,6 +38,7 @@ public class EmployeeAccessor {
                 selectAllStatement = conn.prepareStatement("select * from employee");
                 getEmployeeInfoStatement = conn.prepareStatement("call GetEmployeeInfo(?)");
                 validateUsernameStatement = conn.prepareStatement("select exists(Select username from employee where username = ?) as validUser");
+                resetPasswordStatement = conn.prepareStatement("update employee set password = ? where username = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -112,6 +114,33 @@ public class EmployeeAccessor {
         }
         
         return logIns;
+    }
+    
+    public static Employee resetPassword(LogIn resetPasswordLogIn){
+        boolean success = false;
+        Employee empInfo = null;
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return empInfo;
+            resetPasswordStatement.setString(1, resetPasswordLogIn.getPassword());
+            resetPasswordStatement.setString(2, resetPasswordLogIn.getUsername());
+            int rowCount = resetPasswordStatement.executeUpdate();
+            success = (rowCount == 1);
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Employee Info");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return empInfo;
+        }
+        
+        if(success){
+            empInfo = getEmployeeInfo(resetPasswordLogIn.getUsername());
+        }
+        
+        return empInfo;
     }
     
     public static Employee getEmployeeInfo(String username) {

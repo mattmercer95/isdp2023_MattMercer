@@ -7,9 +7,39 @@ window.onload = function () {
     document.querySelector("#resetPasswordForm").addEventListener("submit", resetPassword);
 };
 
-function resetPassword(e){
+async function resetPassword(e){
     e.preventDefault();
-    alert("Reset");
+    //get the password and password confirm
+    let password = document.querySelector("#password").value;
+    let passwordConfirm = document.querySelector("#passwordConfirm").value;
+    
+    //check for passwords matching
+    if(password !== passwordConfirm){
+        alert("Passwords must match");
+        return;
+    }
+    
+    //Make API call to reset password, returns a log in response object 
+    let username = document.querySelector("#username").value; 
+    let obj = {
+        username: username,
+        password: password,
+    }
+    let url = `PasswordResetService/reset`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(obj),
+    });
+    let response = await resp.json();
+    
+    if(response.errorMessage){
+        alert(response.errorMessage);
+    }
+    else{
+        sessionStorage.setItem("employeeInfo", JSON.stringify(response.employee));
+        alert("Password successfully reset");
+        window.location.href = "dashboard.html";
+    }
 }
 
 function toggleVisiblePassword(){

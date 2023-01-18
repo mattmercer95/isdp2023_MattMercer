@@ -19,6 +19,7 @@ public class TxnAuditAccessor {
     private static String insertStatementRoot = "insert into txnaudit(txnID, txnType, status, txnDate, SiteID, deliveryID, employeeID, notes) ";
     private static PreparedStatement insertLogInTransactionStatement = null;
     private static PreparedStatement insertLogOutTransactionStatement = null;
+    private static PreparedStatement insertPasswordResetTransactionStatement = null;
     
     private TxnAuditAccessor(){
         //no instantiation
@@ -33,6 +34,9 @@ public class TxnAuditAccessor {
                 System.out.println("Connection was not null");
                 insertLogInTransactionStatement = conn.prepareStatement(insertStatementRoot + "values(null, 'Login', 'Successful log in', ?, ?, null, ?, null)");
                 insertLogOutTransactionStatement = conn.prepareStatement(insertStatementRoot + "values(null, 'Logout', 'Successful log out', ?, ?, null, ?, null)");
+                insertPasswordResetTransactionStatement = conn.prepareStatement(insertStatementRoot + 
+                        "values(null, 'Password Reset', 'Reset by User', "
+                        + "?, ?, null, ?, null)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -43,6 +47,28 @@ public class TxnAuditAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean passwordResetTransaction(TxnAudit txnToBeLogged){
+        boolean result = false;
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            insertPasswordResetTransactionStatement.setString(1, txnToBeLogged.getTxnDate());
+            insertPasswordResetTransactionStatement.setInt(2, txnToBeLogged.getSiteID());
+            insertPasswordResetTransactionStatement.setInt(3, txnToBeLogged.getEmployeeID());
+            int rowCount = insertPasswordResetTransactionStatement.executeUpdate();
+            result = (rowCount == 1);
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error Inserting Log In Transaction");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        return result;
     }
     
     public static boolean insertLogInTransaction(TxnAudit txnToBeLogged){
