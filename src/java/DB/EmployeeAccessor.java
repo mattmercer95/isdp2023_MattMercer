@@ -23,6 +23,7 @@ public class EmployeeAccessor {
     private static PreparedStatement getEmployeeInfoStatement = null;
     private static PreparedStatement validateUsernameStatement = null;
     private static PreparedStatement resetPasswordStatement = null;
+    private static PreparedStatement getAllEmployeesStatement = null;
 
     private EmployeeAccessor(){
         //no instantiation
@@ -39,6 +40,7 @@ public class EmployeeAccessor {
                 getEmployeeInfoStatement = conn.prepareStatement("call GetEmployeeInfo(?)");
                 validateUsernameStatement = conn.prepareStatement("select exists(Select username from employee where username = ?) as validUser");
                 resetPasswordStatement = conn.prepareStatement("update employee set password = ? where username = ?");
+                getAllEmployeesStatement = conn.prepareStatement("call GetAllEmployeeInfo()");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -49,6 +51,49 @@ public class EmployeeAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<Employee> getAllEmployees() {
+        ArrayList<Employee> employees = new ArrayList<Employee>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return employees;
+            rs = getAllEmployeesStatement.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Employee List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return employees;
+        }
+        
+        try {
+            while (rs.next()) {
+                int employeeID = rs.getInt("employeeID");
+                String username = rs.getString("username");
+                String password = rs.getString("password");
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                String email = rs.getString("email");
+                boolean active = rs.getBoolean("active");
+                boolean locked = rs.getBoolean("locked");
+                String position = rs.getString("position");
+                String site = rs.getString("site");
+                int siteID = rs.getInt("siteID");
+                Employee temp = new Employee(employeeID, username, password, 
+                        firstName, lastName,email, active, locked, position, site, siteID);
+                employees.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Employee List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return employees;
     }
     
     public static boolean validateUsername(String username) {

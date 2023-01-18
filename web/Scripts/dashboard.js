@@ -1,6 +1,6 @@
 let currentEmployee;
 const idleDurationMins = 15;
-const redirectUrl = "../index.html";
+const redirectUrl = "index.html";
 let idleTimeout;
 
 window.onload = function () {
@@ -32,7 +32,7 @@ function resetIdleTimeout(){
 
 //removes current employee from session storage and redirects user to sign-in page
 async function logout(){
-    let url = `../LogOutService/logout`;
+    let url = `LogOutService/logout`;
     let resp = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(currentEmployee)

@@ -21,7 +21,68 @@ window.onload = function () {
     //initialize idle timeout
     resetIdleTimeout();
     console.log(new Date().toISOString().slice(0, 19).replace('T', ' '));
+    
+    document.querySelector("#allEmployeeesTable").addEventListener('click', highlight);
+    //get all employee info and display into table
+    buildEmployeeTable();
 };
+
+function highlight(e){
+    let trs = document.querySelectorAll("tr");
+    for (let i = 0; i < trs.length; i++) {
+        trs[i].classList.remove("highlighted");
+    }
+    let target = e.target.parentElement;
+    if(target.tagName === "TR"){
+        target.classList.add("highlighted");
+    }
+    
+}
+
+async function buildEmployeeTable(){
+    //get the tbody element
+    let tableBody = document.querySelector("#allEmployeeesTable");
+    //make API call to get employee data
+    let employeeData = await getAllEmployeeData();
+    console.log(employeeData);
+    //populate table
+    employeeData.forEach((emp) =>{
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        idCell.innerHTML = emp.employeeID;
+        row.appendChild(idCell);
+        const usernameCell = document.createElement("td");
+        usernameCell.innerHTML = emp.username;
+        row.appendChild(usernameCell);
+        const firstNameCell = document.createElement("td");
+        firstNameCell.innerHTML = emp.firstName;
+        row.appendChild(firstNameCell);
+        const lastNameCell = document.createElement("td");
+        lastNameCell.innerHTML = emp.lastName;
+        row.appendChild(lastNameCell);
+        const emailCell = document.createElement("td");
+        emailCell.innerHTML = emp.email;
+        row.appendChild(emailCell);
+        const activeCell = document.createElement("td");
+        activeCell.innerHTML = emp.active;
+        row.appendChild(activeCell);
+        const positionCell = document.createElement("td");
+        positionCell.innerHTML = emp.position;
+        row.appendChild(positionCell);
+        const siteCell = document.createElement("td");
+        siteCell.innerHTML = emp.site;
+        row.appendChild(siteCell);
+        tableBody.appendChild(row);
+    });
+}
+
+async function getAllEmployeeData(){
+    let url = `../UserService/all`;
+    let resp = await fetch(url, {
+        method: 'GET',
+    });
+    return await resp.json();
+}
 
 function resetIdleTimeout(){
     //clears current timeout

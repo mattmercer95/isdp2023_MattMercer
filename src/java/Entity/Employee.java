@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class Employee {
     private int employeeID, siteID;
-    private String username, firstName, lastName, email, position, site;
+    private String username, firstName, lastName, email, position, site, password;
     private boolean active, locked;
     private ArrayList<String> permissions;
     
@@ -31,6 +31,23 @@ public class Employee {
         this.siteID = siteID;
         //get permission list from the permission accessor
         this.permissions = PermissionAccessor.getPermissionList(employeeID);
+    }
+    
+    //This constructor is used for the CRUD operations on Employees, does not initialize permission list
+    public Employee(int employeeID, String username, String password, String firstName, String lastName, 
+            String email, boolean active, boolean locked, String position, String site, int siteID){
+        this.employeeID = employeeID;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.active = active;
+        this.locked = locked;
+        this.position = position;
+        this.site = site;
+        this.siteID = siteID;
+        //get password, not the permission list
+        this.password = password;
     }
     
     public int getEmployeeID(){

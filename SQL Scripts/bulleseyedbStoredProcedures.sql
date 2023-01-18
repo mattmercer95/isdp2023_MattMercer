@@ -3,6 +3,18 @@ Run this script after running the main bullseyedb2023_X.X.sql script
 **/
 
 /*
+Retrieves all relevent information for the Employee.java object
+*/
+drop procedure if exists GetAllEmployeeInfo;
+DELIMITER //
+create procedure GetAllEmployeeInfo()
+BEGIN
+    Select employeeID, username, password, firstName, lastName, email, employee.active, locked, permissionLevel as position, name as site, employee.siteID
+    from employee inner join posn using(positionID) inner join site using(siteID);
+END //
+DELIMITER ;
+
+/*
 Retrieves relevent information for the Employee.java object
 */
 drop procedure if exists GetEmployeeInfo;
