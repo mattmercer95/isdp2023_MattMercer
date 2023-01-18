@@ -21,6 +21,7 @@ public class EmployeeAccessor {
     private static Connection conn = null;
     private static PreparedStatement selectAllStatement = null;
     private static PreparedStatement getEmployeeInfoStatement = null;
+    private static PreparedStatement validateUsernameStatement = null;
 
     private EmployeeAccessor(){
         //no instantiation
@@ -35,6 +36,7 @@ public class EmployeeAccessor {
                 System.out.println("Connection was not null");
                 selectAllStatement = conn.prepareStatement("select * from employee");
                 getEmployeeInfoStatement = conn.prepareStatement("call GetEmployeeInfo(?)");
+                validateUsernameStatement = conn.prepareStatement("select exists(Select username from employee where username = ?) as validUser");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -45,6 +47,38 @@ public class EmployeeAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean validateUsername(String username) {
+        boolean result = false;
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            validateUsernameStatement.setString(1, username);
+            rs = validateUsernameStatement.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error validating username");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        try {
+            while (rs.next()) {
+                result = rs.getBoolean("validUser");
+                System.out.println(result);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error validating username");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return result;
     }
     
     public static List<LogIn> getAllLogIns() {

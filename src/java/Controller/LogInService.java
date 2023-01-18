@@ -48,7 +48,6 @@ public class LogInService extends HttpServlet {
             Scanner sc = new Scanner(request.getReader());
             String jsonData = sc.nextLine(); // payload is a single string
             Gson g = new Gson();
-            System.out.println(jsonData);
             LogIn logInToVerify = g.fromJson(jsonData, LogIn.class);
             //get all logins and compare to submitted log in
             List<LogIn> logIns = new ArrayList();

@@ -3,7 +3,36 @@ window.onload = function () {
     document.querySelector("#signIn").addEventListener("submit", signIn);
     //add event for visable password toggle
     document.querySelector("#togglePassword").addEventListener("click", toggleVisiblePassword);
+    document.querySelector("#resetPasswordLink").addEventListener("click", resetPassword);
 };
+
+async function resetPassword(e){
+    e.preventDefault();
+    //get username
+    let username = document.querySelector("#username").value;
+    if(username === ""){
+        alert("Please enter a username to reset their password");
+        return;
+    }
+    validUser = await validateUsername(username);
+    if(validUser){
+        sessionStorage.setItem("resetPasswordUser", username);
+        window.location.href = "resetPassword.html";
+    }
+    else {
+        alert(`${username} is not a valid username`);
+        return;
+    }
+}
+
+async function validateUsername(username){
+    let url = `UsernameValidationService/validate`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: username,
+    });
+    return await resp.json();
+}
 
 function toggleVisiblePassword(){
     let password = document.querySelector("#password");
