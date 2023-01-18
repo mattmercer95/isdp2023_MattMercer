@@ -1,5 +1,5 @@
 let currentEmployee;
-const idleDurationMins = 0.05;
+const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 let idleTimeout;
 
