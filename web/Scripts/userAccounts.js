@@ -22,10 +22,15 @@ window.onload = function () {
     resetIdleTimeout();
     console.log(new Date().toISOString().slice(0, 19).replace('T', ' '));
     
+    document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#allEmployeeesTable").addEventListener('click', highlight);
     //get all employee info and display into table
     buildEmployeeTable();
 };
+
+function returnToDash(){
+    window.location.href = "../dashboard.html";
+}
 
 function highlight(e){
     let trs = document.querySelectorAll("tr");

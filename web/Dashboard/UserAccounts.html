@@ -24,7 +24,10 @@
     </nav>
     <div class="container">
         <br>
-        <div class="table-responsive prevent-select">
+        <div class="row">
+            <button id="returnToDash" class="col-2 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Dashboard</button>
+        </div>
+        <div class="table-responsive prevent-select row">
             <table class="table table-bordered table-striped ">
                 <thead>
                     <tr>
@@ -42,6 +45,12 @@
 
                 </tbody>
             </table>
+        </div>
+        <div class="row justify-content-center">
+            <button id="addNewUser" class="col-2 btn btn-success">Add New User</button>
+            <button class="col-2 btn btn-primary btnSpacing" id="setPermissions">Set Permissions</button>
+            <button class="col-2 btn btn-warning btnSpacing" id="editUser">Edit User</button>
+            <button class="col-2 btn btn-danger btnSpacing" id="editUser">Deactivate User</button>
         </div>
     </div>
     <script src="../Scripts/userAccounts.js">

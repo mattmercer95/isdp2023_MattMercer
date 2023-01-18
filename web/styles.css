@@ -22,13 +22,28 @@
     float: right;
 }
 
+.btnSpacing {
+    margin-left: 25px;
+}
+.btn-warning{
+/*    width: 150px; */
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.btn-danger{
+/*    width: 150px; */
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .btn-success{
-    width: 150px; 
+/*    width: 150px; */
     margin-top: 5px;
     margin-bottom: 5px;
 }
 .btn-primary{
-    width: 150px; 
+/*    width: 150px; */
     margin-top: 5px;
     margin-bottom: 5px;
 }
@@ -39,7 +54,7 @@
 .card{
     margin-bottom: 10px;
 }
-.container{
+.Indexcontainer{
     margin-top: 100px;
 }
 
@@ -65,7 +80,7 @@ form {
 }
 
 .table-responsive {
-    max-height:450px;
+    max-height:400px;
     overflow: auto;
 }
 
