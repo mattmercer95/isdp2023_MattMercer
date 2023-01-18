@@ -1,5 +1,5 @@
 let currentEmployee;
-const idleDurationMins = 15;
+const idleDurationMins = 0.05;
 const redirectUrl = "../index.html";
 let idleTimeout;
 
@@ -38,7 +38,7 @@ async function logout(){
         body: JSON.stringify(currentEmployee)
     });
     sessionStorage.setItem("employeeInfo", null);
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 
