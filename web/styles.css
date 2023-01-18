@@ -15,8 +15,11 @@
 }
 
 .formLabel {
-    width: 100px;
-    float: left;
+    width: 100%;
+}
+
+.formInput {
+    float: right;
 }
 
 .btn-success{
