@@ -26,6 +26,19 @@ window.onload = async function () {
 
 async function loadSelectMenus(){
     //get data for positions
+    await populatePositions();
+    await populateLocations();
+}
+
+async function populateLocations(){
+    let url = "../SiteService";
+    let resp = await fetch(url, {
+        method: 'GET',
+    });
+    console.log(await resp.json());
+}
+
+async function populatePositions(){
     let url = "../PositionService";
     let resp = await fetch(url, {
         method: 'GET',

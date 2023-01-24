@@ -3,6 +3,17 @@ Run this script after running the main bullseyedb2023_X.X.sql script
 **/
 
 /*
+Retrieves just the name and ID for all sites
+*/
+drop procedure if exists GetAllSiteNamesIDs;
+DELIMITER //
+create procedure GetAllSiteNamesIDs()
+BEGIN
+    Select siteID, name from site;
+END //
+DELIMITER ;
+
+/*
 Retrieves all relevent information for the Employee.java object
 */
 drop procedure if exists GetAllEmployeeInfo;
