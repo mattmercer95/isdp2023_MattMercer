@@ -5,11 +5,13 @@
 package Controller;
 
 import DB.EmployeeAccessor;
+import Entity.CustomHTTPResponse;
 import Entity.Employee;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -45,8 +47,29 @@ public class UserService extends HttpServlet {
                 ArrayList<Employee> allEmployees = new ArrayList<Employee>();
                 allEmployees = EmployeeAccessor.getAllEmployees();
                 out.println(g.toJson(allEmployees));
-            } else {
-                System.out.println("Match not found");
+            } 
+            else if(uri.equals("/allUsernames")){
+                ArrayList<String> allUsernames = new ArrayList<String>();
+                allUsernames = EmployeeAccessor.getAllUsernames();
+                out.println(g.toJson(allUsernames));
+            }
+            else if(uri.equals("/addNewUser")){
+                Scanner sc = new Scanner(request.getReader());
+                String jsonData = sc.nextLine();
+                Employee newUser = g.fromJson(jsonData, Employee.class);
+                Boolean success = EmployeeAccessor.addNewUser(newUser);
+                CustomHTTPResponse responseMsg = new CustomHTTPResponse(success, "");
+                if(success){
+                    int newEmpID = EmployeeAccessor.getEmployeeIDByUsername(newUser.getUsername());
+                    responseMsg.setMessage("Successfully created new user " + newUser.getUsername() + " with employeeID: " + newEmpID);
+                }
+                else {
+                    responseMsg.setMessage("Error creating new user");
+                }
+                out.println(g.toJson(responseMsg));
+            }
+            else{
+                out.println("UserService Error: Invalid identifier");
             }
         }  
     }

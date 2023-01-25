@@ -12,52 +12,48 @@ import java.util.ArrayList;
  * @author Matt
  */
 public class Employee {
-    private int employeeID, siteID;
+    private int employeeID, siteID, positionID;
     private String username, firstName, lastName, email, position, site, password;
     private boolean active, locked;
     private ArrayList<String> permissions;
     
-    public Employee(int employeeID, String username, String firstName, String lastName, 
-            String email, boolean active, boolean locked, String position, String site, int siteID){
+    public Employee(int employeeID, String username, String password, String firstName, String lastName, 
+            String email, boolean active, boolean locked, String position, int positionID, String site, int siteID){
         this.employeeID = employeeID;
         this.username = username;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.active = active;
         this.locked = locked;
         this.position = position;
+        this.positionID = positionID;
         this.site = site;
         this.siteID = siteID;
-        //get permission list from the permission accessor
+    }
+    
+    public Employee(int employeeID, String username, String password, String firstName, String lastName, 
+            String email, boolean active, boolean locked, String position, int positionID, String site, int siteID, String permissions){
+        this(employeeID, username, password, firstName, lastName, email, active, locked, position, positionID, site, siteID);
+        //get the permissions
         this.permissions = PermissionAccessor.getPermissionList(employeeID);
     }
-    
-    //This constructor is used for the CRUD operations on Employees, does not initialize permission list
-    public Employee(int employeeID, String username, String password, String firstName, String lastName, 
-            String email, boolean active, boolean locked, String position, String site, int siteID){
-        this.employeeID = employeeID;
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.active = active;
-        this.locked = locked;
-        this.position = position;
-        this.site = site;
-        this.siteID = siteID;
-        //get password, not the permission list
-        this.password = password;
-    }
-    
+ 
     public int getEmployeeID(){
         return this.employeeID;
     }
     public int getSiteID(){
         return this.siteID;
     }
+    public int getPositionID(){
+        return this.positionID;
+    }
     public String getUsername(){
         return this.username;
+    }
+    public String getPassword(){
+        return this.password;
     }
     public String getFirstName(){
         return this.firstName;

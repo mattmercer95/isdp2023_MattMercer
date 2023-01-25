@@ -22,7 +22,7 @@ drop procedure if exists GetAllEmployeeInfo;
 DELIMITER //
 create procedure GetAllEmployeeInfo()
 BEGIN
-    Select employeeID, username, password, firstName, lastName, email, employee.active, locked, permissionLevel as position, name as site, employee.siteID
+    Select employeeID, username, password, firstName, lastName, email, employee.active, locked, permissionLevel as position, employee.positionID, name as site, employee.siteID
     from employee inner join posn using(positionID) inner join site using(siteID);
 END //
 DELIMITER ;
