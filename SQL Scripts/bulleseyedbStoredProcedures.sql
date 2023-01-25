@@ -9,7 +9,9 @@ drop procedure if exists GetAllSiteNamesIDs;
 DELIMITER //
 create procedure GetAllSiteNamesIDs()
 BEGIN
-    Select siteID, name from site;
+    Select siteID, name from site
+    where siteID not in (
+		select siteID from site where siteID = 9999);
 END //
 DELIMITER ;
 

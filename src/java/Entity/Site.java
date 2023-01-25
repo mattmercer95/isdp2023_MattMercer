@@ -9,5 +9,18 @@ package Entity;
  * @author Matt
  */
 public class Site {
+    private int siteID;
+    private String name;
     
+    public Site(int siteID, String name){
+        this.siteID = siteID;
+        this.name = name;
+    }
+    
+    public int getSiteID(){
+        return this.siteID;
+    }
+    public String getName(){
+        return this.name;
+    }
 }

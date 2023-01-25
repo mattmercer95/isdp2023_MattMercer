@@ -15,6 +15,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -35,12 +37,18 @@ public class UserService extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        //determine which action to take based on URI
+        String uri = request.getPathInfo();
         try ( PrintWriter out = response.getWriter()) {
-            ArrayList<Employee> allEmployees = new ArrayList<Employee>();
-            allEmployees = EmployeeAccessor.getAllEmployees();
             Gson g = new Gson();
-            out.println(g.toJson(allEmployees));
-        }
+            if(uri.equals("/all")) {
+                ArrayList<Employee> allEmployees = new ArrayList<Employee>();
+                allEmployees = EmployeeAccessor.getAllEmployees();
+                out.println(g.toJson(allEmployees));
+            } else {
+                System.out.println("Match not found");
+            }
+        }  
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

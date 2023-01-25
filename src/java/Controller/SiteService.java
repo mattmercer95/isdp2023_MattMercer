@@ -4,6 +4,8 @@
  */
 package Controller;
 
+import Entity.Site;
+import DB.SiteAccessor;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,7 +36,7 @@ public class SiteService extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try ( PrintWriter out = response.getWriter()) {
-            ArrayList<Site> sites = SiteAccessor.getAllSites();
+            ArrayList<Site> sites = SiteAccessor.getAllSiteNamesIDs();
             Gson g = new Gson();
             out.println(g.toJson(sites));
         }

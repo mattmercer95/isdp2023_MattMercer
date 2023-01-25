@@ -2,6 +2,7 @@ let currentEmployee;
 const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 let idleTimeout;
+let allUsernames;
 
 window.onload = async function () {
     //set current employee global to the user that logged in
@@ -22,20 +23,32 @@ window.onload = async function () {
     resetIdleTimeout();
     //load data for select menus
     await loadSelectMenus();
+    await getAllUsernames();
 };
+
+async function getAllUsernames(){
+    
+}
 
 async function loadSelectMenus(){
     //get data for positions
     await populatePositions();
-    await populateLocations();
+    await populateSites();
 }
 
-async function populateLocations(){
+async function populateSites(){
     let url = "../SiteService";
     let resp = await fetch(url, {
         method: 'GET',
     });
-    console.log(await resp.json());
+    const sites = await resp.json();
+    const siteSelect = document.querySelector("#site");
+    sites.forEach((site) => {
+        const optionElement = document.createElement("option");
+        optionElement.setAttribute("value", site.siteID);
+        optionElement.innerHTML = site.name;
+        siteSelect.appendChild(optionElement);
+    });
 }
 
 async function populatePositions(){

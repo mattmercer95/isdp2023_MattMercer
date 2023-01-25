@@ -5,6 +5,7 @@
 package DB;
 
 import Entity.Position;
+import Entity.Site;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,63 +16,66 @@ import java.util.ArrayList;
  *
  * @author Matt
  */
-public class SiteAccesor {
+public class SiteAccessor {
+
     private static Connection conn = null;
     private static PreparedStatement getAllSitesStatement = null;
-    
-    private SiteAccesor(){
+
+    private SiteAccessor() {
         //no instantiation
     }
-    
+
     private static boolean init() throws SQLException {
-        if (conn != null)
+        if (conn != null) {
             return true;
+        }
         conn = ConnectionManager.getConnection(ConnectionParameters.URL, ConnectionParameters.USERNAME, ConnectionParameters.PASSWORD);
         if (conn != null)            
             try {
-                System.out.println("Connection was not null");
-                getAllSitesStatement = conn.prepareStatement("call GetAllSiteNamesIDs()");
-                return true;
-            } catch (SQLException ex) {
-                System.err.println("************************");
-                System.err.println("** Error preparing SQL");
-                System.err.println("** " + ex.getMessage());
-                System.err.println("************************");
-                conn = null;
-            }
+            System.out.println("Connection was not null");
+            getAllSitesStatement = conn.prepareStatement("call GetAllSiteNamesIDs()");
+            return true;
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error preparing SQL");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            conn = null;
+        }
         System.out.println("Connection was null");
         return false;
     }
-    
-    public static ArrayList<Position> getAllSiteNamesIDs() {
-        ArrayList<Position> positions = new ArrayList<Position>();
-        
+
+    public static ArrayList<Site> getAllSiteNamesIDs() {
+        ArrayList<Site> sites = new ArrayList<Site>();
+
         ResultSet rs;
-        try{
-            if (!init())
-                return positions;
-            rs = getAllPositionsStatement.executeQuery();
-        } catch(SQLException ex){
+        try {
+            if (!init()) {
+                return sites;
+            }
+            rs = getAllSitesStatement.executeQuery();
+        } catch (SQLException ex) {
             System.err.println("************************");
-            System.err.println("** Error retreiving Positions List");
+            System.err.println("** Error retreiving Sites List");
             System.err.println("** " + ex.getMessage());
             System.err.println("************************");
-            return positions;
+            return sites;
         }
-        
+
         try {
             while (rs.next()) {
-                int positionID = rs.getInt("positionID");
-                String positionTitle = rs.getString("permissionLevel");
-                positions.add(new Position(positionID, positionTitle));
+                int siteID = rs.getInt("siteID");
+                String name = rs.getString("name");
+                sites.add(new Site(siteID, name));
             }
-        } catch(SQLException ex) {
+        } catch (SQLException ex) {
             System.err.println("************************");
-            System.err.println("** Error populating Positions List");
+            System.err.println("** Error populating Site List");
             System.err.println("** " + ex.getMessage());
             System.err.println("************************");
         }
-        
-        return positions;
+
+        return sites;
     }
 }

@@ -1,6 +1,6 @@
 -- Bullseye DB SQL Script
--- version 1.3
--- January 11, 2023
+-- version 1.4
+-- January 25, 2023
 -- 
 
 -- ********************************************
@@ -21,8 +21,8 @@ use bullseyedb2023;
 --
 -- Create table `category`
 --
-CREATE TABLE `category` (
-  `categoryName` varchar(32) NOT NULL PRIMARY KEY
+CREATE TABLE category (
+  categoryName varchar(32) NOT NULL PRIMARY KEY
 );
 
 --
@@ -103,7 +103,7 @@ CREATE TABLE `site` (
 -- Create table `employee`
 --
 CREATE TABLE `employee` (
-  `employeeID` int(11) NOT NULL PRIMARY KEY,
+  `employeeID` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `username` varchar(32) NOT NULL UNIQUE,
   `password` varchar(32) NOT NULL,
   `firstName` varchar(20) NOT NULL,
@@ -216,7 +216,7 @@ CREATE TABLE `txnaudit` (
   `txnDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `SiteID` int(11) NOT NULL,
   `deliveryID` int(11),
-  `employeeID` int(11) NOT NULL,
+  `employeeID` int(11),
   `notes` varchar(255) DEFAULT NULL,
   FOREIGN KEY (`SiteID`) REFERENCES `site` (`siteID`),
   FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`)
