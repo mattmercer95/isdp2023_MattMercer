@@ -20,7 +20,6 @@ window.onload = function () {
     document.addEventListener('keydown', resetIdleTimeout, false);
     //initialize idle timeout
     resetIdleTimeout();
-    console.log(new Date().toISOString().slice(0, 19).replace('T', ' '));
     
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#allEmployeeesTable").addEventListener('click', highlight);
@@ -49,7 +48,6 @@ async function buildEmployeeTable(){
     let tableBody = document.querySelector("#allEmployeeesTable");
     //make API call to get employee data
     let employeeData = await getAllEmployeeData();
-    console.log(employeeData);
     //populate table
     employeeData.forEach((emp) =>{
         const row = document.createElement("tr");
@@ -86,7 +84,11 @@ async function getAllEmployeeData(){
     let resp = await fetch(url, {
         method: 'GET',
     });
-    return await resp.json();
+    let data = await resp.json();
+    await data.sort(function(a, b) { 
+        return a.employeeID - b.employeeID;
+    })
+    return data;
 }
 
 function resetIdleTimeout(){
