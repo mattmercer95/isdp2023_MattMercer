@@ -1,4 +1,5 @@
 let currentEmployee;
+let allEmployees;
 const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 let idleTimeout;
@@ -21,12 +22,32 @@ window.onload = function () {
     //initialize idle timeout
     resetIdleTimeout();
     
+    document.querySelector("#setPermissions").addEventListener("click", setPermissions);
+    document.querySelector("#setPermissions").disabled = true;
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#allEmployeeesTable").addEventListener('click', highlight);
     //get all employee info and display into table
     buildEmployeeTable();
 };
 
+function setPermissions(){
+    //get the currently selected employee object
+    let selected = getSelectedEmployee();
+    sessionStorage.setItem('selectedEmployee', JSON.stringify(selected));
+    window.location.href = "SetPermissions.html";
+}
+
+function getSelectedEmployee(){
+    let rows = document.querySelectorAll("tr");
+    let empIndex;
+    for(let i = 0; i < rows.length; i++){
+        let classList = rows[i].classList;
+        if(classList.contains('highlighted')){
+            empIndex = i-1;
+        }
+    }
+    return allEmployees[empIndex];
+}
 function returnToDash(){
     window.location.href = "../dashboard.html";
 }
@@ -39,8 +60,11 @@ function highlight(e){
     let target = e.target.parentElement;
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
+        document.querySelector("#setPermissions").disabled = false;
     }
-    
+    else {
+        document.querySelector("#setPermissions").disabled = true;
+    }
 }
 
 async function buildEmployeeTable(){
@@ -88,6 +112,7 @@ async function getAllEmployeeData(){
     await data.sort(function(a, b) { 
         return a.employeeID - b.employeeID;
     })
+    allEmployees = data;
     return data;
 }
 

@@ -5,6 +5,7 @@
 package Controller;
 
 import DB.EmployeeAccessor;
+import DB.PermissionAccessor;
 import Entity.CustomHTTPResponse;
 import Entity.Employee;
 import com.google.gson.Gson;
@@ -67,6 +68,13 @@ public class UserService extends HttpServlet {
                     responseMsg.setMessage("Error creating new user");
                 }
                 out.println(g.toJson(responseMsg));
+            }
+            else if(uri.equals("/permissions")){
+                Scanner sc = new Scanner(request.getReader());
+                String jsonData = sc.nextLine();
+                int empID = Integer.parseInt(jsonData);
+                ArrayList<String> permissions = PermissionAccessor.getPermissionList(empID);
+                out.println(g.toJson(permissions));
             }
             else{
                 out.println("UserService Error: Invalid identifier");
