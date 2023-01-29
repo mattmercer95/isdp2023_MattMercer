@@ -27,23 +27,25 @@
                 </div>
                 <div class="card-body">
                     <form id="signIn">
-                        <div class="form-group text-center">
+                        <div class="form-group row">
                             <label for="username">Username:</label>
                             <div>
-                                <input id="username" required>
+                                <input class="form-control" id="username" required>
                             </div>
                         </div>
                         <br>
-                        <div class="form-group text-center">
+                        <div class="form-group row">
                             <label for="password">Password:</label>
-                            <input id="password" type="password" required>
-                            <i class="bi bi-eye-slash passwordIcon" id="togglePassword"></i>
+                            <div>
+                                <input class="form-control" id="password" type="password" required>
+                                <i class="bi bi-eye-slash passwordIcon" id="togglePassword"></i>
+                            </div>
                         </div>
-                        <br>
                         <div class="form-group text-center">
                             <button class="btn btn-primary" type="submit">Sign-In</button>
                         </div>                                        
                     </form>
+                    <br>
                     <div>
                         <a href="resetPassword.html" id="resetPasswordLink">Forgot password?</a>
                     </div>
