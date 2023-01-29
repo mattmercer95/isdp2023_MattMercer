@@ -35,6 +35,22 @@ if new.positionID = 99999999 then
         (new.employeeID, 'RECEIVESTOREORDER'),
         (new.employeeID, 'SETPERMISSION'),
         (new.employeeID, 'VIEWORDERS');
+elseif new.positionID = 1  or new.positionID = 2 then
+	insert into user_permission(employeeID, permissionID) values
+		(new.employeeID, 'CREATEREPORT'),
+        (new.employeeID, 'READUSER'),
+        (new.employeeID, 'DELIVERY'),
+        (new.employeeID, 'VIEWORDERS');
+elseif new.positionID = 3 then
+	insert into user_permission(employeeID, permissionID) values
+		(new.employeeID, 'CREATELOSS'),
+		(new.employeeID, 'CREATEREPORT'),
+        (new.employeeID, 'CREATESTOREORDER'),
+        (new.employeeID, 'DELIVERY'),
+        (new.employeeID, 'MOVEINVENTORY'),
+        (new.employeeID, 'PROCESSRETURN'),
+        (new.employeeID, 'RECEIVESTOREORDER'),
+        (new.employeeID, 'VIEWORDERS');
 end if;
 end; //
 delimiter ;
