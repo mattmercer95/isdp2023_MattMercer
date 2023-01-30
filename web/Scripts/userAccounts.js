@@ -41,13 +41,21 @@ window.onload = function () {
 
 async function deleteUser(){
     let selected = getSelectedEmployee();
-    
-    let url = `../UserService/` + selected.employeeID;
-    let resp = await fetch(url, {
-        method: 'DELETE'
-    });
-    let result = await resp.json();
-    console.log(result);
+    if (confirm(`Deactivate user ${selected.username}?`) == true) {
+        let url = `../UserService/` + selected.employeeID;
+        let resp = await fetch(url, {
+            method: 'DELETE'
+        });
+        let result = await resp.json();
+        if(result.success === true){
+            alert(`User ${selected.username} successfully deactivated`);
+            //rebuild table
+            buildEmployeeTable();
+        }
+        else {
+            alert(result.message);
+        }
+    }
 }
 
 function checkPermissions(){
@@ -112,6 +120,7 @@ function highlight(e){
 async function buildEmployeeTable(){
     //get the tbody element
     let tableBody = document.querySelector("#allEmployeeesTable");
+    tableBody.innerHTML = "";
     //make API call to get employee data
     let employeeData = await getAllEmployeeData();
     //populate table
@@ -133,7 +142,15 @@ async function buildEmployeeTable(){
         emailCell.innerHTML = emp.email;
         row.appendChild(emailCell);
         const activeCell = document.createElement("td");
-        activeCell.innerHTML = emp.active;
+        const activeSpan = document.createElement("span");
+        if(emp.active === true){
+            activeSpan.classList.add("badge", "bg-success");
+        }
+        else {
+            activeSpan.classList.add("badge", "bg-danger");
+        }
+        activeSpan.innerHTML = emp.active;
+        activeCell.appendChild(activeSpan);
         row.appendChild(activeCell);
         const positionCell = document.createElement("td");
         positionCell.innerHTML = emp.position;
