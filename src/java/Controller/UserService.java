@@ -133,6 +133,31 @@ public class UserService extends HttpServlet {
         processRequest(request, response);
     }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try ( PrintWriter out = response.getWriter()) {
+            Scanner sc = new Scanner(request.getReader());
+            String jsonData = sc.nextLine();
+            Gson g = new Gson();
+            Employee empToEdit = g.fromJson(jsonData, Employee.class);
+            boolean success;
+            if(empToEdit.getPassword() == null){
+                success = EmployeeAccessor.updateEmployeeWithoutPassword(empToEdit);
+            }
+            else {
+                success = EmployeeAccessor.updateEmployeeWithPassword(empToEdit);
+            }
+            if(success == true){
+                CustomHTTPResponse result = new CustomHTTPResponse(success, null);
+                out.println(g.toJson(result));
+            }
+            else {
+                CustomHTTPResponse result = new CustomHTTPResponse(success, "Error updating info for employee #" + empToEdit.getEmployeeID());
+                out.println(g.toJson(result));
+            }
+        }  
+    }
     /**
      * Returns a short description of the servlet.
      *

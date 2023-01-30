@@ -3,7 +3,7 @@
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
 -->
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -52,20 +52,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="form-group row">
                                 <label for="email">Email:</label>
                                 <div>
-                                    <input class="form-control" id="email" required>
+                                    <input type="email" class="form-control" id="email" required pattern=".+@bullseye\.ca">
                                 </div> 
                             </div>
                             <div class="form-group row">
                                 <label for="username">Username:</label>
                                 <div>
                                     <input class="form-control" id="username">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="password">Password:</label>
-                                <div>
-                                    <input  id="password" class="form-control" type="password" required>
-                                    <i class="bi bi-eye-slash passwordIcon" id="togglePassword"></i>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -93,6 +86,25 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this temp
                             <div class="form-check">   
                                 <input class="form-check-input" id="locked" type="checkbox">
                                 <label class="form-check-label" for="locked">Account Locked?</label>
+                            </div>
+                            <br>
+                            <div class="form-check">   
+                                <input class="form-check-input" id="changePassword" type="checkbox">
+                                <label class="form-check-label" for="changePassword">Change Password?</label>
+                            </div>
+                            <div id="newPassDiv" class="form-group row" hidden>
+                                <label for="password">New Password:</label>
+                                <div>
+                                    <input class="form-control" id="password" type="password">
+                                    <i class="bi bi-eye-slash passwordIcon" id="togglePassword"></i>
+                                </div> 
+                            </div>
+                            <div id="newPassConfirmDiv" class="form-group row" hidden>
+                                <label for="passwordConfirm">Confirm Password:</label>
+                                <div>
+                                    <input class="form-control" id="passwordConfirm" type="password">
+                                    <i class="bi bi-eye-slash passwordIcon" id="togglePasswordConfirm"></i>
+                                </div>             
                             </div>
                             <br>
                             <div class="form-group text-center">

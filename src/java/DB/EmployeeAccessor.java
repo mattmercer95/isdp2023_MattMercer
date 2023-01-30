@@ -27,6 +27,8 @@ public class EmployeeAccessor {
     private static PreparedStatement getAllUsernamesStatement = null;
     private static PreparedStatement addNewUserStatement = null;
     private static PreparedStatement getEmployeeIDByUsername = null;
+    private static PreparedStatement updateEmployeeWithPassword = null;
+    private static PreparedStatement updateEmployeeWithoutPassword = null;
 
     private EmployeeAccessor(){
         //no instantiation
@@ -47,6 +49,8 @@ public class EmployeeAccessor {
                 getAllUsernamesStatement = conn.prepareStatement("select username from employee");
                 addNewUserStatement = conn.prepareStatement("insert into employee(username, password, firstName, lastName, email, active, locked, positionID, siteID) values(?, ?, ?, ?, ?, ?, '0', ?, ?)");
                 getEmployeeIDByUsername = conn.prepareStatement("select employeeID from employee where username = ?");
+                updateEmployeeWithPassword = conn.prepareStatement("update employee set username = ?, password = ?, firstName = ?, lastName = ?, email = ?, active = ?, locked = ?, positionID = ?, siteID = ? where employeeID = ?");
+                updateEmployeeWithoutPassword = conn.prepareStatement("update employee set username = ?, firstName = ?, lastName = ?, email = ?, active = ?, locked = ?, positionID = ?, siteID = ? where employeeID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -57,6 +61,63 @@ public class EmployeeAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean updateEmployeeWithoutPassword(Employee emp){
+        boolean result = false;
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            updateEmployeeWithoutPassword.setString(1, emp.getUsername());
+            updateEmployeeWithoutPassword.setString(2, emp.getFirstName());
+            updateEmployeeWithoutPassword.setString(3, emp.getLastName());
+            updateEmployeeWithoutPassword.setString(4, emp.getEmail());
+            updateEmployeeWithoutPassword.setBoolean(5, emp.getActive());
+            updateEmployeeWithoutPassword.setBoolean(6, emp.getLocked());
+            updateEmployeeWithoutPassword.setInt(7, emp.getPositionID());
+            updateEmployeeWithoutPassword.setInt(8, emp.getSiteID());
+            updateEmployeeWithoutPassword.setInt(9, emp.getEmployeeID());
+            int rowCount = updateEmployeeWithoutPassword.executeUpdate();
+            result = (rowCount == 1);
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error Updating User, no Password");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        return result;
+    }
+    
+    public static boolean updateEmployeeWithPassword(Employee emp){
+        boolean result = false;
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            updateEmployeeWithPassword.setString(1, emp.getUsername());
+            updateEmployeeWithPassword.setString(2, emp.getPassword());
+            updateEmployeeWithPassword.setString(3, emp.getFirstName());
+            updateEmployeeWithPassword.setString(4, emp.getLastName());
+            updateEmployeeWithPassword.setString(5, emp.getEmail());
+            updateEmployeeWithPassword.setBoolean(6, emp.getActive());
+            updateEmployeeWithPassword.setBoolean(7, emp.getLocked());
+            updateEmployeeWithPassword.setInt(8, emp.getPositionID());
+            updateEmployeeWithPassword.setInt(9, emp.getSiteID());
+            updateEmployeeWithPassword.setInt(10, emp.getEmployeeID());
+            int rowCount = updateEmployeeWithPassword.executeUpdate();
+            result = (rowCount == 1);
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error Updating User, with Password");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        return result;
     }
     
     public static int getEmployeeIDByUsername(String username){

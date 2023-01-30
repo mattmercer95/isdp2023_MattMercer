@@ -8,7 +8,6 @@ let allUsernames;
 window.onload = async function () {
     //store the employee to edit
     employeeToEdit = JSON.parse(sessionStorage.getItem('selectedEmployee'));
-    console.log(employeeToEdit);
     //set current employee global to the user that logged in
     currentEmployee = JSON.parse(sessionStorage.getItem("employeeInfo"));
     //load name and title on the nav bar
@@ -23,8 +22,21 @@ window.onload = async function () {
     document.querySelector("#logoutLink").addEventListener("click", logout);
     //password toggler
     document.querySelector("#togglePassword").addEventListener("click", toggleVisiblePassword);
+    document.querySelector("#togglePasswordConfirm").addEventListener("click", toggleVisiblePasswordConfirm);
     //save button action
-    document.querySelector("#addNewUserForm").addEventListener("submit", saveNewUser);
+    document.querySelector("#addNewUserForm").addEventListener("submit", saveEdits);
+    //change password click event
+    document.querySelector("#changePassword").addEventListener("click", ()=>{
+        let checked = document.querySelector("#changePassword").checked;
+        if(checked === true){
+            document.querySelector("#newPassDiv").hidden = false;
+            document.querySelector("#newPassConfirmDiv").hidden = false;
+        }
+        else {
+            document.querySelector("#newPassDiv").hidden = true;
+            document.querySelector("#newPassConfirmDiv").hidden = true;
+        }
+    });
     //reset idleTimeouts for clicking, moving the mouse, or typing
     document.addEventListener('click', resetIdleTimeout, false);
     document.addEventListener('mousemove', resetIdleTimeout, false);
@@ -40,48 +52,91 @@ window.onload = async function () {
 function loadEmployeeToEdit(){
     //load heading
     document.querySelector("#heading").innerHTML = `Edit User #${employeeToEdit.employeeID}`;
-    //load fields
+    //load fields, selector fields will be loaded on the selector builder
     document.querySelector("#firstName").value = employeeToEdit.firstName;
     document.querySelector("#lastName").value = employeeToEdit.lastName;
     document.querySelector("#email").value = employeeToEdit.email;
     document.querySelector("#username").value = employeeToEdit.username;
-    document.querySelector("#password").value = employeeToEdit.password;
     document.querySelector("#active").checked = employeeToEdit.active;
 }
 
-async function saveNewUser(e){
+async function saveEdits(e){
     e.preventDefault();
     //gather info from form
     const firstName = document.querySelector("#firstName").value;
     const lastName = document.querySelector("#lastName").value;
     const username = document.querySelector("#username").value;
     const email = document.querySelector("#email").value;
-    const password = document.querySelector("#password").value;
+    const changePassword = document.querySelector("#changePassword").checked;
+    const password = changePassword ? document.querySelector("#password").value : null;
     const position = document.querySelector("#position").value;
     const site = document.querySelector("#site").value;
     const active = document.querySelector("#active").checked;
+    const locked = document.querySelector("#locked").checked;
+    const employeeID = employeeToEdit.employeeID;
     
-    let newUser = {
-        firstName: firstName,
-        lastName: lastName,
-        username: username,
-        email: email,
-        password: password,
-        positionID: position,
-        siteID: site,
-        active: active
+    let validData = validateCredentials(username, password);
+    
+    console.log(validData);
+    if(validData === true){
+        let editedUser = {
+            employeeID: employeeID,
+            firstName: firstName,
+            lastName: lastName,
+            username: username,
+            email: email,
+            password: password,
+            positionID: position,
+            siteID: site,
+            active: active,
+            locked: locked
+        }
+        console.log(editedUser);
+        let url = "../UserService";
+        let resp = await fetch(url, {
+            method: 'PUT',
+            body: JSON.stringify(editedUser),
+        });
+        responseObj = await resp.json();
+        if(responseObj.success === true){
+            alert("Successfully edited info for employee #" + employeeID);
+            window.location.href="UserAccounts.html";
+        }
+        else {
+            alert(responseObj.message);
+        }
     }
     
-    let url = "../UserService/addNewUser";
-    let resp = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(newUser),
+}
+
+function validateCredentials(username, password){
+    let originalUsername = employeeToEdit.username;
+    let validUser = true;
+    allUsernames.forEach((u)=>{
+        if(u === username && username !== originalUsername){
+            validUser = false;
+        }
     });
-    responseObj = await resp.json();
-    alert(responseObj.message)
-    if(responseObj.success === true){
-        window.location.href="UserAccounts.html";
+    //exit function and alert user for invalid username
+    if(validUser === false){
+        alert(`Error: username ${username} already taken`);
+        return;
     }
+    //check password, get confirmed password
+    if(password !== null){
+        let passwordConfirm = document.querySelector("#passwordConfirm").value;
+        //exit function and alert user for passwords not matching
+        if(password !== passwordConfirm){
+            console.log(password);
+            console.log(passwordConfirm);
+            alert(`Error: Entered Passwords Do Not Match`);
+            return;
+        }
+        else{
+            return validUser;
+        }
+    }
+    return validUser;
 }
 
 //Funtion that toggles the visibility of the password
@@ -90,6 +145,16 @@ function toggleVisiblePassword(){
     // toggle the type attribute
     let type = password.getAttribute("type") === "password" ? "text" : "password";
     password.setAttribute("type", type);
+    // toggle the icon
+    this.classList.toggle("bi-eye");
+}
+
+function toggleVisiblePasswordConfirm(){
+    let password = document.querySelector("#passwordConfirm");
+    // toggle the type attribute
+    let type = password.getAttribute("type") === "password" ? "text" : "password";
+    password.setAttribute("type", type);
+
     // toggle the icon
     this.classList.toggle("bi-eye");
 }
@@ -120,6 +185,9 @@ async function populateSites(){
         const optionElement = document.createElement("option");
         optionElement.setAttribute("value", site.siteID);
         optionElement.innerHTML = site.name;
+        if(site.name === employeeToEdit.site){
+            optionElement.selected = true;
+        }
         siteSelect.appendChild(optionElement);
     });
 }
@@ -135,6 +203,9 @@ async function populatePositions(){
         const optionElement = document.createElement("option");
         optionElement.setAttribute("value", position.positionID);
         optionElement.innerHTML = position.positionTitle;
+        if(position.positionTitle === employeeToEdit.position){
+            optionElement.selected = true;
+        }
         positionSelect.appendChild(optionElement);
     });
 }
