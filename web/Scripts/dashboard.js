@@ -20,8 +20,26 @@ window.onload = function () {
     document.addEventListener('keydown', resetIdleTimeout, false);
     //initialize idle timeout
     resetIdleTimeout();
-    console.log(new Date().toISOString().slice(0, 19).replace('T', ' '));
+    checkPermissions();
 };
+
+function checkPermissions(){
+    let permissions = JSON.parse(sessionStorage.getItem("permissions"));
+    permissions.forEach((p)=>{
+        if(p === "READUSER"){
+            document.querySelector("#userAccounts").hidden = false;
+        }
+        if(p === "CREATEREPORT"){
+            document.querySelector("#reports").hidden = false;
+        }
+        if(p === "VIEWORDERS" || p === "DELIVERY"){
+            document.querySelector("#orders").hidden = false;
+        }
+        if(p === "MOVEINVENTORY" || p === "PROCESSRETURN" || p === "ADDITEMTOBACKORDER"){
+            document.querySelector("#inventory").hidden = false;
+        }
+    });
+}
 
 function resetIdleTimeout(){
     //clears current timeout

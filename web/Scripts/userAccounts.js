@@ -41,11 +41,13 @@ window.onload = function () {
 
 async function deleteUser(){
     let selected = getSelectedEmployee();
+    
     let url = `../UserService/` + selected.employeeID;
     let resp = await fetch(url, {
         method: 'DELETE'
     });
-    console.log(await resp.text());
+    let result = await resp.json();
+    console.log(result);
 }
 
 function checkPermissions(){
