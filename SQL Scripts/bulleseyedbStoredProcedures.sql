@@ -51,3 +51,13 @@ BEGIN
     where employeeID = id;
 END //
 DELIMITER ;
+
+/*
+Retrieves the permissions that the employee does not currently have
+*/
+drop procedure if exists GetPermissionsToAdd;
+DELIMITER //
+create procedure GetPermissionsToAdd(in empID int)
+BEGIN
+END //
+DELIMITER ;

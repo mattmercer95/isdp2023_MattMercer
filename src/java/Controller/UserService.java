@@ -7,6 +7,7 @@ package Controller;
 import DB.EmployeeAccessor;
 import DB.PermissionAccessor;
 import Entity.CustomHTTPResponse;
+import Entity.EditPermission;
 import Entity.Employee;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -75,6 +76,27 @@ public class UserService extends HttpServlet {
                 int empID = Integer.parseInt(jsonData);
                 ArrayList<String> permissions = PermissionAccessor.getPermissionList(empID);
                 out.println(g.toJson(permissions));
+            }
+            else if(uri.equals("/permissionsToAdd")){
+                Scanner sc = new Scanner(request.getReader());
+                String jsonData = sc.nextLine();
+                int empID = Integer.parseInt(jsonData);
+                ArrayList<String> permissions = PermissionAccessor.getPermissionsToAdd(empID);
+                out.println(g.toJson(permissions));
+            }
+            else if(uri.equals("/removePermission")){
+                Scanner sc = new Scanner(request.getReader());
+                String jsonData = sc.nextLine();
+                EditPermission permission = g.fromJson(jsonData, EditPermission.class);
+                boolean success = PermissionAccessor.removePermission(permission);
+                out.println(g.toJson(success));
+            }
+            else if(uri.equals("/addPermission")){
+                Scanner sc = new Scanner(request.getReader());
+                String jsonData = sc.nextLine();
+                EditPermission permission = g.fromJson(jsonData, EditPermission.class);
+                boolean success = PermissionAccessor.addPermission(permission);
+                out.println(g.toJson(success));
             }
             else{
                 out.println("UserService Error: Invalid identifier");

@@ -5,7 +5,12 @@
         <title>Bullseye Inventory Portal</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
-        <link href="../styles.css" rel="stylesheet">        
+        <link href="../styles.css" rel="stylesheet"> 
+        <style>
+            #controlPanel {
+                margin-left: 50px;
+            }
+        </style>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -24,32 +29,41 @@
         </nav>
         <div class="container">
             <br>
-            <div class="row justify-content-center">
-                <div class="card col-lg-5">
-                    <br>
-                    <div class="card-title">
-                        <h2 class="text-center" >Add New User</h2>
+            <div class="row">
+                <div class="col-6">
+                    <div class="row">
+                        <h4 id="permissionsHeading" class="text-center" ></h4>
                     </div>
-                    <div class="card-body">
-                        <div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Permissions:</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="permissionTable"></tbody>
-                            </table>
+                    <div class="table-responsive prevent-select row">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Permissions:</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="controlPanel" class="col-5">
+                    <div class="row">
+                        <div class="col-5 ">
+                            <select id="permissionsToAdd" class="form-select">
+                            </select>
                         </div>
-                        <form id="addNewUserForm" >
-                            <div class="form-group row">
-                                <label for="firstName">First Name:</label>
-                                <div>
-                                    <input class="form-control" id="firstName" required>
-                                </div>
-                            </div>
-
-                        </form>
+                        <div class="col-5">
+                            <button id="addPermission" class="btn btn-success">Add Selected Permission</button>
+                        </div>
+                    </div>
+                    <div class="rowjustify-content-center">
+                        <div class="col-6">
+                            <button id="removePermission" class="btn btn-danger">Remove Selected Permission</button>
+                        </div>
+                    </div>
+                    <div class="rowjustify-content-center">
+                        <div class="col-6">
+                            <a href="UserAccounts.html" class="btn btn-primary">Return to User Accounts</a>
+                        </div>
                     </div>
                 </div>
             </div>
