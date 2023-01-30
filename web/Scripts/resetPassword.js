@@ -12,7 +12,7 @@ async function resetPassword(e){
     e.preventDefault();
     //get the password and password confirm
     let password = document.querySelector("#password").value;
-        if(!validatePassword(password)){
+    if(!validatePassword(password)){
         alert("Error: Password must be 8-15 characters long,  start with a letter, and contain at least: 1 additional lowercase letter, 1 additional uppercase letter, 1 number, and 1 special character");
         return;
     }
@@ -43,12 +43,20 @@ async function resetPassword(e){
     else{
         sessionStorage.setItem("employeeInfo", JSON.stringify(response.employee));
         alert("Password successfully reset");
+        //get permissions
+        let url = `UserService/permissions`;
+        let resp = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(response.employee.employeeID)
+        });
+        sessionStorage.setItem("permissions", await resp.text());
         window.location.href = "dashboard.html";
     }
 }
 
 function validatePassword(password){
     if(password.match(passwordRegex)){
+        console.log("hello");
         return true;
     }
     else {
