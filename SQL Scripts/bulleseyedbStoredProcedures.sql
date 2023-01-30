@@ -34,7 +34,7 @@ drop procedure if exists GetEmployeeInfo;
 DELIMITER //
 create procedure GetEmployeeInfo(in user varchar(32))
 BEGIN
-    Select employeeID, username, firstName, lastName, email, employee.active, locked, positionID, permissionLevel as position, name as site, employee.siteID
+    Select employeeID, username, firstName, lastName, email, employee.active, locked, permissionLevel as position, employee.positionID, name as site, employee.siteID
     from employee inner join posn using(positionID) inner join site using(siteID)
     where username = user;
 END //
@@ -49,15 +49,5 @@ create procedure GetPermissionsByID(in id int)
 BEGIN
     Select permissionID from user_permission
     where employeeID = id;
-END //
-DELIMITER ;
-
-/*
-Retrieves the permissions that the employee does not currently have
-*/
-drop procedure if exists GetPermissionsToAdd;
-DELIMITER //
-create procedure GetPermissionsToAdd(in empID int)
-BEGIN
 END //
 DELIMITER ;

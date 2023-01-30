@@ -24,6 +24,13 @@ window.onload = function () {
     
     document.querySelector("#setPermissions").addEventListener("click", setPermissions);
     document.querySelector("#setPermissions").disabled = true;
+    document.querySelector("#editUser").disabled = true;
+    document.querySelector("#editUser").addEventListener("click", () =>{
+        let selected = getSelectedEmployee();
+        sessionStorage.setItem('selectedEmployee', JSON.stringify(selected));
+        window.location.href = "EditUser.html";
+    });
+    document.querySelector("#deactivateUser").disabled = true;
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#allEmployeeesTable").addEventListener('click', highlight);
     //get all employee info and display into table
@@ -61,9 +68,13 @@ function highlight(e){
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
         document.querySelector("#setPermissions").disabled = false;
+        document.querySelector("#editUser").disabled = false;
+        document.querySelector("#deactivateUser").disabled = false;
     }
     else {
         document.querySelector("#setPermissions").disabled = true;
+        document.querySelector("#editUser").disabled = true;
+        document.querySelector("#deactivateUser").disabled = true;
     }
 }
 
