@@ -3,6 +3,7 @@ const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 let idleTimeout;
 let allUsernames;
+const passwordRegex = /^[A-Za-z](?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
 
 window.onload = async function () {
     //set current employee global to the user that logged in
@@ -34,14 +35,27 @@ window.onload = async function () {
     await getAllUsernames();
 };
 
+function validatePassword(password){
+    if(password.match(passwordRegex)){
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 async function saveNewUser(e){
     e.preventDefault();
     //gather info from form
+    const password = document.querySelector("#password").value;
+    if(!validatePassword(password)){
+        alert("Error: Password must be 8-15 characters long,  start with a letter, and contain at least: 1 addional lowercase letter, 1 additional uppercase letter, 1 number, and 1 special character");
+        return;
+    }
     const firstName = document.querySelector("#firstName").value;
     const lastName = document.querySelector("#lastName").value;
     const username = document.querySelector("#username").value;
     const email = document.querySelector("#email").value;
-    const password = document.querySelector("#password").value;
     const position = document.querySelector("#position").value;
     const site = document.querySelector("#site").value;
     const active = document.querySelector("#active").checked;

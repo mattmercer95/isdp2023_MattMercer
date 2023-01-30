@@ -1,3 +1,4 @@
+const passwordRegex = /^[A-Za-z](?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
 window.onload = function () {
     //load user into username field
     document.querySelector("#username").value = sessionStorage.getItem("resetPasswordUser");
@@ -11,8 +12,12 @@ async function resetPassword(e){
     e.preventDefault();
     //get the password and password confirm
     let password = document.querySelector("#password").value;
-    let passwordConfirm = document.querySelector("#passwordConfirm").value;
+        if(!validatePassword(password)){
+        alert("Error: Password must be 8-15 characters long,  start with a letter, and contain at least: 1 additional lowercase letter, 1 additional uppercase letter, 1 number, and 1 special character");
+        return;
+    }
     
+    let passwordConfirm = document.querySelector("#passwordConfirm").value;
     //check for passwords matching
     if(password !== passwordConfirm){
         alert("Passwords must match");
@@ -39,6 +44,15 @@ async function resetPassword(e){
         sessionStorage.setItem("employeeInfo", JSON.stringify(response.employee));
         alert("Password successfully reset");
         window.location.href = "dashboard.html";
+    }
+}
+
+function validatePassword(password){
+    if(password.match(passwordRegex)){
+        return true;
+    }
+    else {
+        return false;
     }
 }
 

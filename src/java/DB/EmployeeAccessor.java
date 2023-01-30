@@ -185,7 +185,8 @@ public class EmployeeAccessor {
             if (!init())
                 return result;
             addNewUserStatement.setString(1, newUser.getUsername());
-            addNewUserStatement.setString(2, newUser.getPassword());
+            String hashedPassword = hashPassword(newUser.getPassword());
+            addNewUserStatement.setString(2, hashedPassword);
             addNewUserStatement.setString(3, newUser.getFirstName());
             addNewUserStatement.setString(4, newUser.getLastName());
             addNewUserStatement.setString(5, newUser.getEmail());
