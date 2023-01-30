@@ -71,6 +71,13 @@ async function signIn(e){
         else {
             //successfull login, store emp info in storage and direct user to dashboard
             sessionStorage.setItem("employeeInfo", JSON.stringify(login.employee));
+            //get permissions
+            let url = `UserService/permissions`;
+            let resp = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(login.employee.employeeID)
+            });
+            sessionStorage.setItem("permissions", await resp.text());
             window.location.href = "dashboard.html";
         }
     }

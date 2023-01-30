@@ -134,6 +134,27 @@ public class UserService extends HttpServlet {
     }
 
     @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try ( PrintWriter out = response.getWriter()) {
+            String uri = request.getPathInfo();
+            StringBuilder sb = new StringBuilder(uri);
+            sb.deleteCharAt(0);
+            int empID = Integer.parseInt(sb.toString());
+            boolean success = EmployeeAccessor.deactivateUser(empID);
+            Gson g = new Gson();
+            if(success == true){
+                CustomHTTPResponse result = new CustomHTTPResponse(success, null);
+                out.println(g.toJson(result));
+            }
+            else {
+                CustomHTTPResponse result = new CustomHTTPResponse(success, "Error deleting employee #" + sb.toString());
+                out.println(g.toJson(result));
+            }
+        }
+    }
+    
+    @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try ( PrintWriter out = response.getWriter()) {

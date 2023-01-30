@@ -6,6 +6,9 @@ package DB;
 
 import Entity.Employee;
 import Entity.LogIn;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +32,7 @@ public class EmployeeAccessor {
     private static PreparedStatement getEmployeeIDByUsername = null;
     private static PreparedStatement updateEmployeeWithPassword = null;
     private static PreparedStatement updateEmployeeWithoutPassword = null;
+    private static PreparedStatement deactivateUser = null;
 
     private EmployeeAccessor(){
         //no instantiation
@@ -51,6 +55,7 @@ public class EmployeeAccessor {
                 getEmployeeIDByUsername = conn.prepareStatement("select employeeID from employee where username = ?");
                 updateEmployeeWithPassword = conn.prepareStatement("update employee set username = ?, password = ?, firstName = ?, lastName = ?, email = ?, active = ?, locked = ?, positionID = ?, siteID = ? where employeeID = ?");
                 updateEmployeeWithoutPassword = conn.prepareStatement("update employee set username = ?, firstName = ?, lastName = ?, email = ?, active = ?, locked = ?, positionID = ?, siteID = ? where employeeID = ?");
+                deactivateUser = conn.prepareStatement("update employee set active = false where employeeID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -61,6 +66,26 @@ public class EmployeeAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean deactivateUser(int employeeID){
+        boolean result = false;
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            deactivateUser.setInt(1, employeeID);
+            int rowCount = deactivateUser.executeUpdate();
+            result = (rowCount == 1);
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error Deactivating User");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        return result;
     }
     
     public static boolean updateEmployeeWithoutPassword(Employee emp){
@@ -98,7 +123,8 @@ public class EmployeeAccessor {
             if (!init())
                 return result;
             updateEmployeeWithPassword.setString(1, emp.getUsername());
-            updateEmployeeWithPassword.setString(2, emp.getPassword());
+            String hashedPassword = hashPassword(emp.getPassword());
+            updateEmployeeWithPassword.setString(2, hashedPassword);
             updateEmployeeWithPassword.setString(3, emp.getFirstName());
             updateEmployeeWithPassword.setString(4, emp.getLastName());
             updateEmployeeWithPassword.setString(5, emp.getEmail());
@@ -387,5 +413,29 @@ public class EmployeeAccessor {
         }
         
         return result;
+    }
+    
+    private static String hashPassword(String password){
+        String result = "";
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(
+                    password.getBytes(StandardCharsets.UTF_8));
+                result = bytesToHex(encodedhash);
+        } catch (NoSuchAlgorithmException ex) {
+            System.out.println("Error with hashing algorithm");
+        }
+        return result;
+    }
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }

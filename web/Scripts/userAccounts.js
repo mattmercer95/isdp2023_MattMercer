@@ -21,21 +21,50 @@ window.onload = function () {
     document.addEventListener('keydown', resetIdleTimeout, false);
     //initialize idle timeout
     resetIdleTimeout();
-    
     document.querySelector("#setPermissions").addEventListener("click", setPermissions);
     document.querySelector("#setPermissions").disabled = true;
     document.querySelector("#editUser").disabled = true;
+    document.querySelector("#deleteUser").disabled = true;
     document.querySelector("#editUser").addEventListener("click", () =>{
         let selected = getSelectedEmployee();
         sessionStorage.setItem('selectedEmployee', JSON.stringify(selected));
         window.location.href = "EditUser.html";
     });
-    document.querySelector("#deactivateUser").disabled = true;
+    document.querySelector("#deleteUser").addEventListener("click", deleteUser);
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#allEmployeeesTable").addEventListener('click', highlight);
+    //unhide action buttons depending on user permission
+    checkPermissions();
     //get all employee info and display into table
     buildEmployeeTable();
 };
+
+async function deleteUser(){
+    let selected = getSelectedEmployee();
+    let url = `../UserService/` + selected.employeeID;
+    let resp = await fetch(url, {
+        method: 'DELETE'
+    });
+    console.log(await resp.text());
+}
+
+function checkPermissions(){
+    let permissions = JSON.parse(sessionStorage.getItem("permissions"));
+    permissions.forEach((p)=>{
+        if(p === "ADDUSER"){
+            document.querySelector("#addNewUser").hidden = false;
+        }
+        if(p === "EDITUSER"){
+            document.querySelector("#editUser").hidden = false;
+        }
+        if(p === "DELETEUSER"){
+            document.querySelector("#deleteUser").hidden = false;
+        }
+        if(p === "SETPERMISSION"){
+            document.querySelector("#setPermissions").hidden = false;
+        }
+    });
+}
 
 function setPermissions(){
     //get the currently selected employee object
@@ -69,12 +98,12 @@ function highlight(e){
         target.classList.add("highlighted");
         document.querySelector("#setPermissions").disabled = false;
         document.querySelector("#editUser").disabled = false;
-        document.querySelector("#deactivateUser").disabled = false;
+        document.querySelector("#deleteUser").disabled = false;
     }
     else {
         document.querySelector("#setPermissions").disabled = true;
         document.querySelector("#editUser").disabled = true;
-        document.querySelector("#deactivateUser").disabled = true;
+        document.querySelector("#deleteUser").disabled = true;
     }
 }
 
