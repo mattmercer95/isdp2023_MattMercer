@@ -127,7 +127,9 @@ async function buildEmployeeTable(){
     employeeData.forEach((emp) =>{
         const row = document.createElement("tr");
         const idCell = document.createElement("td");
-        idCell.innerHTML = emp.employeeID;
+        const boldID = document.createElement("b");
+        boldID.innerHTML = emp.employeeID;
+        idCell.appendChild(boldID);
         row.appendChild(idCell);
         const usernameCell = document.createElement("td");
         usernameCell.innerHTML = emp.username;
