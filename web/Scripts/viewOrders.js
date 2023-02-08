@@ -4,7 +4,9 @@ const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 let idleTimeout;
 
-window.onload = function () {
+let allTransactions = null;
+
+window.onload = async function () {
     //set current employee global to the user that logged in
     currentEmployee = JSON.parse(sessionStorage.getItem("employeeInfo"));
     //load name and title on the nav bar
@@ -28,7 +30,16 @@ window.onload = function () {
     document.querySelector("#ordersTable").addEventListener('click', highlight);
     //unhide action buttons depending on user permission
     checkPermissions();
+    await getAllTransactions();
 };
+
+async function getAllTransactions(){
+    let url = `../TransactionService`;
+    let resp = await fetch(url, {
+        method: 'GET'
+    });
+    console.log(await resp.json());
+}
 
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));

@@ -14,6 +14,10 @@ public class Item {
     private double weight, costPrice, retailPrice;
     private boolean active;
     
+    public Item(){
+        
+    }
+    
     public Item(int itemID, String name, String sku, String description, String category,
             double weight, double costPrice, double retailPrice, int supplierId, boolean active,
             String notes, int caseSize){

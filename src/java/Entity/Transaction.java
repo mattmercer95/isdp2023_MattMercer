@@ -18,6 +18,10 @@ public class Transaction {
     private boolean emergencyDelivery;
     private ArrayList<Item> items;
     
+    public Transaction(){
+        //empty constructor
+    }
+    
     public Transaction(int transactionID, String location, int siteIDTo, int siteIDFrom,
             String status, String shipDate, String transactionType, String barCode,
             String createdDate, int deliveryID, boolean emergencyDelivery, int quantity,
@@ -36,5 +40,44 @@ public class Transaction {
         this.createdDate = createdDate;
         this.emergencyDelivery = emergencyDelivery;
         this.items = items;
+    }
+    public void setTransactionID(int transactionID){
+        this.transactionID = transactionID;
+    }
+    public void setSiteIDTo(int siteIDTo){
+         this.siteIDTo = siteIDTo;
+    }
+    public void setLocation(String location){
+        this.location = location;
+    }
+    public void setSiteIDFrom(int siteIDFrom){
+        this.siteIDFrom = siteIDFrom;
+    }
+    public void setStatus(String status){
+        this.status = status;
+    }
+    public void setShipDate(String shipDate){
+        this.shipDate = shipDate;
+    }
+    public void setTransactionType(String transactionType){
+        this.transactionType = transactionType;
+    }
+    public void setBarCode(String barCode){
+        this.barCode = barCode;
+    }
+    public void setCreatedDate(String createdDate){
+        this.createdDate = createdDate;
+    }
+    public void setDeliveryID(int deliveryID){
+        this.deliveryID = deliveryID;
+    }
+    public void setEmergencyDelivery(boolean emergencyDelivery){
+        this.emergencyDelivery = emergencyDelivery;
+    }
+    public void setQuantity(int quantity){
+        this.quantity = quantity;
+    }
+    public void setTotalWeight(double totalWeight){
+        this.totalWeight = totalWeight;
     }
 }
