@@ -15,7 +15,7 @@ window.onload = async function () {
     let nameTitle = (currentEmployee.employeeID === 1) ? "System Admin" : 
             `${currentEmployee.firstName} ${currentEmployee.lastName}, 
             ${currentEmployee.position}`;
-    nameTitleElement.innerHTML = nameTitle;
+    nameTitleElement.innerHTML = nameTitle + ` - ${currentEmployee.site}`;
     //fill input fields with current data
     loadEmployeeToEdit();
     //add event for logout button

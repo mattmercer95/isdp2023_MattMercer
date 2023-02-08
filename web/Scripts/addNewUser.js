@@ -13,7 +13,7 @@ window.onload = async function () {
     let nameTitle = (currentEmployee.employeeID === 1) ? "System Admin" : 
             `${currentEmployee.firstName} ${currentEmployee.lastName}, 
             ${currentEmployee.position}`;
-    nameTitleElement.innerHTML = nameTitle;
+    nameTitleElement.innerHTML = nameTitle + ` - ${currentEmployee.site}`;
     //add event for logout button
     document.querySelector("#logoutLink").addEventListener("click", logout);
     //password toggler
