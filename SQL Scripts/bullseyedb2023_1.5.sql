@@ -1,6 +1,6 @@
 -- Bullseye DB SQL Script
--- version 1.4
--- January 25, 2023
+-- version 1.5
+-- January 31, 2023
 -- 
 
 -- ********************************************
@@ -433,15 +433,16 @@ INSERT INTO `txntype` (`txnType`) VALUES
 -- Insert data for table `txnstatus`
 --
 INSERT INTO `txnstatus` (`statusName`, `statusDescription`) VALUES
-('ASSEMBLED', 'Order is ready at warehouse and to be picked up by delivery truck'),
-('ASSEMBLING', 'Order assigned to floor, warehouse preparing the order'),
-('COMPLETE', 'Order has been received and accounted for by the store'),
-('DELIVERED', 'Order has been delivered to the store'),
-('IN PROGRESS', 'Order is still being populated while store is preparing the order'),
-('IN TRANSIT', 'Order is on the truck and on its way to the store'),
-('PENDING BACKORDER', 'Backorder has been created and is in progress'),
-('REJECTED', 'Order is rejected by the warehouse (Item no longer exists etc...)'),
+('NEW', 'Order is newly created by Store Manager or designate'),
 ('SUBMITTED', 'Order has been submitted by the store to the warehouse but not yet assigned to the floor'),
+('RECEIVED', 'Order has been received by the Warehouse manager or designate'),
+('PROCESSING', 'Order is being processed by warehouse staff'),
+('READY', 'Order is ready for pickup'),
+('IN TRANSIT', 'Order is on the truck and on its way to the store'),
+('DELIVERED', 'Order has been delivered to the store'),
+('CLOSED', 'Order has been received and accounted for by the store'),
+('BACKORDER', 'Backorder has been created and is in progress'),
+('REJECTED', 'Order is rejected by the warehouse (Item no longer exists etc...)'),
 ('CANCELLED', 'Order is cancelled by originating site or by the warehouse manager');
 
 --
