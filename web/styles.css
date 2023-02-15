@@ -83,7 +83,7 @@ form {
     margin-right: 30px;
 }
 
-html, body, .container {
+html, body, .container, .modal-card, .modal-card-body {
     height: 100%;
 }
 
