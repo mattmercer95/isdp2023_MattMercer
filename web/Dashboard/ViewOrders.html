@@ -23,10 +23,12 @@
           <button type="button" class="btn btn-primary" id="logoutLink">Logout</button>
       </div>
     </nav>
+    <h1 class="text-center">Store Orders</h1>
     <div class="container">
         <br>
         <div class="row">
             <button id="returnToDash" class="col-2 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Dashboard</button>
+            <a href="CreateOrder.html" id="returnToDash" class="col-2 btn btn-success btnSpacing"><i class="bi bi-plus-square" id="togglePassword"></i>    New Order</a>
         </div>
         <div class="table-responsive prevent-select row">
             <table class="table table-bordered table-striped ">
@@ -43,12 +45,6 @@
 
                 </tbody>
             </table>
-        </div>
-        <div class="row justify-content-center">
-            <a hidden id="addNewUser" href="AddNewUser.html" class="col-2 btn btn-success">Add New User</a>
-            <button hidden class="col-2 btn btn-primary btnSpacing" id="setPermissions">Set Permissions</button>
-            <button hidden class="col-2 btn btn-warning btnSpacing" id="editUser">Edit User</button>
-            <button hidden class="col-2 btn btn-danger btnSpacing" id="deleteUser">Delete User</button>
         </div>
     </div>
     <script src="../Scripts/viewOrders.js">
