@@ -105,3 +105,7 @@ html, body, .container, .modal-card, .modal-card-body {
 .form-control {
     display: inline;
 }
+
+td:hover {
+    cursor: pointer;
+}
