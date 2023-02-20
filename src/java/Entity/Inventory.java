@@ -9,7 +9,7 @@ package Entity;
  * @author mattm
  */
 public class Inventory {
-    private int itemID, quantity, reorderThreshold;
+    private int itemID, quantity, reorderThreshold, caseSize;
     private String name;
     
     public Inventory(){
@@ -25,6 +25,10 @@ public class Inventory {
     
     public void setReorderThreshold(int reorderThreshold){
         this.reorderThreshold = reorderThreshold;
+    }
+    
+    public void setCaseSize(int caseSize){
+        this.caseSize = caseSize;
     }
     
     public void setName(String name){

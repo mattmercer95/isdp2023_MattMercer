@@ -39,9 +39,11 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Description</th>
-                                    <th>Qty</th>
+                                    <th>Qty On-Hand</th>
                                     <th>Threshold</th>
-                                    <th>Ordered</th>
+                                    <th>Case Size</th>
+                                    <th>Items Ordered</th>
+                                    <th>Cases Ordered</th>
                                 </tr>
                             </thead>
                             <tbody id="orderTable">
@@ -51,9 +53,11 @@
                     </div>
                     <div class="row justify-content-center">
                         <button type="button" class="btn btn-success col-2 btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
-                        <button type="button" class="btn btn-primary col-2 btnSpacing">Submit Order</button>
+                        <button id="removeItem" type="button" class="btn btn-danger col-2 btnSpacing" disabled>Remove Item</button>
+                        <button type="button" class="btn btn-primary col-2 btnSpacing" disabled>Submit Order</button>
+                        
                     </div>
-                    
+
                     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-scrollable modal-lg">
                             <div class="modal-content">
@@ -62,17 +66,21 @@
                                     <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">×</span>
                                     </button>
+                                    
+                                </div>
+                                <div class="modal-header modal-search">
+                                    <div class="form-group">
+                                        <label>Search</label>
+                                        <input id="itemSearch" class="form-control"/>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <button id="add" class="btn btn-success col-2" disabled>Add Item</button>
+                                    </div>
                                 </div>
                                 <div class="modal-body">
                                     <div class="card-body">
-                                        <div class="form-group">
-                                            <label>Search</label>
-                                            <input id="itemSearch" class="form-control"/>
-                                        </div>
-                                        <br>
-                                        <div class="form-group">
-                                            <button id="add" class="btn btn-success col-2" disabled>Add Item</button>
-                                        </div>
+
                                         <br>
                                         <div class="table-responsive prevent-select row">
                                             <table class="table table-bordered table-striped ">
@@ -80,8 +88,9 @@
                                                     <tr>
                                                         <th>ID</th>
                                                         <th>Description</th>
-                                                        <th>Qty</th>
+                                                        <th>Qty On-Hand</th>
                                                         <th>Threshold</th>
+                                                        <th>Case Size</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="itemsTable">

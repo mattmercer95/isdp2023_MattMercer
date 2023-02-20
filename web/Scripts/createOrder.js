@@ -35,17 +35,41 @@ window.onload = async function () {
     document.querySelector("#itemsTable").addEventListener('click', itemHighlight);
     document.querySelector("#orderTable").addEventListener('click', orderHighlight);
     document.querySelector("#itemSearch").addEventListener('input', itemSearch);
+    document.querySelector("#removeItem").addEventListener('click', removeItem);
     document.querySelector("#add").addEventListener('click', addItem);
     //unhide action buttons depending on user permission
     checkPermissions();
     await getAllItems();
 };
 
+//removes an item from the order and returns it to the item list
+function removeItem(){
+    //get selected item to remove
+    let itemToRemove = getSelectedOrderItem();
+    //remove item from cart
+    let index;
+    let counter = 0;
+    cart.forEach((item) =>{
+       if(item.itemID === itemToRemove.itemID){
+           index = counter;
+       } 
+       counter++;
+    });
+    cart.splice(index, 1);
+    //add item to allItems
+    allItems.push(itemToRemove);
+    //sort and rebuild
+    allItems.sort((a,b) => a.itemID - b.itemID);
+    alert(`Item ${itemToRemove.name} removed from order`);
+    buildTable(allItems);
+    buildCart();
+}
+
 function addItem(){
     let selectedItem = getSelectedItem();
-    console.log(selectedItem);
     //add selecteditem to cart
     cart.push(selectedItem);
+    cart.sort((a,b) => a.itemID - b.itemID);
     buildCart();
     alert(`${selectedItem.name} added to order`);
     //get index of item in allItems to remove it
@@ -68,7 +92,6 @@ function addItem(){
 function buildCart(){
     const table = document.querySelector("#orderTable");
     table.innerHTML = "";
-    console.log(cart);
     cart.forEach((item)=>{
         //create row and data cells
         const row = document.createElement("tr");
@@ -84,19 +107,48 @@ function buildCart(){
         const reorderCell = document.createElement("td");
         reorderCell.innerHTML = item.reorderThreshold;
         row.appendChild(reorderCell);
+        const caseSizeCell = document.createElement("td");
+        caseSizeCell.innerHTML = item.caseSize;
+        row.appendChild(caseSizeCell);
+        const itemsOrderedCell = document.createElement("td");
+        itemsOrderedCell.id = "qty" + item.itemID;
+        itemsOrderedCell.innerHTML = `<b>${item.caseSize}</b>`;
+        row.appendChild(itemsOrderedCell);
         const qtyOrderedCell = document.createElement("td");
         const qtyUpDown = document.createElement("input");
         qtyUpDown.type = "number";
         qtyUpDown.classList.add("form-control");
         qtyUpDown.increment = 1;
         qtyUpDown.min = 1;
-        qtyUpDown.id = item.itemID;
+        qtyUpDown.id = `cases${item.itemID}`;
         qtyUpDown.value = 1;
+        //Changes the quantity of items ordered based on their case size
+        qtyUpDown.addEventListener('input', function(){
+           const cell = document.querySelector("#qty" + item.itemID);
+           const casesOrdered = document.querySelector(`#cases${item.itemID}`).value;
+           let itemsOrdered = +casesOrdered * +item.caseSize;
+           cell.innerHTML = `<b>${itemsOrdered}</b>`;
+        });
         qtyOrderedCell.appendChild(qtyUpDown);
         row.appendChild(qtyOrderedCell);
         //add row to table
         table.appendChild(row);
     });
+}
+
+//Helper function to get the selected order item from the order table
+function getSelectedOrderItem(){
+    let table = document.querySelector("#orderTable");
+    rows = table.querySelectorAll("tr");
+    let selectedItem;
+    let selectedIndex;
+    for(let i = 0; i < rows.length; i++){
+        row = rows[i];
+        if(row.classList.contains("highlighted")){
+            selectedItem = cart[i];
+        }
+    }
+    return selectedItem;
 }
 
 //Helper function to get the selected item from the add items table
@@ -141,7 +193,7 @@ async function getAllItems(){
     buildTable(searchResults);
 }
 
-//builds the order table
+//builds the add item table
 function buildTable(items){
     //get search value for highlighting
     let query = document.querySelector("#itemSearch").value;
@@ -173,6 +225,9 @@ function buildTable(items){
         const reorderCell = document.createElement("td");
         reorderCell.innerHTML = item.reorderThreshold;
         row.appendChild(reorderCell);
+        const caseSizeCell = document.createElement("td");
+        caseSizeCell.innerHTML = item.caseSize;
+        row.appendChild(caseSizeCell);
         //add row to table
         table.appendChild(row);
     });
@@ -185,7 +240,6 @@ function checkPermissions(){
 }
 
 function itemHighlight(e){
-    console.log(e);
     const table = document.querySelector("#itemsTable");
     let trs = table.querySelectorAll("tr");
     for (let i = 0; i < trs.length; i++) {
@@ -210,6 +264,10 @@ function orderHighlight(e){
     let target = e.target.parentElement;
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
+        document.querySelector("#removeItem").disabled = false;
+    }
+    else {
+        document.querySelector("#removeItem").disabled = true;
     }
 }
 

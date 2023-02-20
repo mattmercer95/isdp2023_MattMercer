@@ -15,7 +15,7 @@ drop procedure if exists GetInventoryBySiteID;
 DELIMITER //
 create procedure GetInventoryBySiteID(in id int)
 BEGIN
-    Select itemID, name, quantity, reorderThreshold   
+    Select itemID, name, quantity, reorderThreshold, caseSize   
     from inventory inner join item using (itemID)
     where siteID = id;
 END //

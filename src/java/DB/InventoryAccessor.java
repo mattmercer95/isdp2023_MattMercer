@@ -67,6 +67,7 @@ public class InventoryAccessor {
                 item.setName(rs.getString("name"));
                 item.setQuantity(rs.getInt("quantity"));
                 item.setReorderThreshold(rs.getInt("reorderThreshold"));
+                item.setCaseSize(rs.getInt("caseSize"));
                 inventory.add(item);
             }
         } catch(SQLException ex) {
