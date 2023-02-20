@@ -43,6 +43,7 @@ window.onload = async function () {
 
 function addItem(){
     let selectedItem = getSelectedItem();
+    console.log(selectedItem);
     //add selecteditem to cart
     cart.push(selectedItem);
     buildCart();
@@ -67,6 +68,7 @@ function addItem(){
 function buildCart(){
     const table = document.querySelector("#orderTable");
     table.innerHTML = "";
+    console.log(cart);
     cart.forEach((item)=>{
         //create row and data cells
         const row = document.createElement("tr");
@@ -83,7 +85,14 @@ function buildCart(){
         reorderCell.innerHTML = item.reorderThreshold;
         row.appendChild(reorderCell);
         const qtyOrderedCell = document.createElement("td");
-        qtyOrderedCell.innerHTML = "#";
+        const qtyUpDown = document.createElement("input");
+        qtyUpDown.type = "number";
+        qtyUpDown.classList.add("form-control");
+        qtyUpDown.increment = 1;
+        qtyUpDown.min = 1;
+        qtyUpDown.id = item.itemID;
+        qtyUpDown.value = 1;
+        qtyOrderedCell.appendChild(qtyUpDown);
         row.appendChild(qtyOrderedCell);
         //add row to table
         table.appendChild(row);
@@ -96,7 +105,7 @@ function getSelectedItem(){
     rows = table.querySelectorAll("tr");
     let selectedItem;
     let selectedIndex;
-    for(let i = 1; i < rows.length; i++){
+    for(let i = 0; i < rows.length; i++){
         row = rows[i];
         if(row.classList.contains("highlighted")){
             selectedItem = searchResults[i];
@@ -193,7 +202,6 @@ function itemHighlight(e){
 }
 
 function orderHighlight(e){
-    console.log(e);
     const table = document.querySelector("#orderTable");
     let trs = table.querySelectorAll("tr");
     for (let i = 0; i < trs.length; i++) {
