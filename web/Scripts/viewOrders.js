@@ -88,14 +88,9 @@ function highlight(e){
     let target = e.target.parentElement;
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
-        document.querySelector("#setPermissions").disabled = false;
-        document.querySelector("#editUser").disabled = false;
-        document.querySelector("#deleteUser").disabled = false;
     }
     else {
-        document.querySelector("#setPermissions").disabled = true;
-        document.querySelector("#editUser").disabled = true;
-        document.querySelector("#deleteUser").disabled = true;
+        //TODO: enable and disable buttons
     }
 }
 
