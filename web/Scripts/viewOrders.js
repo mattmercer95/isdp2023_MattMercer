@@ -6,6 +6,7 @@ let idleTimeout;
 
 let allOrders = null;
 let allSites = null;
+let siteIndex = {};
 
 window.onload = async function () {
     //set current employee global to the user that logged in
@@ -57,6 +58,7 @@ async function getAllSites(){
             let optionEle = document.createElement("option");
             optionEle.value = site.siteID;
             optionEle.innerHTML = site.name;
+            optionEle.id = site.name;
             select.appendChild(optionEle);
         });
     }
@@ -73,8 +75,31 @@ async function newOrder(){
         method: 'POST',
         body: origin
     });
-    let isOrderOpen = await resp.text();
+    let isOrderOpen = await resp.json();
+    if(isOrderOpen){
+        let emergencyOrder = confirm("Warning: A store order is already open for the current location. Create an Emergency Order?");
+        if(emergencyOrder){
+            //Create a new emergency order
+            await newEmergencyOrder(origin);
+        }
+    }
+    else {
+        let newOrder = confirm(`Create a new store order?`);
+        if(newOrder){
+            window.location.href = "CreateOrder.html";
+        }
+    }
     console.log(`origin: ${origin} open order? ${isOrderOpen}`);
+}
+
+async function newEmergencyOrder(origin){
+    //check if emergency order is open
+    let url = `../SiteService/isEmergencyOrderOpen`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: origin
+    });
+    let isEmergencyOrderOpen = await resp.json();
 }
 
 //Makes API call to get all orders and stores them in the global variable

@@ -4,12 +4,14 @@
  */
 package Controller;
 
+import DB.SiteAccessor;
 import DB.TransactionAccessor;
 import Entity.Transaction;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -35,8 +37,15 @@ public class TransactionService extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        String uri = request.getPathInfo();
         try ( PrintWriter out = response.getWriter()) {
             Gson g = new Gson();
+            if(uri.equals("/isOrderOpen")){
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                boolean isOrderOpen = SiteAccessor.isOrderOpen(siteID);
+                out.println(g.toJson(isOrderOpen));
+            }
             ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
             out.println(g.toJson(transactions));
         }

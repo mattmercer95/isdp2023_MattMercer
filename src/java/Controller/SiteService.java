@@ -39,7 +39,6 @@ public class SiteService extends HttpServlet {
         String uri = request.getPathInfo();
         try ( PrintWriter out = response.getWriter()) {
             Gson g = new Gson();
-            System.out.println(uri);
             if(uri.equals("/isOrderOpen")){
                 Scanner sc = new Scanner(request.getReader());
                 int siteID = Integer.parseInt(sc.nextLine());
@@ -49,6 +48,12 @@ public class SiteService extends HttpServlet {
             else if(uri.equals("/retailLocations")){
                 ArrayList<Site> sites = SiteAccessor.getAllRetailLocations();
                 out.println(g.toJson(sites));
+            }
+            else if(uri.equals("/isEmergencyOrderOpen")){
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                boolean isOrderOpen = SiteAccessor.isEmergencyOrderOpen(siteID);
+                out.println(g.toJson(isOrderOpen));
             }
             else {
                 ArrayList<Site> sites = SiteAccessor.getAllSiteNamesIDs();

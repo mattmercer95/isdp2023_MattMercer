@@ -9,6 +9,21 @@
 */ 
 
 /*
+Returns how many emergency store orders are NEW for a location
+*/
+drop procedure if exists GetOpenEmergencyStoreOrderCount;
+DELIMITER //
+create procedure GetOpenEmergencyStoreOrderCount(in id int)
+BEGIN
+    select count(*) as ordersOpen 
+    from txn 
+    where status = 'NEW' 
+    and siteIDTO = id 
+    and emergencyDelivery = true;
+END //
+DELIMITER ;
+
+/*
 Returns how many regular store orders are open for a location
 */
 drop procedure if exists GetOpenStoreOrderCount;
