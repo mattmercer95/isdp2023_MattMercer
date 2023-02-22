@@ -11,7 +11,7 @@ const redirectUrl = "../index.html";
 let allItems = null;
 let searchResults = null;
 let cart = [];
-
+ 
 window.onload = async function () {
     //set current employee global to the user that logged in
     currentEmployee = JSON.parse(sessionStorage.getItem("employeeInfo"));

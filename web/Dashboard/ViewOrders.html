@@ -26,9 +26,17 @@
     <h1 class="text-center">Store Orders</h1>
     <div class="container">
         <br>
+        <div class="row" id="adminSitePanel" hidden>
+            <div id="adminSiteSelect" class="col-2">
+                <label>Select Site as Admin:</label>
+                <select class="form-select" id="siteSelect" name="siteSelect">
+                </select>
+            </div>
+        </div>
         <div class="row">
-            <button id="returnToDash" class="col-3 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Dashboard</button>
-            <a href="CreateOrder.html" id="returnToDash" class="col-3 btn btn-success btnSpacing"><i class="bi bi-plus-square" id="togglePassword"></i>    New Order</a>
+            <button id="returnToDash" class="col-2 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Dashboard</button>
+            <button id="newOrder" class="col-2 btn btn-success btnSpacing"><i class="bi bi-plus-square" id="togglePassword"></i>    New Order</button>
+            <button id="viewDetails" class="col-2 btn btn-primary btnSpacing" disabled>Edit/Submit Order</button>
         </div>
         <div class="table-responsive prevent-select row">
             <table class="table table-bordered table-striped ">

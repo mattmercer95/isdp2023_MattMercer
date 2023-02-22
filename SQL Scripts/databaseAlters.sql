@@ -9,6 +9,34 @@
 */ 
 
 /*
+Returns how many regular store orders are open for a location
+*/
+drop procedure if exists GetOpenStoreOrderCount;
+DELIMITER //
+create procedure GetOpenStoreOrderCount(in id int)
+BEGIN
+    select count(*) as ordersOpen 
+    from txn 
+    where status not in ('CLOSED', 'REJECTED', 'BACKORDER') 
+    and siteIDTO = id 
+    and emergencyDelivery = false;
+END //
+DELIMITER ;
+
+/*
+Returns all retail locations
+*/
+drop procedure if exists GetAllRetailLocations;
+DELIMITER //
+create procedure GetAllRetailLocations()
+BEGIN
+    SELECT siteID, name 
+    from site 
+    where siteType = 'Retail';
+END //
+DELIMITER ;
+
+/*
 Retrieves the inventory for a particular site
 */
 drop procedure if exists GetInventoryBySiteID;

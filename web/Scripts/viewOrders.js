@@ -5,6 +5,7 @@ const redirectUrl = "../index.html";
 let idleTimeout;
 
 let allOrders = null;
+let allSites = null;
 
 window.onload = async function () {
     //set current employee global to the user that logged in
@@ -28,10 +29,53 @@ window.onload = async function () {
 
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#ordersTable").addEventListener('click', highlight);
+    document.querySelector("#newOrder").addEventListener('click', newOrder);
     //unhide action buttons depending on user permission
     checkPermissions();
     await getAllOrders();
+    await getAllSites();
 };
+
+//Event for loading all the sites into the admin site select
+async function getAllSites(){
+    if(currentEmployee.positionID === 99999999){
+        //unhide the select panel
+        let panel = document.querySelector("#adminSitePanel");
+        panel.hidden = false;
+        //get the select element
+        let select = document.querySelector("#siteSelect");
+        select.innerHTML = "";
+        //make API call to get all sites
+        let url = `../SiteService/retailLocations`;
+        let resp = await fetch(url, {
+            method: 'GET'
+        });
+        allSites = await resp.json();
+        console.log(allSites);
+        //load all sites into the select input
+        allSites.forEach((site)=>{
+            let optionEle = document.createElement("option");
+            optionEle.value = site.siteID;
+            optionEle.innerHTML = site.name;
+            select.appendChild(optionEle);
+        });
+    }
+}
+
+//Event for clicking new order button. Checks if new order can be created. 
+async function newOrder(){
+    //get the site of origin
+    let origin = (currentEmployee.positionID === 99999999) ? 
+        document.querySelector("#siteSelect").value : currentEmployee.siteID;
+    //check if store order is open
+    let url = `../SiteService/isOrderOpen`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: origin
+    });
+    let isOrderOpen = await resp.text();
+    console.log(`origin: ${origin} open order? ${isOrderOpen}`);
+}
 
 //Makes API call to get all orders and stores them in the global variable
 async function getAllOrders(){
@@ -73,7 +117,6 @@ function buildTable(){
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
     //TODO: enable buttons based on permission
-    console.log(permissions);
 }
 
 function returnToDash(){

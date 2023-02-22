@@ -133,7 +133,7 @@ async function loadSelectMenus(){
 }
 
 async function populateSites(){
-    let url = "../SiteService";
+    let url = "../SiteService/";
     let resp = await fetch(url, {
         method: 'GET',
     });

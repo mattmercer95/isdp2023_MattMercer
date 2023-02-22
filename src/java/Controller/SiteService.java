@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Matt
  */
-@WebServlet(name = "SiteService", urlPatterns = {"/SiteService"})
+@WebServlet(name = "SiteService", urlPatterns = {"/SiteService/*"})
 public class SiteService extends HttpServlet {
 
     /**
@@ -35,10 +36,24 @@ public class SiteService extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        String uri = request.getPathInfo();
         try ( PrintWriter out = response.getWriter()) {
-            ArrayList<Site> sites = SiteAccessor.getAllSiteNamesIDs();
             Gson g = new Gson();
-            out.println(g.toJson(sites));
+            System.out.println(uri);
+            if(uri.equals("/isOrderOpen")){
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                boolean isOrderOpen = SiteAccessor.isOrderOpen(siteID);
+                out.println(g.toJson(isOrderOpen));
+            }
+            else if(uri.equals("/retailLocations")){
+                ArrayList<Site> sites = SiteAccessor.getAllRetailLocations();
+                out.println(g.toJson(sites));
+            }
+            else {
+                ArrayList<Site> sites = SiteAccessor.getAllSiteNamesIDs();
+                out.println(g.toJson(sites));
+            }
         }
     }
 
