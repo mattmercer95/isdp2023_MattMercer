@@ -70,7 +70,7 @@ async function newOrder(){
     let origin = (currentEmployee.positionID === 99999999) ? 
         document.querySelector("#siteSelect").value : currentEmployee.siteID;
     //check if store order is open
-    let url = `../SiteService/isOrderOpen`;
+    let url = `../TransactionService/isOrderOpen`;
     let resp = await fetch(url, {
         method: 'POST',
         body: origin
@@ -94,7 +94,7 @@ async function newOrder(){
 
 async function newEmergencyOrder(origin){
     //check if emergency order is open
-    let url = `../SiteService/isEmergencyOrderOpen`;
+    let url = `../TransactionService/isEmergencyOrderOpen`;
     let resp = await fetch(url, {
         method: 'POST',
         body: origin

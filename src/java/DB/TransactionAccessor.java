@@ -18,6 +18,8 @@ import java.util.ArrayList;
 public class TransactionAccessor {
     private static Connection conn = null;
     private static PreparedStatement getAllTransactions = null;
+    private static PreparedStatement getAllOpenStoreOrders = null;
+    private static PreparedStatement getAllOpenEmergencyStoreOrders = null;
     
     private TransactionAccessor(){
         //no instant
@@ -31,6 +33,8 @@ public class TransactionAccessor {
             try {
                 System.out.println("Connection was not null");
                 getAllTransactions = conn.prepareStatement("call GetAllOrders()");
+                getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
+                getAllOpenEmergencyStoreOrders = conn.prepareStatement("call call GetOpenEmergencyStoreOrderCount(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -41,6 +45,72 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean isOrderOpen(int siteID){
+        boolean result = true;
+
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            getAllOpenStoreOrders.setInt(1, siteID);
+            rs = getAllOpenStoreOrders.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error checking Open Orders");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                int ordersOpen = rs.getInt("ordersOpen");
+                result = (ordersOpen == 0) ? false : true;
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error checking Open Orders");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
+    }
+    
+    public static boolean isEmergencyOrderOpen(int siteID){
+        boolean result = true;
+
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            getAllOpenEmergencyStoreOrders.setInt(1, siteID);
+            rs = getAllOpenEmergencyStoreOrders.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error checking Open Emergency Orders");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                int ordersOpen = rs.getInt("ordersOpen");
+                result = (ordersOpen == 0) ? false : true;
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error checking Open Emergency Orders");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
     }
     
     public static ArrayList<Transaction> getAllTransactions(){
