@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author mattm
  */
-@WebServlet(name = "TransactionService", urlPatterns = {"/TransactionService"})
+@WebServlet(name = "TransactionService", urlPatterns = {"/TransactionService/*"})
 public class TransactionService extends HttpServlet {
 
     /**
@@ -52,8 +52,11 @@ public class TransactionService extends HttpServlet {
                 boolean isOrderOpen = TransactionAccessor.isEmergencyOrderOpen(siteID);
                 out.println(g.toJson(isOrderOpen));
             }
-            ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
-            out.println(g.toJson(transactions));
+            else {
+                ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
+                out.println(g.toJson(transactions));
+            }
+            
         }
     }
 

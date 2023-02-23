@@ -89,7 +89,6 @@ async function newOrder(){
             window.location.href = "CreateOrder.html";
         }
     }
-    console.log(`origin: ${origin} open order? ${isOrderOpen}`);
 }
 
 async function newEmergencyOrder(origin){
@@ -104,7 +103,7 @@ async function newEmergencyOrder(origin){
 
 //Makes API call to get all orders and stores them in the global variable
 async function getAllOrders(){
-    let url = `../TransactionService`;
+    let url = `../TransactionService/`;
     let resp = await fetch(url, {
         method: 'GET'
     });

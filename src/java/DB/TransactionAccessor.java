@@ -34,7 +34,7 @@ public class TransactionAccessor {
                 System.out.println("Connection was not null");
                 getAllTransactions = conn.prepareStatement("call GetAllOrders()");
                 getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
-                getAllOpenEmergencyStoreOrders = conn.prepareStatement("call call GetOpenEmergencyStoreOrderCount(?)");
+                getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -89,6 +89,7 @@ public class TransactionAccessor {
                 return result;
             }
             getAllOpenEmergencyStoreOrders.setInt(1, siteID);
+            
             rs = getAllOpenEmergencyStoreOrders.executeQuery();
         } catch (SQLException ex) {
             System.err.println("************************");

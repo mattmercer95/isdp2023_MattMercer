@@ -51,7 +51,7 @@ public class EmployeeAccessor {
                 resetPasswordStatement = conn.prepareStatement("update employee set password = ? where username = ?");
                 getAllEmployeesStatement = conn.prepareStatement("call GetAllEmployeeInfo()");
                 getAllUsernamesStatement = conn.prepareStatement("select username from employee");
-                addNewUserStatement = conn.prepareStatement("insert into employee(username, password, firstName, lastName, email, active, locked, positionID, siteID) values(?, ?, ?, ?, ?, ?, '0', ?, ?)");
+                addNewUserStatement = conn.prepareStatement("insert into employee(username, password, firstName, lastName, email, active, locked, positionID, siteID) values(?, ?, ?, ?, ?, ?, '0', ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 getEmployeeIDByUsername = conn.prepareStatement("select employeeID from employee where username = ?");
                 updateEmployeeWithPassword = conn.prepareStatement("update employee set username = ?, password = ?, firstName = ?, lastName = ?, email = ?, active = ?, locked = ?, positionID = ?, siteID = ? where employeeID = ?");
                 updateEmployeeWithoutPassword = conn.prepareStatement("update employee set username = ?, firstName = ?, lastName = ?, email = ?, active = ?, locked = ?, positionID = ?, siteID = ? where employeeID = ?");
