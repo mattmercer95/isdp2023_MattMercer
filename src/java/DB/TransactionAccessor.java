@@ -21,6 +21,8 @@ public class TransactionAccessor {
     private static PreparedStatement getAllOpenStoreOrders = null;
     private static PreparedStatement getAllOpenEmergencyStoreOrders = null;
     private static PreparedStatement createNewStoreOrder = null;
+    private static PreparedStatement getTransactionByID = null;
+    private static PreparedStatement getTransactionItems = null;
     
     private TransactionAccessor(){
         //no instant
@@ -45,6 +47,7 @@ public class TransactionAccessor {
                 getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
                 getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
                 createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                getTransactionByID = conn.prepareStatement("call GetTransactionByID(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -55,6 +58,51 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static Transaction getTransactionByID(int transactionID){
+        Transaction result = null;
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            getTransactionByID.setInt(1, transactionID);
+            rs = getTransactionByID.executeQuery();
+            result = new Transaction();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Retrieving Transaction");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                if(result != null){
+                    result.setTransactionID(rs.getInt("txnID"));
+                    result.setSiteIDTo(rs.getInt("siteIDTo"));
+                    result.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                    result.setStatus(rs.getString("status"));
+                    result.setShipDate(rs.getString("shipDate"));
+                    result.setTransactionType(rs.getString("txnType"));
+                    result.setCreatedDate(rs.getString("createdDate"));
+                    result.setDeliveryID(rs.getInt("deliveryID"));
+                    result.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                    result.setDestination(rs.getString("destination"));
+                    result.setOrigin(rs.getString("origin"));
+                };
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating Transaction object");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
     }
     
     public static int createNewStoreOrder(int siteID){
@@ -179,7 +227,7 @@ public class TransactionAccessor {
             while (rs.next()) {
                 Transaction temp = new Transaction();
                 temp.setTransactionID(rs.getInt("txnID"));
-                temp.setLocation(rs.getString("Location"));
+                temp.setDestination(rs.getString("Location"));
                 temp.setSiteIDTo(rs.getInt("siteIDTo"));
                 temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
                 temp.setStatus(rs.getString("status"));

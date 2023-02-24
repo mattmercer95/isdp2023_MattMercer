@@ -9,6 +9,28 @@
 */ 
 
 /*
+Gets the transaction details by transaction id
+*/
+drop procedure if exists GetTransactionByID;
+DELIMITER //
+create procedure GetTransactionByID(in orderID int)
+BEGIN
+	select *, (select name from site where siteIDTo = siteID) as desintation, (select name as origin from site where siteIDFrom = siteID) as origin from txn where txnID = orderID;
+END //
+DELIMITER ;
+
+/*
+Gets the items for a transaction by transactionID
+*/
+drop procedure if exists GetTransactionItemsByID;
+DELIMITER //
+create procedure GetTransactionItemsByID(in orderID int)
+BEGIN
+	select * from txnitems inner join item using (itemID) where txnID = orderID;
+END //
+DELIMITER ;
+
+/*
 Gets the next delivery date for a store location
 */
 drop procedure if exists GetNextDeliveryDate;
@@ -31,11 +53,13 @@ BEGIN
     call GetNextDeliveryDate(storeID, @nextShipDate);
 	insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery)
 		values(storeID, 1, 'NEW', @nextShipDate, 'Store Order', 'X', orderDate, null, false);
+	select LAST_INSERT_ID() into @orderID;
     insert into txnitems (txnID, itemID, quantity)
-		select LAST_INSERT_ID(), itemID, ceiling((reorderThreshold - quantity) / caseSize) 
+		select @orderID, itemID, ceiling((reorderThreshold - quantity) / caseSize) 
         from inventory inner join item using (itemID)
         where quantity < reorderThreshold;
 	commit;
+    select @orderID;
 END //
 DELIMITER ;
 
@@ -91,7 +115,7 @@ create procedure GetInventoryBySiteID(in id int)
 BEGIN
     Select itemID, name, quantity, reorderThreshold, caseSize   
     from inventory inner join item using (itemID)
-    where siteID = id;
+    where siteID = id and active = true;
 END //
 DELIMITER ;
 

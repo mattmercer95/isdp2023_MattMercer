@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Transaction {
     private int transactionID, siteIDTo, siteIDFrom, deliveryID, quantity;
     private double totalWeight;
-    private String location, status, shipDate, transactionType, barCode, 
+    private String origin, destination, status, shipDate, transactionType, barCode, 
             createdDate;
     private boolean emergencyDelivery;
     private ArrayList<Item> items;
@@ -22,7 +22,7 @@ public class Transaction {
         //empty constructor
     }
     
-    public Transaction(int transactionID, String location, int siteIDTo, int siteIDFrom,
+    public Transaction(int transactionID, int siteIDTo, int siteIDFrom,
             String status, String shipDate, String transactionType, String barCode,
             String createdDate, int deliveryID, boolean emergencyDelivery, int quantity,
             double totalWeight, ArrayList<Item> items){
@@ -32,7 +32,6 @@ public class Transaction {
         this.deliveryID = deliveryID;
         this.quantity = quantity;
         this.totalWeight = totalWeight;
-        this.location = location;
         this.status = status;
         this.shipDate = shipDate;
         this.transactionType = transactionType;
@@ -46,9 +45,6 @@ public class Transaction {
     }
     public void setSiteIDTo(int siteIDTo){
          this.siteIDTo = siteIDTo;
-    }
-    public void setLocation(String location){
-        this.location = location;
     }
     public void setSiteIDFrom(int siteIDFrom){
         this.siteIDFrom = siteIDFrom;
@@ -79,5 +75,14 @@ public class Transaction {
     }
     public void setTotalWeight(double totalWeight){
         this.totalWeight = totalWeight;
+    }
+    public void setOrigin(String origin){
+        this.origin = origin;
+    }
+    public void setDestination(String destination){
+        this.destination = destination;
+    }
+    public void setItems(ArrayList<Item> items){
+        this.items = items;
     }
 }

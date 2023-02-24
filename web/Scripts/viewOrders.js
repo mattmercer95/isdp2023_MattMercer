@@ -159,7 +159,7 @@ function buildTable(){
         //create row and data cells
         const row = document.createElement("tr");
         const locationCell = document.createElement("td");
-        locationCell.innerHTML = order.location;
+        locationCell.innerHTML = order.destination;
         row.appendChild(locationCell);
         const statusCell = document.createElement("td");
         statusCell.innerHTML = order.status;
