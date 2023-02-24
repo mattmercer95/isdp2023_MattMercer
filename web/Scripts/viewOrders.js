@@ -31,11 +31,33 @@ window.onload = async function () {
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#ordersTable").addEventListener('click', highlight);
     document.querySelector("#newOrder").addEventListener('click', newOrder);
+    document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     //unhide action buttons depending on user permission
     checkPermissions();
     await getAllOrders();
     await getAllSites();
 };
+
+function viewDetails(){
+    let selectedOrder = getSelectedOrder();
+    sessionStorage.setItem("currentOrderID", selectedOrder.transactionID);
+    window.location.href = "CreateOrder.html";
+}
+
+//Helper function to get the selected order from the  table
+function getSelectedOrder(){
+    let table = document.querySelector("#ordersTable");
+    rows = table.querySelectorAll("tr");
+    let selectedItem;
+    let selectedIndex;
+    for(let i = 0; i < rows.length; i++){
+        row = rows[i];
+        if(row.classList.contains("highlighted")){
+            selectedItem = allOrders[i];
+        }
+    }
+    return selectedItem;
+}
 
 //Event for loading all the sites into the admin site select
 async function getAllSites(){
@@ -173,9 +195,10 @@ function highlight(e){
     let target = e.target.parentElement;
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
+        document.querySelector("#viewDetails").disabled = false;
     }
     else {
-        //TODO: enable and disable buttons
+        document.querySelector("#viewDetails").disabled = true;
     }
 }
 

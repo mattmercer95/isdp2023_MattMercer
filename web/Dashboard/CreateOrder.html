@@ -30,10 +30,53 @@
             </div>
             <div class="card">
                 <div class="card-title text-center">
-                    <h3>Create New Store Order</h3>
+                    <h3>Order Details</h3>
                 </div>
                 <div class="card-body">
-                    <div class= "prevent-select row">
+                    <div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row justify-content-center">
+                                    <div class="col-2 createOrderPanelCol">
+                                        <div class="form-group">
+                                            <label>Order ID:</label>
+                                            <input id="orderID" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Creation Date:</label>
+                                            <input id="creationDate" class="form-control" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 createOrderPanelCol">
+                                        <div class="form-group">
+                                            <label>Site of Origin:</label>
+                                            <input id="originSite" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Destination Site:</label>
+                                            <input id="destinationSite" class="form-control" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 createOrderPanelCol">
+                                        <div class="form-group">
+                                            <label>Status:</label>
+                                            <input id="status" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Ship Date:</label>
+                                            <input id="shipDate" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Delivery ID:</label>
+                                            <input id="deliveryID" class="form-control" readonly/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class= "prevent-select">
                         <table class="table table-bordered table-striped ">
                             <thead>
                                 <tr>
@@ -55,7 +98,7 @@
                         <button type="button" class="btn btn-success col-2 btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
                         <button id="removeItem" type="button" class="btn btn-danger col-2 btnSpacing" disabled>Remove Item</button>
                         <button type="button" class="btn btn-primary col-2 btnSpacing" disabled>Submit Order</button>
-                        
+
                     </div>
 
                     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -66,7 +109,7 @@
                                     <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">×</span>
                                     </button>
-                                    
+
                                 </div>
                                 <div class="modal-header modal-search">
                                     <div class="form-group">
