@@ -28,3 +28,5 @@ values (2,10000,10),
 (6,10000,10),
 (6,10020,5),
 (6,10100,6);
+
+update inventory set quantity = 0 where siteID = 4 and itemID in (10000, 10001, 10002, 10003, 10004);

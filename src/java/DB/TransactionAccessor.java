@@ -20,9 +20,18 @@ public class TransactionAccessor {
     private static PreparedStatement getAllTransactions = null;
     private static PreparedStatement getAllOpenStoreOrders = null;
     private static PreparedStatement getAllOpenEmergencyStoreOrders = null;
+    private static PreparedStatement createNewStoreOrder = null;
     
     private TransactionAccessor(){
         //no instant
+    }
+    
+    //Helper function for getting the current time in the MySQL datetime format
+    private static String getCurrentTimeStamp(){
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = 
+             new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(dt);
     }
     
     private static boolean init() throws SQLException {
@@ -35,6 +44,7 @@ public class TransactionAccessor {
                 getAllTransactions = conn.prepareStatement("call GetAllOrders()");
                 getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
                 getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
+                createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -45,6 +55,41 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static int createNewStoreOrder(int siteID){
+        int result = -1;
+
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            createNewStoreOrder.setInt(1, siteID);
+            //create date of order creation
+            String timestamp = getCurrentTimeStamp();
+            createNewStoreOrder.setString(2, timestamp);
+            rs = createNewStoreOrder.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating New Store Order");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                result = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating New Store Order");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
     }
     
     public static boolean isOrderOpen(int siteID){

@@ -52,6 +52,12 @@ public class TransactionService extends HttpServlet {
                 boolean isOrderOpen = TransactionAccessor.isEmergencyOrderOpen(siteID);
                 out.println(g.toJson(isOrderOpen));
             }
+            else if(uri.equals("/newStoreOrder")){
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                int orderID = TransactionAccessor.createNewStoreOrder(siteID);
+                out.println(g.toJson(orderID));
+            }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
                 out.println(g.toJson(transactions));

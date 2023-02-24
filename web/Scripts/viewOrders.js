@@ -86,8 +86,26 @@ async function newOrder(){
     else {
         let newOrder = confirm(`Create a new store order?`);
         if(newOrder){
-            window.location.href = "CreateOrder.html";
+            await createNewOrder(origin);
         }
+    }
+}
+
+//Makes API call to create a new order entry and redirects to the create order page.
+async function createNewOrder(origin){
+    let url = `../TransactionService/newStoreOrder`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: origin
+    });
+    let newOrderID = await resp.json();
+    if(newOrder > 0){
+        //successful order creation
+        sessionStorage.setItem("currentOrderID", newOrderID);
+        window.location.href = "CreateOrder.html";
+    }
+    else {
+        alert("Error creating new order, check server status");
     }
 }
 
