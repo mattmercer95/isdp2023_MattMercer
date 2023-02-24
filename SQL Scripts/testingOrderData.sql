@@ -1,6 +1,5 @@
 insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, emergencyDelivery)
-values (4, 1, 'NEW', '2023-02-13', 'Store Order', 'ABCDEFGHIJKLM', '2023-02-08', 0),
-(5, 1, 'NEW', '2023-02-13', 'Store Order', 'ABCDEFGHIJKLM', '2023-02-08', 0),
+values (5, 1, 'NEW', '2023-02-13', 'Store Order', 'ABCDEFGHIJKLM', '2023-02-08', 0),
 (6, 1, 'NEW', '2023-02-14', 'Store Order', 'ABCDEFGHIJKLM', '2023-02-08', 0),
 (7, 1, 'NEW', '2023-02-15', 'Store Order', 'ABCDEFGHIJKLM', '2023-02-08', 0),
 (8, 1, 'NEW', '2023-02-16', 'Store Order', 'ABCDEFGHIJKLM', '2023-02-08', 0),

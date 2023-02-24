@@ -7,7 +7,7 @@ let idleTimeout;
 const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 
-
+let currentOrder = null;
 let allItems = null;
 let searchResults = null;
 let cart = [];
@@ -39,8 +39,34 @@ window.onload = async function () {
     document.querySelector("#add").addEventListener('click', addItem);
     //unhide action buttons depending on user permission
     checkPermissions();
+    await getCurrentOrder();
     await getAllItems();
 };
+
+async function getCurrentOrder(){
+    let orderID = sessionStorage.getItem("currentOrderID");
+    let url = `../TransactionService/getDetails`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: orderID
+    });
+    currentOrder = await resp.json();
+    console.log(currentOrder);
+    //populate info panel
+    document.querySelector("#orderID").value = currentOrder.transactionID;
+    document.querySelector("#creationDate").value = currentOrder.createdDate;
+    document.querySelector("#originSite").value = currentOrder.origin;
+    document.querySelector("#destinationSite").value = currentOrder.destination;
+    document.querySelector("#status").value = currentOrder.status;
+    document.querySelector("#shipDate").value = currentOrder.shipDate;
+    document.querySelector("#deliveryID").value = (currentOrder.deliveryID === 0) ? "N/A" : currentOrder.deliveryID;
+    document.querySelector("#totalQtyOrdered").value = currentOrder.quantity;
+    document.querySelector("#totalWeight").value = currentOrder.totalWeight;
+    
+    //load cart
+    cart = currentOrder.items;
+    buildCart();
+}
 
 //removes an item from the order and returns it to the item list
 function removeItem(){
@@ -68,6 +94,7 @@ function removeItem(){
 function addItem(){
     let selectedItem = getSelectedItem();
     //add selecteditem to cart
+    selectedItem.caseQuantityOrdered = 1;
     cart.push(selectedItem);
     cart.sort((a,b) => a.itemID - b.itemID);
     buildCart();
@@ -102,7 +129,7 @@ function buildCart(){
         nameCell.innerHTML = item.name;
         row.appendChild(nameCell);
         const qtyCell = document.createElement("td");
-        qtyCell.innerHTML = item.quantity;
+        qtyCell.innerHTML = item.itemQuantityOnHand;
         row.appendChild(qtyCell);
         const reorderCell = document.createElement("td");
         reorderCell.innerHTML = item.reorderThreshold;
@@ -112,7 +139,7 @@ function buildCart(){
         row.appendChild(caseSizeCell);
         const itemsOrderedCell = document.createElement("td");
         itemsOrderedCell.id = "qty" + item.itemID;
-        itemsOrderedCell.innerHTML = `<b>${item.caseSize}</b>`;
+        itemsOrderedCell.innerHTML = `<b>${item.caseSize * item.caseQuantityOrdered}</b>`;
         row.appendChild(itemsOrderedCell);
         const qtyOrderedCell = document.createElement("td");
         const qtyUpDown = document.createElement("input");
@@ -121,7 +148,7 @@ function buildCart(){
         qtyUpDown.increment = 1;
         qtyUpDown.min = 1;
         qtyUpDown.id = `cases${item.itemID}`;
-        qtyUpDown.value = 1;
+        qtyUpDown.value = item.caseQuantityOrdered;
         //Changes the quantity of items ordered based on their case size
         qtyUpDown.addEventListener('input', function(){
            const cell = document.querySelector("#qty" + item.itemID);
@@ -220,7 +247,7 @@ function buildTable(items){
         }
         row.appendChild(nameCell);
         const qtyCell = document.createElement("td");
-        qtyCell.innerHTML = item.quantity;
+        qtyCell.innerHTML = item.itemQuantityOnHand;
         row.appendChild(qtyCell);
         const reorderCell = document.createElement("td");
         reorderCell.innerHTML = item.reorderThreshold;

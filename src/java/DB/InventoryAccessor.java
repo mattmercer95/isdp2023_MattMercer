@@ -65,7 +65,7 @@ public class InventoryAccessor {
                 Inventory item = new Inventory();
                 item.setItemID(rs.getInt("itemID"));
                 item.setName(rs.getString("name"));
-                item.setQuantity(rs.getInt("quantity"));
+                item.setItemQuantityOnHand(rs.getInt("quantity"));
                 item.setReorderThreshold(rs.getInt("reorderThreshold"));
                 item.setCaseSize(rs.getInt("caseSize"));
                 inventory.add(item);

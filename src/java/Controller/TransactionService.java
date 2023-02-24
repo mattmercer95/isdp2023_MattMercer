@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import DB.InventoryAccessor;
 import DB.SiteAccessor;
 import DB.TransactionAccessor;
 import Entity.Transaction;
@@ -62,6 +63,9 @@ public class TransactionService extends HttpServlet {
                 Scanner sc = new Scanner(request.getReader());
                 int transactionID = Integer.parseInt(sc.nextLine());
                 Transaction t = TransactionAccessor.getTransactionByID(transactionID);
+                t.setItems(TransactionAccessor.getTransactionItems(transactionID));
+                t.calculateStats();
+                out.println(g.toJson(t));
             }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();

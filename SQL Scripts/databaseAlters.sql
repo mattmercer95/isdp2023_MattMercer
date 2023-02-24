@@ -15,7 +15,7 @@ drop procedure if exists GetTransactionByID;
 DELIMITER //
 create procedure GetTransactionByID(in orderID int)
 BEGIN
-	select *, (select name from site where siteIDTo = siteID) as desintation, (select name as origin from site where siteIDFrom = siteID) as origin from txn where txnID = orderID;
+	select *, (select name from site where siteIDTo = siteID) as destination, (select name as origin from site where siteIDFrom = siteID) as origin from txn where txnID = orderID;
 END //
 DELIMITER ;
 
@@ -26,7 +26,8 @@ drop procedure if exists GetTransactionItemsByID;
 DELIMITER //
 create procedure GetTransactionItemsByID(in orderID int)
 BEGIN
-	select * from txnitems inner join item using (itemID) where txnID = orderID;
+	select siteIDTo into @storeID from txn where txnID = orderID;
+	select * from txnitems inner join item using (itemID) inner join inventory using (itemID) where txnID = orderID and siteID = @storeID;
 END //
 DELIMITER ;
 
@@ -115,7 +116,8 @@ create procedure GetInventoryBySiteID(in id int)
 BEGIN
     Select itemID, name, quantity, reorderThreshold, caseSize   
     from inventory inner join item using (itemID)
-    where siteID = id and active = true;
+    where siteID = id and active = true
+    and itemID not in (select distinct itemID from txnitems inner join txn using(txnID) where status = 'NEW' and siteIDTo = id);
 END //
 DELIMITER ;
 

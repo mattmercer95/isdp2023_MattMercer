@@ -16,7 +16,7 @@ public class Transaction {
     private String origin, destination, status, shipDate, transactionType, barCode, 
             createdDate;
     private boolean emergencyDelivery;
-    private ArrayList<Item> items;
+    private ArrayList<TransactionItem> items;
     
     public Transaction(){
         //empty constructor
@@ -25,7 +25,7 @@ public class Transaction {
     public Transaction(int transactionID, int siteIDTo, int siteIDFrom,
             String status, String shipDate, String transactionType, String barCode,
             String createdDate, int deliveryID, boolean emergencyDelivery, int quantity,
-            double totalWeight, ArrayList<Item> items){
+            double totalWeight, ArrayList<TransactionItem> items){
         this.transactionID = transactionID;
         this.siteIDTo = siteIDTo;
         this.siteIDFrom = siteIDFrom;
@@ -40,6 +40,20 @@ public class Transaction {
         this.emergencyDelivery = emergencyDelivery;
         this.items = items;
     }
+    
+    //Cals the total weight and item quantity based on item list
+    public void calculateStats(){
+        double totalWeight = 0;
+        int totalItemQuantity = 0;
+        for(TransactionItem item : this.items){
+            int itemsOrdered = item.getCaseQuantityOrdered() * item.getCaseSize();
+            totalItemQuantity += itemsOrdered;
+            totalWeight += (item.getWeight() * itemsOrdered);
+        }
+        this.totalWeight = totalWeight;
+        this.quantity = totalItemQuantity;
+    }
+    
     public void setTransactionID(int transactionID){
         this.transactionID = transactionID;
     }
@@ -82,7 +96,7 @@ public class Transaction {
     public void setDestination(String destination){
         this.destination = destination;
     }
-    public void setItems(ArrayList<Item> items){
+    public void setItems(ArrayList<TransactionItem> items){
         this.items = items;
     }
 }

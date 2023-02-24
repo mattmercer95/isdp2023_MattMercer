@@ -9,7 +9,7 @@ package Entity;
  * @author mattm
  */
 public class Inventory {
-    private int itemID, quantity, reorderThreshold, caseSize;
+    private int itemID, itemQuantityOnHand, reorderThreshold, caseSize;
     private String name;
     
     public Inventory(){
@@ -19,8 +19,8 @@ public class Inventory {
     public void setItemID(int itemID){
         this.itemID = itemID;
     }
-    public void setQuantity(int quantity){
-        this.quantity = quantity;
+    public void setItemQuantityOnHand(int itemQuantityOnHand){
+        this.itemQuantityOnHand = itemQuantityOnHand;
     }
     
     public void setReorderThreshold(int reorderThreshold){

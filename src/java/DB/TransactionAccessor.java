@@ -5,6 +5,7 @@
 package DB;
 
 import Entity.Transaction;
+import Entity.TransactionItem;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,6 +49,7 @@ public class TransactionAccessor {
                 getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
                 createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 getTransactionByID = conn.prepareStatement("call GetTransactionByID(?)");
+                getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -58,6 +60,51 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<TransactionItem> getTransactionItems(int transactionID){
+        ArrayList<TransactionItem> result = null;
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            getTransactionItems.setInt(1, transactionID);
+            rs = getTransactionItems.executeQuery();
+            result = new ArrayList<TransactionItem>();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Retrieving Transaction Items");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                if(result != null){
+                    TransactionItem item = new TransactionItem();
+                    item.setItemID(rs.getInt("itemID"));
+                    item.setTxnID(rs.getInt("txnID"));
+                    item.setCaseQuantityOrdered(rs.getInt(3));
+                    item.setName(rs.getString("name"));
+                    item.setWeight(rs.getFloat("weight"));
+                    item.setCaseSize(rs.getInt("caseSize"));
+                    item.setSiteID(rs.getInt("siteID"));
+                    item.setItemQuantityOnHand(rs.getInt(16));
+                    item.setReorderThreshold(rs.getInt("reorderThreshold"));
+                    result.add(item);
+                };
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Populating Transaction Item list");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
     }
     
     public static Transaction getTransactionByID(int transactionID){
@@ -86,9 +133,11 @@ public class TransactionAccessor {
                     result.setSiteIDTo(rs.getInt("siteIDTo"));
                     result.setSiteIDFrom(rs.getInt("siteIDFrom"));
                     result.setStatus(rs.getString("status"));
-                    result.setShipDate(rs.getString("shipDate"));
+                    String shipDateString = rs.getString("shipDate");
+                    result.setShipDate(shipDateString.substring(0, shipDateString.length() - 9));
                     result.setTransactionType(rs.getString("txnType"));
-                    result.setCreatedDate(rs.getString("createdDate"));
+                    String createdDateString = rs.getString("createdDate");
+                    result.setCreatedDate(createdDateString.substring(0, createdDateString.length() - 9));
                     result.setDeliveryID(rs.getInt("deliveryID"));
                     result.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
                     result.setDestination(rs.getString("destination"));
