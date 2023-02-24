@@ -36,6 +36,11 @@
                     <div>
                         <div class="card">
                             <div class="card-body">
+                                <div class="form-check">
+                                    <label class="form-check-label"><b>Order Type:</b></label>
+                                    <label class="form-check-label"><span class="badge bg-danger">Emergency</span></label>
+                                </div>
+                                <br>
                                 <div class="row justify-content-center">
                                     <div class="col-3 createOrderPanelCol">
                                         <div class="form-group">
@@ -47,7 +52,7 @@
                                             <input id="creationDate" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
-                                            <label><b>Total Qty Ordered:</b></label>
+                                            <label><b>Total Items Ordered:</b></label>
                                             <input id="totalQtyOrdered" class="form-control" readonly/>
                                         </div>
                                     </div>
@@ -61,7 +66,7 @@
                                             <input id="destinationSite" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
-                                            <label><b>Total Weight:</b></label>
+                                            <label><b>Total Weight(kg):</b></label>
                                             <input id="totalWeight" class="form-control" readonly/>
                                         </div>
                                     </div>
@@ -90,6 +95,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Description</th>
+                                    <th>Weight(kg)</th>
                                     <th>Qty On-Hand</th>
                                     <th>Threshold</th>
                                     <th>Case Size</th>
@@ -105,7 +111,8 @@
                     <div class="row justify-content-center">
                         <button type="button" class="btn btn-success col-2 btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
                         <button id="removeItem" type="button" class="btn btn-danger col-2 btnSpacing" disabled>Remove Item</button>
-                        <button type="button" class="btn btn-primary col-2 btnSpacing" disabled>Submit Order</button>
+                        <button id="orderSave" type="button" class="btn btn-primary col-2 btnSpacing">Save Changes</button>
+                        <button id="orderSubmit" type="button" class="btn btn-primary col-2 btnSpacing" disabled>Submit Order</button>
 
                     </div>
 

@@ -36,12 +36,21 @@ window.onload = async function () {
     document.querySelector("#orderTable").addEventListener('click', orderHighlight);
     document.querySelector("#itemSearch").addEventListener('input', itemSearch);
     document.querySelector("#removeItem").addEventListener('click', removeItem);
+    document.querySelector("#orderSave").addEventListener('click', saveOrder);
     document.querySelector("#add").addEventListener('click', addItem);
     //unhide action buttons depending on user permission
     checkPermissions();
     await getCurrentOrder();
     await getAllItems();
 };
+
+async function saveOrder(){
+    //save total items, weight, and cart
+    currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
+    currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
+    currentOrder.items = cart;
+    console.log(currentOrder);
+}
 
 async function getCurrentOrder(){
     let orderID = sessionStorage.getItem("currentOrderID");
@@ -89,14 +98,24 @@ function removeItem(){
     alert(`Item ${itemToRemove.name} removed from order`);
     buildTable(allItems);
     buildCart();
+    updatePanel();
 }
 
 function addItem(){
     let selectedItem = getSelectedItem();
     //add selecteditem to cart
     selectedItem.caseQuantityOrdered = 1;
+    console.log(selectedItem);
     cart.push(selectedItem);
     cart.sort((a,b) => a.itemID - b.itemID);
+    //adjust total weight and item quantity
+    let curQty = +document.querySelector("#totalQtyOrdered").value;
+    let curWeight = +document.querySelector("#totalWeight").value;
+    let qtyOrdered = selectedItem.caseQuantityOrdered * selectedItem.caseSize;
+    curQty += qtyOrdered;
+    curWeight += (selectedItem.weight * qtyOrdered);
+    document.querySelector("#totalQtyOrdered").value = curQty;
+    document.querySelector("#totalWeight").value = curWeight;
     buildCart();
     alert(`${selectedItem.name} added to order`);
     //get index of item in allItems to remove it
@@ -128,6 +147,10 @@ function buildCart(){
         const nameCell = document.createElement("td");
         nameCell.innerHTML = item.name;
         row.appendChild(nameCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = (item.weight * item.caseQuantityOrdered * item.caseSize);
+        weightCell.id = `weight${item.itemID}`;
+        row.appendChild(weightCell);
         const qtyCell = document.createElement("td");
         qtyCell.innerHTML = item.itemQuantityOnHand;
         row.appendChild(qtyCell);
@@ -151,16 +174,42 @@ function buildCart(){
         qtyUpDown.value = item.caseQuantityOrdered;
         //Changes the quantity of items ordered based on their case size
         qtyUpDown.addEventListener('input', function(){
+           //update items ordered
            const cell = document.querySelector("#qty" + item.itemID);
            const casesOrdered = document.querySelector(`#cases${item.itemID}`).value;
            let itemsOrdered = +casesOrdered * +item.caseSize;
            cell.innerHTML = `<b>${itemsOrdered}</b>`;
+           //update weight
+           const wCell = document.querySelector("#weight" + item.itemID);
+           let weight = itemsOrdered * item.weight;;
+           wCell.innerHTML = weight;
+           //update panel info
+           updatePanel();
         });
         qtyOrderedCell.appendChild(qtyUpDown);
         row.appendChild(qtyOrderedCell);
         //add row to table
         table.appendChild(row);
     });
+}
+
+//Updates the total quantity of the order in the info panel
+function updatePanel(){
+    //get table 
+    let table = document.querySelector("#orderTable");
+    let rows = table.querySelectorAll("tr");
+    let totalQty = 0;
+    let totalWeight = 0;
+    rows.forEach((row) =>{
+        let cells = row.querySelectorAll("td");
+        let qtyCell = cells[6];
+        let qtyNum = qtyCell.querySelector("b");
+        totalQty += +qtyNum.innerHTML;
+        let wNum = +cells[2].innerHTML;
+        totalWeight += wNum;
+    });
+    document.querySelector("#totalQtyOrdered").value = totalQty;
+    document.querySelector("#totalWeight").value = totalWeight;
 }
 
 //Helper function to get the selected order item from the order table

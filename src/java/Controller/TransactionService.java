@@ -26,6 +26,15 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "TransactionService", urlPatterns = {"/TransactionService/*"})
 public class TransactionService extends HttpServlet {
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try ( PrintWriter out = response.getWriter()) {
+            Gson g = new Gson();
+            
+        }
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.

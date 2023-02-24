@@ -10,6 +10,7 @@ package Entity;
  */
 public class Inventory {
     private int itemID, itemQuantityOnHand, reorderThreshold, caseSize;
+    private double weight;
     private String name;
     
     public Inventory(){
@@ -33,6 +34,10 @@ public class Inventory {
     
     public void setName(String name){
         this.name = name;
+    }
+    
+    public void setWeight(double weight){
+        this.weight = weight;
     }
     
 }
