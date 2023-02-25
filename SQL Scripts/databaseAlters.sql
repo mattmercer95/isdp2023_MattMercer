@@ -191,7 +191,7 @@ drop procedure if exists GetAllOrders;
 DELIMITER //
 create procedure GetAllOrders()
 BEGIN
-    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, quantity, sum(weight * quantity) as totalWeight
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
     from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID
     group by txnID;
 END //
