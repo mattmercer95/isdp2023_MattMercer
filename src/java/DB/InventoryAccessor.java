@@ -50,7 +50,7 @@ public class InventoryAccessor {
         try{
             if (!init())
                 return inventory;
-            getInventoryByID.setString(1, Integer.toString(siteID));
+            getInventoryByID.setInt(1, siteID);
             rs = getInventoryByID.executeQuery();
         } catch(SQLException ex){
             System.err.println("************************");

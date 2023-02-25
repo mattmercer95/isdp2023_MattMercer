@@ -17,6 +17,12 @@ public class TransactionItem {
     
     }
     
+    public int getItemID(){
+        return this.itemID;
+    }
+    public int getTransactionID(){
+        return this.txnID;
+    }
     public double getWeight(){
         return this.weight;
     }

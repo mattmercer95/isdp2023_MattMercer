@@ -31,7 +31,10 @@ public class TransactionService extends HttpServlet {
             throws ServletException, IOException {
         try ( PrintWriter out = response.getWriter()) {
             Gson g = new Gson();
-            
+            Scanner sc = new Scanner(request.getReader());
+            Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
+            boolean success = TransactionAccessor.updateTransaction(t);
+            out.println(g.toJson(success));
         }
     }
     

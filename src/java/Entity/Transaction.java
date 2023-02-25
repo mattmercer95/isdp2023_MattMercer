@@ -54,6 +54,22 @@ public class Transaction {
         this.quantity = totalItemQuantity;
     }
     
+    public String getStatus(){
+        return this.status;
+    }
+    
+    public int getDeliveryID(){
+        return this.deliveryID;
+    }
+    
+    public int getTransactionID(){
+        return this.transactionID;
+    }
+    
+    public ArrayList<TransactionItem> getTransactionItems(){
+        return this.items;
+    }
+    
     public void setTransactionID(int transactionID){
         this.transactionID = transactionID;
     }

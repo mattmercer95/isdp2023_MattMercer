@@ -24,6 +24,9 @@ public class TransactionAccessor {
     private static PreparedStatement createNewStoreOrder = null;
     private static PreparedStatement getTransactionByID = null;
     private static PreparedStatement getTransactionItems = null;
+    private static PreparedStatement updateTransaction = null;
+    private static String insertTxnItems = null;
+    private static PreparedStatement dropTxnItems = null;
     
     private TransactionAccessor(){
         //no instant
@@ -50,6 +53,8 @@ public class TransactionAccessor {
                 createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 getTransactionByID = conn.prepareStatement("call GetTransactionByID(?)");
                 getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
+                updateTransaction = conn.prepareStatement("update txn set status = ? where txnID = ?");
+                dropTxnItems = conn.prepareStatement("delete from txnitems where txnID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -60,6 +65,71 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean updateTransaction(Transaction t){
+        boolean result = false;
+
+        //update txn table
+        int rc1;
+        try {
+            if (!init()) {
+                return result;
+            }
+            updateTransaction.setString(1, t.getStatus());
+            updateTransaction.setInt(2, t.getTransactionID());
+            
+            rc1 = updateTransaction.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error updating txn table");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        boolean b1 = rc1 > 0;
+
+        //drop old txnitems table
+        int rc2 = 0;
+        try {
+            dropTxnItems.setInt(1, t.getTransactionID());
+            rc2 = dropTxnItems.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error dropping txnitems");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        boolean b2 = rc2 > 0;
+        
+        //update txnitems table
+        int rc3 = 0;
+        try {
+            ArrayList<TransactionItem> items = t.getTransactionItems();
+            insertTxnItems = "insert into txnitems (txnID, itemID, quantity) values";
+            int counter = 0;
+            for(TransactionItem item : items){
+                if(counter > 0){
+                    insertTxnItems += ",";
+                }
+                counter++;
+                insertTxnItems += "(" + item.getTransactionID() + ", " +
+                        item.getItemID() + ", " + item.getCaseQuantityOrdered() + ")";
+            }
+            System.out.println(insertTxnItems);
+            PreparedStatement insertTxnItemsStmt = conn.prepareStatement(insertTxnItems);
+            rc3 = insertTxnItemsStmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error inserting txnitems");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        boolean b3 = rc3 > 0;
+        
+        result = (b1 && b2 && b3) ? true : false;
+        
+        return result;
     }
     
     public static ArrayList<TransactionItem> getTransactionItems(int transactionID){

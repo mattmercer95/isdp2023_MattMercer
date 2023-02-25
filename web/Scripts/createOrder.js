@@ -50,6 +50,13 @@ async function saveOrder(){
     currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
     currentOrder.items = cart;
     console.log(currentOrder);
+    let url = `../TransactionService/`;
+    let resp = await fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(currentOrder)
+    });
+    result = await resp.text();
+    console.log(result);
 }
 
 async function getCurrentOrder(){
@@ -105,6 +112,8 @@ function addItem(){
     let selectedItem = getSelectedItem();
     //add selecteditem to cart
     selectedItem.caseQuantityOrdered = 1;
+    //add transaction id
+    selectedItem.txnID = +document.querySelector("#orderID").value;
     console.log(selectedItem);
     cart.push(selectedItem);
     cart.sort((a,b) => a.itemID - b.itemID);
@@ -200,11 +209,18 @@ function updatePanel(){
     let rows = table.querySelectorAll("tr");
     let totalQty = 0;
     let totalWeight = 0;
+    let cartIndex = 0;
     rows.forEach((row) =>{
         let cells = row.querySelectorAll("td");
         let qtyCell = cells[6];
         let qtyNum = qtyCell.querySelector("b");
-        totalQty += +qtyNum.innerHTML;
+        let caseCell = cells[7];
+        let caseNum = caseCell.querySelector("input").value;
+        console.log(caseNum);
+        cart[cartIndex].caseQuantityOrdered = caseNum;
+        cartIndex++;
+        let itemQty = +qtyNum.innerHTML;
+        totalQty += itemQty;
         let wNum = +cells[2].innerHTML;
         totalWeight += wNum;
     });
@@ -262,9 +278,10 @@ async function getAllItems(){
     let url = `../InventoryService`;
     let resp = await fetch(url, {
         method: 'POST',
-        body: 4
+        body: currentOrder.siteIDTo
     });
     allItems = await resp.json();
+    console.log(allItems);
     searchResults = allItems
     buildTable(searchResults);
 }
