@@ -32,6 +32,18 @@
                 <select class="form-select" id="siteSelect" name="siteSelect">
                 </select>
             </div>
+            <div id="openOrderStatusSelect" class="col-2">
+                <label>Filter by Order Status:</label>
+                <select class="form-select" id="statusSelect" name="statusSelect">
+                </select>
+            </div>
+            
+        </div>
+        <div class="row">
+            <div id="cancelledOrderCheckDiv" class="form-check">
+                <label class="form-check-label">Include Cancelled/Closed orders</label>
+                <input class="form-check-input" type="checkbox" id="cancelledOrderCheck">
+            </div>
         </div>
         <div class="row">
             <button id="returnToDash" class="col-2 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Dashboard</button>

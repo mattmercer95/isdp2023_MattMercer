@@ -29,3 +29,6 @@ values (2,10000,10),
 (6,10100,6);
 
 update inventory set quantity = 0 where siteID = 4 and itemID in (10000, 10001, 10002, 10003, 10004);
+
+insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, emergencyDelivery)
+values (4, 1, 'CLOSED', '2005-02-13', 'Store Order', 'ABCDEFGHIJKLM', '2005-02-08', 0);

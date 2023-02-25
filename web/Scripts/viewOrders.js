@@ -5,8 +5,9 @@ const redirectUrl = "../index.html";
 let idleTimeout;
 
 let allOrders = null;
+let filteredOrders = [];
 let allSites = null;
-let siteIndex = {};
+let orderStatusList = null;
 
 window.onload = async function () {
     //set current employee global to the user that logged in
@@ -32,11 +33,33 @@ window.onload = async function () {
     document.querySelector("#ordersTable").addEventListener('click', highlight);
     document.querySelector("#newOrder").addEventListener('click', newOrder);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
+    document.querySelector("#statusSelect").addEventListener('input', buildTable);
+    document.querySelector("#cancelledOrderCheck").addEventListener('input', buildTable);
     //unhide action buttons depending on user permission
     checkPermissions();
+    await getOrderStatusList();
     await getAllOrders();
     await getAllSites();
 };
+
+async function getOrderStatusList(){
+    let url = `../TransactionService/orderStatusList`;
+    let resp = await fetch(url, {
+        method: 'GET'
+    });
+    orderStatusList = await resp.json();
+    orderStatusList.push("ALL");
+    let statusSelector = document.querySelector("#statusSelect");
+    orderStatusList.forEach((status) =>{
+        const optionEle = document.createElement("option");
+        optionEle.value = status;
+        optionEle.innerHTML = status;
+        if(status === "ALL"){
+            optionEle.selected = true;
+        }
+        statusSelector.appendChild(optionEle);
+    });
+}
 
 function viewDetails(){
     let selectedOrder = getSelectedOrder();
@@ -53,7 +76,7 @@ function getSelectedOrder(){
     for(let i = 0; i < rows.length; i++){
         row = rows[i];
         if(row.classList.contains("highlighted")){
-            selectedItem = allOrders[i];
+            selectedItem = filteredOrders[i];
         }
     }
     return selectedItem;
@@ -74,7 +97,6 @@ async function getAllSites(){
             method: 'GET'
         });
         allSites = await resp.json();
-        console.log(allSites);
         //load all sites into the select input
         allSites.forEach((site)=>{
             let optionEle = document.createElement("option");
@@ -153,9 +175,26 @@ async function getAllOrders(){
 
 //builds the order table
 function buildTable(){
-    console.log(allOrders);
+    let filtered = [];
+    //get the order filter from the selector
+    let statusFilter = document.querySelector("#statusSelect").value;
+    let closedOrderFilter = document.querySelector("#cancelledOrderCheck").checked;
+    let allFilter = statusFilter === "ALL";
+    let allFilterWithClosed = allFilter && closedOrderFilter;
+    console.log(`statusFilter = ${statusFilter} closedOrderFilter = ${closedOrderFilter} allFilter = ${allFilter} allFilterWithClosed = ${allFilterWithClosed}`);
+    if(allFilterWithClosed){
+        filtered = allOrders;
+    }
+    else{
+        allOrders.forEach((order)=>{
+            if(order.status === statusFilter || allFilter){
+                filtered.push(order);
+            }
+        })
+    }
     const table = document.querySelector("#ordersTable");
-    allOrders.forEach((order)=>{
+    table.innerHTML = "";
+    filtered.forEach((order)=>{
         //create row and data cells
         const row = document.createElement("tr");
         const locationCell = document.createElement("td");
@@ -176,6 +215,7 @@ function buildTable(){
         //add row to table
         table.appendChild(row);
     });
+    filteredOrders = filtered;
 }
 
 function checkPermissions(){

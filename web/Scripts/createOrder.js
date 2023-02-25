@@ -38,25 +38,51 @@ window.onload = async function () {
     document.querySelector("#removeItem").addEventListener('click', removeItem);
     document.querySelector("#orderSave").addEventListener('click', saveOrder);
     document.querySelector("#add").addEventListener('click', addItem);
+    document.querySelector("#orderSubmit").addEventListener('click', submitOrder);
     //unhide action buttons depending on user permission
-    checkPermissions();
+    
     await getCurrentOrder();
     await getAllItems();
+    checkPermissions();
 };
+
+async function submitOrder(){
+    //save total items, weight, and cart
+    currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
+    currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
+    currentOrder.items = cart;
+    let url = `../TransactionService/submit`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(currentOrder)
+    });
+    result = await resp.text();
+    if(result){
+        alert(`Order #${currentOrder.transactionID} submitted successfully`);
+        window.location.href = "ViewOrders.html";
+    }
+    else {
+        alert("Something went wrong submitting order. Please contact admin.");
+    }
+}
 
 async function saveOrder(){
     //save total items, weight, and cart
     currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
     currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
     currentOrder.items = cart;
-    console.log(currentOrder);
     let url = `../TransactionService/`;
     let resp = await fetch(url, {
         method: 'PUT',
         body: JSON.stringify(currentOrder)
     });
     result = await resp.text();
-    console.log(result);
+    if(result){
+        alert(`Sucessfully saved order #${currentOrder.transactionID}`);
+    }
+    else {
+        alert("Something went wrong saving order. Check Server.");
+    }
 }
 
 async function getCurrentOrder(){
@@ -67,7 +93,6 @@ async function getCurrentOrder(){
         body: orderID
     });
     currentOrder = await resp.json();
-    console.log(currentOrder);
     //populate info panel
     document.querySelector("#orderID").value = currentOrder.transactionID;
     document.querySelector("#creationDate").value = currentOrder.createdDate;
@@ -281,7 +306,6 @@ async function getAllItems(){
         body: currentOrder.siteIDTo
     });
     allItems = await resp.json();
-    console.log(allItems);
     searchResults = allItems
     buildTable(searchResults);
 }
@@ -328,8 +352,10 @@ function buildTable(items){
 
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
-    //TODO: enable buttons based on permission
-    console.log(permissions);
+    let submitButton = document.querySelector("#orderSubmit");
+    if(currentOrder.status === "NEW"){
+        submitButton.disabled = false;
+    }
 }
 
 function itemHighlight(e){

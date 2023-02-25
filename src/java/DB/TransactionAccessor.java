@@ -27,6 +27,7 @@ public class TransactionAccessor {
     private static PreparedStatement updateTransaction = null;
     private static String insertTxnItems = null;
     private static PreparedStatement dropTxnItems = null;
+    private static PreparedStatement getOrderStatusList = null;
     
     private TransactionAccessor(){
         //no instant
@@ -55,6 +56,7 @@ public class TransactionAccessor {
                 getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
                 updateTransaction = conn.prepareStatement("update txn set status = ? where txnID = ?");
                 dropTxnItems = conn.prepareStatement("delete from txnitems where txnID = ?");
+                getOrderStatusList = conn.prepareStatement("select statusName from txnstatus where statusName not in ('CLOSED', 'CANCELLED')");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -65,6 +67,37 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<String> getOrderStatusList(){
+        ArrayList<String> orderStatusList = new ArrayList<String>();
+
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return orderStatusList;
+            }
+            rs = getOrderStatusList.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Getting Order Status List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return orderStatusList;
+        }
+
+        try {
+            while (rs.next()) {
+                orderStatusList.add(rs.getString("statusName"));
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Populating Order Status List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return orderStatusList;
     }
     
     public static boolean updateTransaction(Transaction t){
