@@ -113,11 +113,14 @@ async function getAllSites(){
         allSites = await resp.json();
         //load all sites into the select input
         allSites.forEach((site)=>{
-            let optionEle = document.createElement("option");
-            optionEle.value = site.siteID;
-            optionEle.innerHTML = site.name;
-            optionEle.id = site.name;
-            select.appendChild(optionEle);
+            if(site.siteID !== 2){
+                let optionEle = document.createElement("option");
+                optionEle.value = site.siteID;
+                optionEle.innerHTML = site.name;
+                optionEle.id = site.name;
+                select.appendChild(optionEle);
+            }
+            
         });
     }
 }
@@ -264,6 +267,9 @@ function buildTable(){
     filtered = filterByStatus(filter);
     const table = document.querySelector("#ordersTable");
     table.innerHTML = "";
+    filtered.sort((a,b)=>{
+        return a.transactionID - b.transactionID;
+    });
     filtered.forEach((order)=>{
         //create row and data cells
         const row = document.createElement("tr");
@@ -350,7 +356,6 @@ function highlight(e){
         let selected = getSelectedOrder();
         if(selected.status === "SUBMITTED"){
             document.querySelector("#processOrder").disabled = false;
-            console.log(selected);
         }
         else {
             document.querySelector("#processOrder").disabled = true;

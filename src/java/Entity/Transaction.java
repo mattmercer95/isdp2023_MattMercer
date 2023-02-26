@@ -66,6 +66,10 @@ public class Transaction {
         return this.transactionID;
     }
     
+    public String getShipDate(){
+        return this.shipDate;
+    }
+    
     public ArrayList<TransactionItem> getTransactionItems(){
         return this.items;
     }

@@ -55,7 +55,7 @@ public class TransactionAccessor {
                 createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 getTransactionByID = conn.prepareStatement("call GetTransactionByID(?)");
                 getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
-                updateTransaction = conn.prepareStatement("update txn set status = ? where txnID = ?");
+                updateTransaction = conn.prepareStatement("update txn set status = ?, shipDate = ? where txnID = ?");
                 dropTxnItems = conn.prepareStatement("delete from txnitems where txnID = ?");
                 getOrderStatusList = conn.prepareStatement("select statusName from txnstatus");
                 getZeroItemTransactions = conn.prepareStatement("call GetZeroItemOrders()");
@@ -112,8 +112,8 @@ public class TransactionAccessor {
                 return result;
             }
             updateTransaction.setString(1, t.getStatus());
-            updateTransaction.setInt(2, t.getTransactionID());
-            
+            updateTransaction.setString(2, t.getShipDate());
+            updateTransaction.setInt(3, t.getTransactionID());
             rc1 = updateTransaction.executeUpdate();
         } catch (SQLException ex) {
             System.err.println("************************");

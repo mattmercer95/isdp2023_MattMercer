@@ -1,5 +1,4 @@
 let currentEmployee;
-let allEmployees;
 
 let idleTimeout;
 const idleDurationMins = 15;
@@ -73,6 +72,7 @@ async function submitOrder(){
     //save total items, weight, and cart
     currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
     currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
+    currentOrder.shipDate = document.querySelector("#shipDate").value;
     currentOrder.items = cart;
     let confirmSubmit = confirm(`Submit Order #${currentOrder.transactionID} for processing?\n\nShip Date: ${currentOrder.shipDate}\nTotal Items: ${currentOrder.quantity}\nTotal Weight: ${currentOrder.totalWeight}`);
     if(!confirmSubmit){
@@ -102,6 +102,7 @@ async function saveOrder(){
     //save total items, weight, and cart
     currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
     currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
+    currentOrder.shipDate = document.querySelector("#shipDate").value;
     currentOrder.items = cart;
     let url = `../TransactionService/`;
     let resp = await fetch(url, {
@@ -193,7 +194,6 @@ function addItem(){
     selectedItem.caseQuantityOrdered = 1;
     //add transaction id
     selectedItem.txnID = +document.querySelector("#orderID").value;
-    console.log(selectedItem);
     cart.push(selectedItem);
     cart.sort((a,b) => a.itemID - b.itemID);
     //adjust total weight and item quantity
