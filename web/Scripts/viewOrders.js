@@ -95,7 +95,7 @@ function getSelectedOrder(){
 async function getAllSites(){
     if(currentEmployee.positionID === 99999999){
         //unhide the select panel
-        let panel = document.querySelector("#adminSitePanel");
+        let panel = document.querySelector("#adminSiteSelect");
         panel.hidden = false;
         //get the select element
         let select = document.querySelector("#siteSelect");
@@ -144,6 +144,31 @@ async function newOrder(){
     }
 }
 
+async function logTransaction(orderID, emergencyOrder, origin){
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = `${yyyy}-${mm}-${dd}`;
+    let obj = {
+        txnID: orderID,
+        txnType: (emergencyOrder) ? 'Emergency' : 'Regular',
+        status: "NEW",
+        txnDate: today,
+        siteID: +origin,
+        employeeID: currentEmployee.employeeID
+    }
+    console.log(obj);
+    let url = `../AuditService/new`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    });
+    console.log(await resp.text());
+    
+}
+
 //Makes API call to create a new order entry and redirects to the create order page.
 async function createNewOrder(origin, emergency){
     let url = `../TransactionService/${(emergency) ? "newEmergencyStoreOrder" : "newStoreOrder"}`;
@@ -154,6 +179,8 @@ async function createNewOrder(origin, emergency){
     let newOrderID = await resp.json();
     if(newOrderID > 0){
         //successful order creation
+        //submit audit log
+        await logTransaction(newOrderID, emergency, origin);
         sessionStorage.setItem("currentOrderID", newOrderID);
         window.location.href = "CreateOrder.html";
     }
@@ -187,13 +214,23 @@ async function getAllOrders(){
     let resp = await fetch(url, {
         method: 'GET'
     });
-    allOrders = await resp.json();
+    orders = await resp.json();
+    if(currentEmployee.positionID === 3){
+        allOrders = [];
+        orders.forEach((order)=>{
+            if(currentEmployee.siteID === order.siteIDTo){
+                allOrders.push(order);
+            }
+        });
+    }
+    else {
+        allOrders = orders;
+    }
     buildTable();
 }
 
 //helper function to filter the order list
 function filterByStatus(filter){
-    console.log(filter);
     let filteredList = [];
     allOrders.forEach((order) =>{
         switch(filter){
@@ -281,7 +318,12 @@ function buildTable(){
 
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
-    //TODO: enable buttons based on permission
+    permissions.forEach((permission)=>{
+        if(permission === "CREATESTOREORDER"){
+            document.querySelector("#newOrder").hidden = false;
+            document.querySelector("#newEmergency").hidden = false;
+        }
+    });
 }
 
 function returnToDash(){

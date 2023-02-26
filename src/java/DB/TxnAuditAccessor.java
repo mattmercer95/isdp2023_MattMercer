@@ -20,6 +20,7 @@ public class TxnAuditAccessor {
     private static PreparedStatement insertLogInTransactionStatement = null;
     private static PreparedStatement insertLogOutTransactionStatement = null;
     private static PreparedStatement insertPasswordResetTransactionStatement = null;
+    private static PreparedStatement insertStoreOrderTransaction = null;
     
     private TxnAuditAccessor(){
         //no instantiation
@@ -37,6 +38,8 @@ public class TxnAuditAccessor {
                 insertPasswordResetTransactionStatement = conn.prepareStatement(insertStatementRoot + 
                         "values(null, 'Password Reset', 'Reset by User', "
                         + "?, ?, null, ?, null)");
+                insertStoreOrderTransaction = conn.prepareStatement(insertStatementRoot +
+                        "values(?, ?, ?, ?, ?, ?, ?, null)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -63,6 +66,33 @@ public class TxnAuditAccessor {
         } catch(SQLException ex){
             System.err.println("************************");
             System.err.println("** Error Inserting Log In Transaction");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        return result;
+    }
+    
+    public static boolean insertOrderTransaction(TxnAudit txnToBeLogged){
+        boolean result = false;
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            insertStoreOrderTransaction.setInt(1, txnToBeLogged.getTxnID());
+            insertStoreOrderTransaction.setString(2, txnToBeLogged.getTxnType());
+            insertStoreOrderTransaction.setString(3, txnToBeLogged.getStatus());
+            insertStoreOrderTransaction.setString(4, txnToBeLogged.getTxnDate());
+            System.out.println(txnToBeLogged.getSiteID());
+            insertStoreOrderTransaction.setInt(5, txnToBeLogged.getSiteID());
+            insertStoreOrderTransaction.setInt(6, txnToBeLogged.getDeliveryID());
+            insertStoreOrderTransaction.setInt(7, txnToBeLogged.getEmployeeID());
+            int rowCount = insertStoreOrderTransaction.executeUpdate();
+            result = (rowCount == 1);
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error Inserting Order Transaction");
             System.err.println("** " + ex.getMessage());
             System.err.println("************************");
             return result;

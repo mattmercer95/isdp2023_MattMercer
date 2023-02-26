@@ -1,5 +1,3 @@
-
-
 let currentEmployee;
 let allEmployees;
 

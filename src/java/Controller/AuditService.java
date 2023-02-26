@@ -4,12 +4,11 @@
  */
 package Controller;
 
-import DB.InventoryAccessor;
-import Entity.Inventory;
+import DB.TxnAuditAccessor;
+import Entity.TxnAudit;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,10 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author mattm
+ * @author Matt
  */
-@WebServlet(name = "InventoryService", urlPatterns = {"/InventoryService/*"})
-public class InventoryService extends HttpServlet {
+@WebServlet(name = "AuditService", urlPatterns = {"/AuditService/*"})
+public class AuditService extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,17 +38,14 @@ public class InventoryService extends HttpServlet {
         String uri = request.getPathInfo();
         try ( PrintWriter out = response.getWriter()) {
             Gson g = new Gson();
-            if(uri.equals("/newOrder")){
+            if(uri.equals("/new")){
                 Scanner sc = new Scanner(request.getReader());
-                int siteID = Integer.parseInt(sc.nextLine());
-                ArrayList<Inventory> inventory = InventoryAccessor.getAvailableInventory(siteID);
-                out.println(g.toJson(inventory));
+                TxnAudit auditItem = g.fromJson(sc.nextLine(), TxnAudit.class);
+                boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
+                out.println(g.toJson(result));
             }
             else {
-                Scanner sc = new Scanner(request.getReader());
-                int siteID = Integer.parseInt(sc.nextLine());
-                ArrayList<Inventory> inventory = InventoryAccessor.getInventoryByID(siteID);
-                out.println(g.toJson(inventory));
+                System.out.println(":(");
             }
         }
     }
