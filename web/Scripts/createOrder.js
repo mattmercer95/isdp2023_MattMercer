@@ -44,11 +44,40 @@ window.onload = async function () {
     checkPermissions();
 };
 
+async function logTransaction(){
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = `${yyyy}-${mm}-${dd}`;
+    let obj = {
+        txnID: currentOrder.transactionID,
+        txnType: (currentOrder.emergencyDelivery) ? 'Emergency' : 'Regular',
+        status: "SUBMITTED",
+        txnDate: today,
+        siteID: currentOrder.siteIDTo,
+        employeeID: currentEmployee.employeeID
+    }
+    console.log(obj);
+    let url = `../AuditService/new`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    });
+    console.log(await resp.text());
+    
+}
+
 async function submitOrder(){
     //save total items, weight, and cart
     currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
     currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
     currentOrder.items = cart;
+    let confirmSubmit = confirm(`Submit Order #${currentOrder.transactionID} for processing?\n\nShip Date: ${currentOrder.shipDate}\nTotal Items: ${currentOrder.quantity}\nTotal Weight: ${currentOrder.totalWeight}`);
+    if(!confirmSubmit){
+        return;
+    }
     if(cart.length === 0){
         alert("Error: Order must contain at least 1 item to be submitted");
         return;
@@ -61,6 +90,7 @@ async function submitOrder(){
     result = await resp.text();
     if(result){
         alert(`Order #${currentOrder.transactionID} submitted successfully`);
+        logTransaction();
         window.location.href = "ViewOrders.html";
     }
     else {

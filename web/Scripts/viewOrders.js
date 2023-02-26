@@ -35,6 +35,11 @@ window.onload = async function () {
     document.querySelector("#newEmergency").addEventListener('click', newEmergency);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     document.querySelector("#statusSelect").addEventListener('input', buildTable);
+    document.querySelector("#processOrder").addEventListener('click', ()=>{
+        let selected = getSelectedOrder();
+        sessionStorage.setItem("currentOrderID", selected.transactionID);
+        window.location.href = "ProcessOrder.html";
+    });
     //unhide action buttons depending on user permission
     checkPermissions();
     await getOrderStatusList();
@@ -323,6 +328,9 @@ function checkPermissions(){
             document.querySelector("#newOrder").hidden = false;
             document.querySelector("#newEmergency").hidden = false;
         }
+        if(permission === "RECEIVESTOREORDER"){
+            document.querySelector("#processOrder").hidden = false;
+        }
     });
 }
 
@@ -339,9 +347,18 @@ function highlight(e){
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
         document.querySelector("#viewDetails").disabled = false;
+        let selected = getSelectedOrder();
+        if(selected.status === "SUBMITTED"){
+            document.querySelector("#processOrder").disabled = false;
+            console.log(selected);
+        }
+        else {
+            document.querySelector("#processOrder").disabled = true;
+        }
     }
     else {
         document.querySelector("#viewDetails").disabled = true;
+        document.querySelector("#processOrder").disabled = true;
     }
 }
 
