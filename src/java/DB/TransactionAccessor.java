@@ -28,6 +28,7 @@ public class TransactionAccessor {
     private static String insertTxnItems = null;
     private static PreparedStatement dropTxnItems = null;
     private static PreparedStatement getOrderStatusList = null;
+    private static PreparedStatement getZeroItemTransactions = null;
     
     private TransactionAccessor(){
         //no instant
@@ -56,7 +57,8 @@ public class TransactionAccessor {
                 getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
                 updateTransaction = conn.prepareStatement("update txn set status = ? where txnID = ?");
                 dropTxnItems = conn.prepareStatement("delete from txnitems where txnID = ?");
-                getOrderStatusList = conn.prepareStatement("select statusName from txnstatus where statusName not in ('CLOSED', 'CANCELLED')");
+                getOrderStatusList = conn.prepareStatement("select statusName from txnstatus");
+                getZeroItemTransactions = conn.prepareStatement("call GetZeroItemOrders()");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -357,6 +359,48 @@ public class TransactionAccessor {
         }
 
         return result;
+    }
+    
+    public static ArrayList<Transaction> getZeroItemTransactions(){
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            rs = getZeroItemTransactions.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Zero-item Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Zero-item Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
     }
     
     public static ArrayList<Transaction> getAllTransactions(){

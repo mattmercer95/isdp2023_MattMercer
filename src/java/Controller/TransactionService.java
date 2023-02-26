@@ -92,6 +92,8 @@ public class TransactionService extends HttpServlet {
             }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
+                //get zero item orders and add to list
+                transactions.addAll(TransactionAccessor.getZeroItemTransactions());
                 out.println(g.toJson(transactions));
             }
             

@@ -197,6 +197,19 @@ BEGIN
 END //
 DELIMITER ;
 
+/*
+Retreives the Information needed to display orders
+*/
+drop procedure if exists GetZeroItemOrders;
+DELIMITER //
+create procedure GetZeroItemOrders()
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery
+    from txn inner join site where siteIDTo = siteID and txnID not in (select distinct txnID from txnitems)
+    group by txnID;
+END //
+DELIMITER ;
+
 /* -----------------------------
 			Triggers
    ------------------------------ 

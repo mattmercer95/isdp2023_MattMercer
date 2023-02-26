@@ -34,7 +34,6 @@ window.onload = async function () {
     document.querySelector("#newOrder").addEventListener('click', newOrder);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     document.querySelector("#statusSelect").addEventListener('input', buildTable);
-    document.querySelector("#cancelledOrderCheck").addEventListener('input', buildTable);
     //unhide action buttons depending on user permission
     checkPermissions();
     await getOrderStatusList();
@@ -49,12 +48,14 @@ async function getOrderStatusList(){
     });
     orderStatusList = await resp.json();
     orderStatusList.push("ALL");
+    orderStatusList.push("ALL OPEN");
+    orderStatusList.sort();
     let statusSelector = document.querySelector("#statusSelect");
     orderStatusList.forEach((status) =>{
         const optionEle = document.createElement("option");
         optionEle.value = status;
         optionEle.innerHTML = status;
-        if(status === "ALL"){
+        if(status === "ALL OPEN"){
             optionEle.selected = true;
         }
         statusSelector.appendChild(optionEle);
@@ -173,35 +174,78 @@ async function getAllOrders(){
     buildTable();
 }
 
+//helper function to filter the order list
+function filterByStatus(filter){
+    console.log(filter);
+    let filteredList = [];
+    allOrders.forEach((order) =>{
+        switch(filter){
+            case "ALL":
+                filteredList.push(order);
+                break;
+            case "ALL OPEN":
+                if(order.status !== "CLOSED" && order.status !== "CANCELLED"){
+                    filteredList.push(order);
+                }
+                break;
+            default:
+                if(order.status === filter){
+                    filteredList.push(order);
+                }
+                break;
+        }
+    });
+    return filteredList;
+}
+
 //builds the order table
 function buildTable(){
     let filtered = [];
-    //get the order filter from the selector
-    let statusFilter = document.querySelector("#statusSelect").value;
-    let closedOrderFilter = document.querySelector("#cancelledOrderCheck").checked;
-    let allFilter = statusFilter === "ALL";
-    let allFilterWithClosed = allFilter && closedOrderFilter;
-    console.log(`statusFilter = ${statusFilter} closedOrderFilter = ${closedOrderFilter} allFilter = ${allFilter} allFilterWithClosed = ${allFilterWithClosed}`);
-    if(allFilterWithClosed){
-        filtered = allOrders;
-    }
-    else{
-        allOrders.forEach((order)=>{
-            if(order.status === statusFilter || allFilter){
-                filtered.push(order);
-            }
-        })
-    }
+    let filter = document.querySelector("#statusSelect").value.trim();
+    filtered = filterByStatus(filter);
     const table = document.querySelector("#ordersTable");
     table.innerHTML = "";
     filtered.forEach((order)=>{
         //create row and data cells
         const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        const boldID = document.createElement("b");
+        boldID.innerHTML = order.transactionID;
+        idCell.appendChild(boldID);
+        row.appendChild(idCell);
         const locationCell = document.createElement("td");
         locationCell.innerHTML = order.destination;
         row.appendChild(locationCell);
+        const typeCell = document.createElement("td");
+        const typePill = document.createElement("span");
+        typePill.classList.add("badge");
+        if(order.emergencyOrder){
+            typePill.classList.add("text-bg-danger");
+            typePill.innerHTML = "Emergency";
+        }
+        else {
+            typePill.classList.add("text-bg-primary");
+            typePill.innerHTML = "Regular";
+        }
+        typeCell.appendChild(typePill);
+        row.appendChild(typeCell);
         const statusCell = document.createElement("td");
-        statusCell.innerHTML = order.status;
+        const statusPill = document.createElement("span");
+        statusPill.classList.add("badge");
+        if(order.status === "NEW"){
+            statusPill.classList.add("text-bg-success");
+        }
+        else if(order.status === "CLOSED" || order.status === "CANCELLED"){
+            statusPill.classList.add("text-bg-secondary");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else {
+            statusPill.classList.add("text-bg-info");
+        }
+        statusPill.innerHTML = order.status;
+        statusCell.appendChild(statusPill);
         row.appendChild(statusCell);
         const itemsCell = document.createElement("td");
         itemsCell.innerHTML = order.quantity;
@@ -229,6 +273,7 @@ function returnToDash(){
 
 function highlight(e){
     let trs = document.querySelectorAll("tr");
+    console.log(trs);
     for (let i = 0; i < trs.length; i++) {
         trs[i].classList.remove("highlighted");
     }

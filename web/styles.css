@@ -76,7 +76,7 @@
 }
 
 .highlighted {
-    background-color: yellow;
+    background-color: yellow !important;
 }
 .wrongAnswer {
     color: red;

@@ -104,6 +104,22 @@ async function getCurrentOrder(){
     document.querySelector("#totalQtyOrdered").value = currentOrder.quantity;
     document.querySelector("#totalWeight").value = currentOrder.totalWeight;
     
+    let typeLabel = document.querySelector("#typeLabel");
+    const typeBadge = document.createElement("span");
+    typeBadge.classList.add("badge");
+    if(currentOrder.emergencyOrder){
+        typeBadge.classList.add("text-bg-danger");
+        typeBadge.innerHTML = "Emergency";
+    }
+    else {
+        typeBadge.classList.add("text-bg-primary");
+        typeBadge.innerHTML = "Regular";
+    }
+    typeLabel.appendChild(typeBadge);
+    
+    if(currentOrder.status === "NEW"){
+        document.querySelector("#newOrderPanel").hidden = false;
+    }
     //load cart
     cart = currentOrder.items;
     buildCart();
@@ -206,6 +222,9 @@ function buildCart(){
         qtyUpDown.min = 1;
         qtyUpDown.id = `cases${item.itemID}`;
         qtyUpDown.value = item.caseQuantityOrdered;
+        if(currentOrder.status !== "NEW"){
+            qtyUpDown.disabled = true;
+        }
         //Changes the quantity of items ordered based on their case size
         qtyUpDown.addEventListener('input', function(){
            //update items ordered
@@ -241,7 +260,6 @@ function updatePanel(){
         let qtyNum = qtyCell.querySelector("b");
         let caseCell = cells[7];
         let caseNum = caseCell.querySelector("input").value;
-        console.log(caseNum);
         cart[cartIndex].caseQuantityOrdered = caseNum;
         cartIndex++;
         let itemQty = +qtyNum.innerHTML;

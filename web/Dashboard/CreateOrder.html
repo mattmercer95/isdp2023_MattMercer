@@ -38,7 +38,7 @@
                             <div class="card-body">
                                 <div class="form-check">
                                     <label class="form-check-label"><b>Order Type:</b></label>
-                                    <label class="form-check-label"><span class="badge bg-danger">Emergency</span></label>
+                                    <label class="form-check-label" id="typeLabel"></label>
                                 </div>
                                 <br>
                                 <div class="row justify-content-center">
@@ -108,7 +108,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="row justify-content-center">
+                    <div id="newOrderPanel" class="row justify-content-center" hidden>
                         <button type="button" class="btn btn-success col-2 btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
                         <button id="removeItem" type="button" class="btn btn-danger col-2 btnSpacing" disabled>Remove Item</button>
                         <button id="orderSave" type="button" class="btn btn-primary col-2 btnSpacing">Save Changes</button>
