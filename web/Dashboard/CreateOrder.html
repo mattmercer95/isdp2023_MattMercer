@@ -42,7 +42,7 @@
                                 </div>
                                 <br>
                                 <div class="row justify-content-center">
-                                    <div class="col-3 createOrderPanelCol">
+                                    <div class="col createOrderPanelCol">
                                         <div class="form-group">
                                             <label><b>Order ID:</b></label>
                                             <input id="orderID" class="form-control" readonly/>
@@ -56,7 +56,7 @@
                                             <input id="totalQtyOrdered" class="form-control" readonly/>
                                         </div>
                                     </div>
-                                    <div class="col-3 createOrderPanelCol">
+                                    <div class="col createOrderPanelCol">
                                         <div class="form-group">
                                             <label><b>Site of Origin:</b></label>
                                             <input id="originSite" class="form-control" readonly/>
@@ -70,7 +70,7 @@
                                             <input id="totalWeight" class="form-control" readonly/>
                                         </div>
                                     </div>
-                                    <div class="col-3 createOrderPanelCol">
+                                    <div class="col createOrderPanelCol">
                                         <div class="form-group">
                                             <label><b>Status:</b></label>
                                             <input id="status" class="form-control" readonly/>
@@ -109,13 +109,11 @@
                         </table>
                     </div>
                     <div id="newOrderPanel" class="row justify-content-center" hidden>
-                        <button type="button" class="btn btn-success col-2 btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
-                        <button id="removeItem" type="button" class="btn btn-danger col-2 btnSpacing" disabled>Remove Item</button>
-                        <button id="orderSave" type="button" class="btn btn-primary col-2 btnSpacing">Save Changes</button>
-                        <button id="orderSubmit" type="button" class="btn btn-primary col-2 btnSpacing" disabled>Submit Order</button>
-
+                        <button type="button" class="btn btn-success col btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
+                        <button id="removeItem" type="button" class="btn btn-danger col btnSpacing" disabled>Remove Item</button>
+                        <button id="orderSave" type="button" class="btn btn-primary col btnSpacing">Save Changes</button>
+                        <button id="orderSubmit" type="button" class="btn btn-primary col btnSpacing" disabled>Submit Order</button>
                     </div>
-
                     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-scrollable modal-lg">
                             <div class="modal-content">
