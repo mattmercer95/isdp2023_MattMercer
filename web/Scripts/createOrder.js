@@ -51,6 +51,10 @@ async function submitOrder(){
     currentOrder.quantity = +document.querySelector("#totalQtyOrdered").value;
     currentOrder.totalWeight = +document.querySelector("#totalWeight").value;
     currentOrder.items = cart;
+    if(cart.length === 0){
+        alert("Error: Order must contain at least 1 item to be submitted");
+        return;
+    }
     let url = `../TransactionService/submit`;
     let resp = await fetch(url, {
         method: 'POST',
@@ -107,7 +111,7 @@ async function getCurrentOrder(){
     let typeLabel = document.querySelector("#typeLabel");
     const typeBadge = document.createElement("span");
     typeBadge.classList.add("badge");
-    if(currentOrder.emergencyOrder){
+    if(currentOrder.emergencyDelivery){
         typeBadge.classList.add("text-bg-danger");
         typeBadge.innerHTML = "Emergency";
     }
@@ -144,6 +148,12 @@ function removeItem(){
     //sort and rebuild
     allItems.sort((a,b) => a.itemID - b.itemID);
     alert(`Item ${itemToRemove.name} removed from order`);
+    //check for emergency order item limit
+    if(currentOrder.emergencyDelivery && cart.length < 5){
+        document.querySelector("#emergencyItemLimitAlert").hidden = true;
+        document.querySelector("#addItemToOrder").disabled = false;
+    }
+    document.querySelector("#removeItem").disabled = true;
     buildTable(allItems);
     buildCart();
     updatePanel();
@@ -186,6 +196,11 @@ function addItem(){
 }
 
 function buildCart(){
+    //check for emergency order item limit
+    if(currentOrder.emergencyDelivery && cart.length >= 5){
+        document.querySelector("#emergencyItemLimitAlert").hidden = false;
+        document.querySelector("#addItemToOrder").disabled = true;
+    }
     const table = document.querySelector("#orderTable");
     table.innerHTML = "";
     cart.forEach((item)=>{
@@ -318,7 +333,7 @@ function itemSearch(){
 
 //Makes API call to get all items and stores them in the global variable
 async function getAllItems(){
-    let url = `../InventoryService`;
+    let url = `../InventoryService/newOrder`;
     let resp = await fetch(url, {
         method: 'POST',
         body: currentOrder.siteIDTo

@@ -89,6 +89,9 @@
                             </div>
                         </div>
                     </div>
+                    <div id="emergencyItemLimitAlert" class="alert alert-danger" role="alert" hidden>
+                        Maximum of 5 items reached for Emergency Order
+                    </div>
                     <div class= "prevent-select">
                         <table class="table table-bordered table-striped ">
                             <thead>
@@ -109,7 +112,7 @@
                         </table>
                     </div>
                     <div id="newOrderPanel" class="row justify-content-center" hidden>
-                        <button type="button" class="btn btn-success col btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
+                        <button id="addItemToOrder" type="button" class="btn btn-success col btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
                         <button id="removeItem" type="button" class="btn btn-danger col btnSpacing" disabled>Remove Item</button>
                         <button id="orderSave" type="button" class="btn btn-primary col btnSpacing">Save Changes</button>
                         <button id="orderSubmit" type="button" class="btn btn-primary col btnSpacing" disabled>Submit Order</button>

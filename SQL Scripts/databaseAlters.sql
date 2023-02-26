@@ -48,17 +48,19 @@ Creates a store order and adds the inventory items that are below the threshold
 */
 drop procedure if exists CreateNewStoreOrder;
 DELIMITER //
-create procedure CreateNewStoreOrder(in storeID int, in orderDate date)
+create procedure CreateNewStoreOrder(in storeID int, in orderDate date, in emg tinyint)
 BEGIN
 	start transaction;
     call GetNextDeliveryDate(storeID, @nextShipDate);
 	insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery)
-		values(storeID, 1, 'NEW', @nextShipDate, 'Store Order', 'X', orderDate, null, false);
+		values(storeID, 1, 'NEW', @nextShipDate, 'Store Order', 'X', orderDate, null, emg);
 	select LAST_INSERT_ID() into @orderID;
-    insert into txnitems (txnID, itemID, quantity)
-		select @orderID, itemID, ceiling((reorderThreshold - quantity) / caseSize) 
-        from inventory inner join item using (itemID)
-        where quantity < reorderThreshold;
+    if emg = false then
+		insert into txnitems (txnID, itemID, quantity)
+			select @orderID, itemID, ceiling((reorderThreshold - quantity) / caseSize) 
+			from inventory inner join item using (itemID)
+			where quantity < reorderThreshold and active = true;
+	end if;
 	commit;
     select @orderID;
 END //
@@ -108,6 +110,20 @@ END //
 DELIMITER ;
 
 /*
+Retrieves the availbible inventory for a particular site
+*/
+drop procedure if exists GetAvailableInventory;
+DELIMITER //
+create procedure GetAvailableInventory(in id int)
+BEGIN
+    Select itemID, name, quantity, reorderThreshold, caseSize, weight   
+    from inventory inner join item using (itemID)
+    where siteID = id and active = true
+    and itemID not in (select distinct itemID from txnitems inner join txn using(txnID) where status not in ('CLOSED', 'CANCELLED', 'REJECTED') and siteIDTo = id);
+END //
+DELIMITER ;
+
+/*
 Retrieves the inventory for a particular site
 */
 drop procedure if exists GetInventoryBySiteID;
@@ -117,7 +133,7 @@ BEGIN
     Select itemID, name, quantity, reorderThreshold, caseSize, weight   
     from inventory inner join item using (itemID)
     where siteID = id and active = true
-    and itemID not in (select distinct itemID from txnitems inner join txn using(txnID) where status = 'NEW' and siteIDTo = id);
+    and itemID not in (select distinct itemID from txnitems inner join txn using(txnID) where status not in ('CLOSED', 'CANCELLED', 'REJECTED') and siteIDTo = id);
 END //
 DELIMITER ;
 

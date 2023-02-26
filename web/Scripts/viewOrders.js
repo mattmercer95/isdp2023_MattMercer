@@ -32,6 +32,7 @@ window.onload = async function () {
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#ordersTable").addEventListener('click', highlight);
     document.querySelector("#newOrder").addEventListener('click', newOrder);
+    document.querySelector("#newEmergency").addEventListener('click', newEmergency);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     document.querySelector("#statusSelect").addEventListener('input', buildTable);
     //unhide action buttons depending on user permission
@@ -40,6 +41,13 @@ window.onload = async function () {
     await getAllOrders();
     await getAllSites();
 };
+
+async function newEmergency(){
+    //get the site of origin
+    let origin = (currentEmployee.positionID === 99999999) ? 
+        document.querySelector("#siteSelect").value : currentEmployee.siteID;
+    await newEmergencyOrder(origin);
+}
 
 async function getOrderStatusList(){
     let url = `../TransactionService/orderStatusList`;
@@ -131,20 +139,20 @@ async function newOrder(){
     else {
         let newOrder = confirm(`Create a new store order?`);
         if(newOrder){
-            await createNewOrder(origin);
+            await createNewOrder(origin, false);
         }
     }
 }
 
 //Makes API call to create a new order entry and redirects to the create order page.
-async function createNewOrder(origin){
-    let url = `../TransactionService/newStoreOrder`;
+async function createNewOrder(origin, emergency){
+    let url = `../TransactionService/${(emergency) ? "newEmergencyStoreOrder" : "newStoreOrder"}`;
     let resp = await fetch(url, {
         method: 'POST',
         body: origin
     });
     let newOrderID = await resp.json();
-    if(newOrder > 0){
+    if(newOrderID > 0){
         //successful order creation
         sessionStorage.setItem("currentOrderID", newOrderID);
         window.location.href = "CreateOrder.html";
@@ -155,13 +163,22 @@ async function createNewOrder(origin){
 }
 
 async function newEmergencyOrder(origin){
-    //check if emergency order is open
-    let url = `../TransactionService/isEmergencyOrderOpen`;
-    let resp = await fetch(url, {
-        method: 'POST',
-        body: origin
-    });
-    let isEmergencyOrderOpen = await resp.json();
+    let newOrder = confirm(`Create a new emergency store order?`);
+    if(newOrder){
+        //check if emergency order is open
+        let url = `../TransactionService/isEmergencyOrderOpen`;
+        let resp = await fetch(url, {
+            method: 'POST',
+            body: origin
+        });
+        let isEmergencyOrderOpen = await resp.json();
+        if(isEmergencyOrderOpen){
+            alert("Error: A New Emergency Order is already open");
+        }
+        else {
+            await createNewOrder(origin, true);
+        }
+    }
 }
 
 //Makes API call to get all orders and stores them in the global variable
@@ -219,7 +236,7 @@ function buildTable(){
         const typeCell = document.createElement("td");
         const typePill = document.createElement("span");
         typePill.classList.add("badge");
-        if(order.emergencyOrder){
+        if(order.emergencyDelivery === true){
             typePill.classList.add("text-bg-danger");
             typePill.innerHTML = "Emergency";
         }
@@ -273,7 +290,6 @@ function returnToDash(){
 
 function highlight(e){
     let trs = document.querySelectorAll("tr");
-    console.log(trs);
     for (let i = 0; i < trs.length; i++) {
         trs[i].classList.remove("highlighted");
     }

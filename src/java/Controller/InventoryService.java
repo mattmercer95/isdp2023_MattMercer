@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author mattm
  */
-@WebServlet(name = "InventoryService", urlPatterns = {"/InventoryService"})
+@WebServlet(name = "InventoryService", urlPatterns = {"/InventoryService/*"})
 public class InventoryService extends HttpServlet {
 
     /**
@@ -36,12 +36,22 @@ public class InventoryService extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        String uri = request.getPathInfo();
+        System.out.println(uri);
         try ( PrintWriter out = response.getWriter()) {
-            Scanner sc = new Scanner(request.getReader());
-            int siteID = Integer.parseInt(sc.nextLine());
-            ArrayList<Inventory> inventory = InventoryAccessor.getInventoryByID(siteID);
             Gson g = new Gson();
-            out.println(g.toJson(inventory));
+            if(uri.equals("/newOrder")){
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                ArrayList<Inventory> inventory = InventoryAccessor.getAvailableInventory(siteID);
+                out.println(g.toJson(inventory));
+            }
+            else {
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                ArrayList<Inventory> inventory = InventoryAccessor.getInventoryByID(siteID);
+                out.println(g.toJson(inventory));
+            }
         }
     }
 

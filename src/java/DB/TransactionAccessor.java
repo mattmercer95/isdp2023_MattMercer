@@ -52,7 +52,7 @@ public class TransactionAccessor {
                 getAllTransactions = conn.prepareStatement("call GetAllOrders()");
                 getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
                 getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
-                createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 getTransactionByID = conn.prepareStatement("call GetTransactionByID(?)");
                 getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
                 updateTransaction = conn.prepareStatement("update txn set status = ? where txnID = ?");
@@ -259,7 +259,7 @@ public class TransactionAccessor {
         return result;
     }
     
-    public static int createNewStoreOrder(int siteID){
+    public static int createNewStoreOrder(int siteID, boolean type){
         int result = -1;
 
         ResultSet rs;
@@ -271,6 +271,7 @@ public class TransactionAccessor {
             //create date of order creation
             String timestamp = getCurrentTimeStamp();
             createNewStoreOrder.setString(2, timestamp);
+            createNewStoreOrder.setBoolean(3, type);
             rs = createNewStoreOrder.executeQuery();
         } catch (SQLException ex) {
             System.err.println("************************");
