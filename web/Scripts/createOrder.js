@@ -144,6 +144,10 @@ async function getCurrentOrder(){
         typeBadge.classList.add("text-bg-danger");
         typeBadge.innerHTML = "Emergency";
     }
+    else if(currentOrder.transactionType === "Back Order"){
+        typeBadge.classList.add("bg-dark");
+        typeBadge.innerHTML = currentOrder.transactionType;
+    }
     else {
         typeBadge.classList.add("text-bg-primary");
         typeBadge.innerHTML = "Regular";

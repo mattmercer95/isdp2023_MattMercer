@@ -29,6 +29,8 @@ public class TransactionAccessor {
     private static PreparedStatement dropTxnItems = null;
     private static PreparedStatement getOrderStatusList = null;
     private static PreparedStatement getZeroItemTransactions = null;
+    private static PreparedStatement getCurrentBackOrder = null;
+    private static PreparedStatement createNewBackOrder = null;
     
     private TransactionAccessor(){
         //no instant
@@ -59,6 +61,8 @@ public class TransactionAccessor {
                 dropTxnItems = conn.prepareStatement("delete from txnitems where txnID = ?");
                 getOrderStatusList = conn.prepareStatement("select statusName from txnstatus");
                 getZeroItemTransactions = conn.prepareStatement("call GetZeroItemOrders()");
+                getCurrentBackOrder = conn.prepareStatement("call GetCurrentBackOrder(?)");
+                createNewBackOrder = conn.prepareStatement("call CreateNewBackOrder(?,?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -69,6 +73,100 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static Transaction createNewBackOrder(int siteID){
+        Transaction result = null;
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            createNewBackOrder.setInt(1, siteID);
+            String timestamp = getCurrentTimeStamp();
+            createNewBackOrder.setString(2, timestamp);
+            rs = createNewBackOrder.executeQuery();
+            result = new Transaction();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating new Back Order Transaction");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                result.setTransactionID(rs.getInt("txnID"));
+                result.setSiteIDTo(rs.getInt("siteIDTo"));
+                result.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                result.setStatus(rs.getString("status"));
+                String shipDateString = rs.getString("shipDate");
+                result.setShipDate(shipDateString.substring(0, shipDateString.length() - 9));
+                result.setTransactionType(rs.getString("txnType"));
+                String createdDateString = rs.getString("createdDate");
+                result.setCreatedDate(createdDateString.substring(0, createdDateString.length() - 9));
+                result.setDeliveryID(rs.getInt("deliveryID"));
+                result.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                result.setDestination(rs.getString("destination"));
+                result.setOrigin(rs.getString("origin"));
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating new Back Order Transaction object");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
+    }
+    
+    
+    public static Transaction getCurrentBackOrder(int siteID){
+        Transaction result = null;
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            getCurrentBackOrder.setInt(1, siteID);
+            rs = getCurrentBackOrder.executeQuery();
+            result = new Transaction();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Retrieving Back Order Transaction");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                result = new Transaction();
+                result.setTransactionID(rs.getInt("txnID"));
+                result.setSiteIDTo(rs.getInt("siteIDTo"));
+                result.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                result.setStatus(rs.getString("status"));
+                String shipDateString = rs.getString("shipDate");
+                result.setShipDate(shipDateString.substring(0, shipDateString.length() - 9));
+                result.setTransactionType(rs.getString("txnType"));
+                String createdDateString = rs.getString("createdDate");
+                result.setCreatedDate(createdDateString.substring(0, createdDateString.length() - 9));
+                result.setDeliveryID(rs.getInt("deliveryID"));
+                result.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                result.setDestination(rs.getString("destination"));
+                result.setOrigin(rs.getString("origin"));
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating Back Order Transaction object");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
     }
     
     public static ArrayList<String> getOrderStatusList(){

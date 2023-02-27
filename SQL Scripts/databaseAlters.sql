@@ -9,6 +9,20 @@
 */ 
 
 /*
+Gets the inventory from the warehouse based on items in a transaction. Used to determine back orders.
+*/
+drop procedure if exists GetWarehouseInventory;
+DELIMITER //
+create procedure GetWarehouseInventory(in orderID int)
+BEGIN
+	Select itemID, name, quantity, reorderThreshold, caseSize, weight   
+    from inventory inner join item using (itemID) 
+    where siteID = 1 and active = true
+    and itemID in (select distinct itemID from txnitems where txnID = orderID);
+END //
+DELIMITER ;
+
+/*
 Gets the transaction details by transaction id
 */
 drop procedure if exists GetTransactionByID;
@@ -16,6 +30,35 @@ DELIMITER //
 create procedure GetTransactionByID(in orderID int)
 BEGIN
 	select *, (select name from site where siteIDTo = siteID) as destination, (select name as origin from site where siteIDFrom = siteID) as origin from txn where txnID = orderID;
+END //
+DELIMITER ;
+
+/*
+Gets the back order transaction details by site id
+*/
+drop procedure if exists GetCurrentBackOrder;
+DELIMITER //
+create procedure GetCurrentBackOrder(in id int)
+BEGIN
+	select *, (select name from site where siteIDTo = siteID) as destination, (select name as origin from site where siteIDFrom = siteID) as origin from txn 
+    where siteIDTo = id and status = 'BACKORDER' and txnType = 'Back Order';
+END //
+DELIMITER ;
+
+/*
+Creates a new back order transaction and returns the info
+*/
+drop procedure if exists CreateNewBackOrder;
+DELIMITER //
+create procedure CreateNewBackOrder(in id int, in orderDate date)
+BEGIN
+	start transaction;
+    call GetNextDeliveryDate(id, @nextShipDate);
+    set @nextShipDate = DATE_ADD(@nextShipDate, INTERVAL 7 DAY);
+	insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery)
+		values(id, 1, 'BACKORDER', @nextShipDate, 'Back Order', 'X', orderDate, null, false);
+	commit;
+    call GetCurrentBackOrder(id);
 END //
 DELIMITER ;
 

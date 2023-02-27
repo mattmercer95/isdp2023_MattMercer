@@ -288,6 +288,10 @@ function buildTable(){
             typePill.classList.add("text-bg-danger");
             typePill.innerHTML = "Emergency";
         }
+        else if(order.transactionType === "Back Order"){
+            typePill.classList.add("bg-dark");
+            typePill.innerHTML = order.transactionType;
+        }
         else {
             typePill.classList.add("text-bg-primary");
             typePill.innerHTML = "Regular";
@@ -354,7 +358,7 @@ function highlight(e){
         target.classList.add("highlighted");
         document.querySelector("#viewDetails").disabled = false;
         let selected = getSelectedOrder();
-        if(selected.status === "SUBMITTED"){
+        if(selected.status === "SUBMITTED" || selected.status === "BACKORDER"){
             document.querySelector("#processOrder").disabled = false;
         }
         else {

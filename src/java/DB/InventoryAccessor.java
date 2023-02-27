@@ -19,6 +19,7 @@ public class InventoryAccessor {
     private static Connection conn = null;
     private static PreparedStatement getInventoryByID = null;
     private static PreparedStatement getAvailableInventory = null;
+    private static PreparedStatement getWarehouseInventory = null;
     
     private InventoryAccessor(){
         
@@ -33,6 +34,7 @@ public class InventoryAccessor {
                 System.out.println("Connection was not null");
                 getInventoryByID = conn.prepareStatement("call GetInventoryBySiteID(?)");
                 getAvailableInventory = conn.prepareStatement("call GetAvailableInventory(?)");
+                getWarehouseInventory = conn.prepareStatement("call GetWarehouseInventory(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -43,6 +45,44 @@ public class InventoryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<Inventory> getWarehouseInventory(int txnID){
+        ArrayList<Inventory> inventory = new ArrayList<Inventory>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return inventory;
+            getWarehouseInventory.setInt(1, txnID);
+            rs = getWarehouseInventory.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Warehouse Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return inventory;
+        }
+        
+        try {
+            while (rs.next()) {
+                Inventory item = new Inventory();
+                item.setItemID(rs.getInt("itemID"));
+                item.setName(rs.getString("name"));
+                item.setItemQuantityOnHand(rs.getInt("quantity"));
+                item.setReorderThreshold(rs.getInt("reorderThreshold"));
+                item.setCaseSize(rs.getInt("caseSize"));
+                item.setWeight(rs.getFloat("weight"));
+                inventory.add(item);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Warehouse Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return inventory;
     }
     
     public static ArrayList<Inventory> getAvailableInventory(int siteID){
