@@ -89,6 +89,9 @@
                             </div>
                         </div>
                     </div>
+                    <div id="discrepancyAlert" class="alert alert-danger" role="alert" hidden>
+                        Order cannot be received by Warehouse with unresolved discrepancies.
+                    </div>
                     <div class= "prevent-select">
                         <table class="table table-bordered table-striped ">
                             <thead>
@@ -110,8 +113,8 @@
                         </table>
                     </div>
                     <div id="processOrderPanel" class="row justify-content-center" hidden>
-                        <button id="approveOrder" type="button" class="btn btn-success col btnSpacing">Approve Order</button>
-                        <button id="rejectOrder" type="button" class="btn btn-danger col btnSpacing" disabled>Reject Order</button>
+                        <button id="approveOrder" type="button" class="btn btn-success col btnSpacing">Receive Order</button>
+                        <button id="rejectOrder" type="button" class="btn btn-danger col btnSpacing">Reject Order</button>
                         <button id="createNewBackOrder" type="button" class="btn btn-primary col btnSpacing">Create New Back Order</button>
                         <button type="button" id="addToBackOrder" class="btn btn-primary col btnSpacing" data-bs-toggle="modal" data-bs-target="#exampleModal" hidden disabled>
                             Add Item to Back Order

@@ -8,6 +8,7 @@ let currentOrder = null;
 let allItems = null;
 let searchResults = null;
 let backorder = null;
+let discrepancyFlag = false;
 let warehouseInventory = [];
 let cart = [];
 
@@ -36,9 +37,46 @@ window.onload = async function () {
     document.querySelector("#addToBackOrder").addEventListener('click', populateModal);
     document.querySelector("#boNumCasesToAdd").addEventListener('input', adjustQuantities);
     document.querySelector("#saveChanges").addEventListener('click', saveChanges);
-
+    document.querySelector("#approveOrder").addEventListener('click', approveOrder);
+    document.querySelector("#rejectOrder").addEventListener('click', rejectOrder);
     await getCurrentOrder();
 };
+
+async function rejectOrder(){
+    let confirmReject = confirm(`Confirm rejection of order #${currentOrder.transactionID}`);
+    if(!confirmReject){
+        return;
+    }
+    currentOrder.status = "REJECTED"
+    let url = `../TransactionService/`;
+    let resp = await fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(currentOrder)
+    });
+    let success = await resp.json();
+    if(success){
+        alert("Successfully Rejected Order");
+        window.location.href = "ViewOrders.html";
+    }
+}
+
+async function approveOrder(){
+    let confirmApprove = confirm(`Confirm receival of order #${currentOrder.transactionID}`);
+    if(!confirmApprove){
+        return;
+    }
+    currentOrder.status = "RECEIVED"
+    let url = `../TransactionService/`;
+    let resp = await fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(currentOrder)
+    });
+    let success = await resp.json();
+    if(success){
+        alert("Successfully Received Order");
+        window.location.href = "ViewOrders.html";
+    }
+}
 
 //saves the changes made to the back order
 async function saveChanges() {
@@ -74,8 +112,6 @@ async function saveChanges() {
             backorder.items.push(temp);
         }
     }
-    console.log("backorder:");
-    console.log(backorder);
     //update both orders in database
     let success = await updateOrders(currentOrder, backorder);
     if(success){
@@ -302,20 +338,24 @@ function buildCart() {
         discrepencyCell.id = `discrepency${item.itemID}`;
         let discrepancy = numItemsAvailable - numItemsOrdered;
         if (discrepancy < 0) {
+            discrepancyFlag = true;
             const discrepancyBadge = document.createElement("span");
             discrepancyBadge.classList.add("badge", "text-bg-danger");
             discrepancyBadge.innerHTML = discrepancy;
             discrepencyCell.appendChild(discrepancyBadge);
         } else {
-            discrepencyCell.innerHTML = discrepancy;
+            discrepencyCell.innerHTML = "-";
         }
         row.appendChild(discrepencyCell);
-
 
         //add row to table
         table.appendChild(row);
         indexCounter++;
     });
+    if(discrepancyFlag){
+        document.querySelector("#approveOrder").disabled = true;
+        document.querySelector("#discrepancyAlert").hidden = false;
+    }
 }
 
 function orderHighlight(e) {

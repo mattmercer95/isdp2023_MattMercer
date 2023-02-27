@@ -246,7 +246,7 @@ function filterByStatus(filter){
                 filteredList.push(order);
                 break;
             case "ALL OPEN":
-                if(order.status !== "CLOSED" && order.status !== "CANCELLED"){
+                if(order.status !== "CLOSED" && order.status !== "CANCELLED" && order.status !== "REJECTED"){
                     filteredList.push(order);
                 }
                 break;
@@ -304,8 +304,11 @@ function buildTable(){
         if(order.status === "NEW"){
             statusPill.classList.add("text-bg-success");
         }
-        else if(order.status === "CLOSED" || order.status === "CANCELLED"){
+        else if(order.status === "CLOSED" || order.status === "CANCELLED" || order.status === "REJECTED"){
             statusPill.classList.add("text-bg-secondary");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
         }
         else if(order.status === "SUBMITTED"){
             statusPill.classList.add("text-bg-warning");
