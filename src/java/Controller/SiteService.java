@@ -43,6 +43,10 @@ public class SiteService extends HttpServlet {
                 ArrayList<Site> sites = SiteAccessor.getAllRetailLocations();
                 out.println(g.toJson(sites));
             }
+            else if(uri.equals("/allDetailed")){
+                ArrayList<Site> sites = SiteAccessor.getAllDetailed();
+                out.println(g.toJson(sites));
+            }
             else {
                 ArrayList<Site> sites = SiteAccessor.getAllSiteNamesIDs();
                 out.println(g.toJson(sites));

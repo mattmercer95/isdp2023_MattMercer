@@ -58,7 +58,6 @@ async function logTransaction(){
         siteID: currentOrder.siteIDTo,
         employeeID: currentEmployee.employeeID
     }
-    console.log(obj);
     let url = `../AuditService/new`;
     let resp = await fetch(url, {
         method: 'POST',
@@ -153,10 +152,7 @@ async function getCurrentOrder(){
         typeBadge.innerHTML = "Regular";
     }
     typeLabel.appendChild(typeBadge);
-    
-    if(currentOrder.status === "NEW"){
-        document.querySelector("#newOrderPanel").hidden = false;
-    }
+   
     //load cart
     cart = currentOrder.items;
     buildCart();
@@ -417,7 +413,17 @@ function buildTable(items){
 
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
+    let createFlag = false;
+    permissions.forEach((permission) =>{
+        if(permission === "CREATESTOREORDER"){
+            createFlag = true;
+        }
+    });
     let submitButton = document.querySelector("#orderSubmit");
+    if(createFlag){
+        console.log("has permission");
+        document.querySelector("#newOrderPanel").hidden = false;
+    }
     if(currentOrder.status === "NEW"){
         submitButton.disabled = false;
     }

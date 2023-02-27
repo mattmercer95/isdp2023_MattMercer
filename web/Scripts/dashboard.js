@@ -29,9 +29,9 @@ function checkPermissions(){
         if(p === "READUSER"){
             document.querySelector("#userAccounts").hidden = false;
         }
-        if(p === "CREATEREPORT"){
-            document.querySelector("#reports").hidden = false;
-        }
+//        if(p === "CREATEREPORT"){
+//            document.querySelector("#reports").hidden = false;
+//        }
         if(p === "VIEWORDERS" || p === "DELIVERY"){
             document.querySelector("#orders").hidden = false;
         }

@@ -285,9 +285,26 @@ async function getCurrentOrder() {
     //load warehouse inventory 
     await getWarehouseInventory();
     await getCurrentBackOrder();
+    checkPermissions();
     buildCart();
 }
 
+function checkPermissions(){
+    let permissions = JSON.parse(sessionStorage.getItem("permissions"));
+    let createFlag = false;
+    permissions.forEach((permission) =>{
+        if(permission === "RECEIVESTOREORDER"){
+            createFlag = true;
+        }
+    });
+    let submitButton = document.querySelector("#orderSubmit");
+    if(createFlag){
+        document.querySelector("#processOrderPanel").hidden = false;
+    }
+    if(currentOrder.status === "NEW"){
+        submitButton.disabled = false;
+    }
+}
 function buildCart() {
     const table = document.querySelector("#orderTable");
     table.innerHTML = "";
