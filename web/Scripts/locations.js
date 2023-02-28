@@ -6,6 +6,7 @@ const redirectUrl = "../index.html";
 
 let locations = null;
 let editFlag = false;
+let daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
 window.onload = async function () {
     //set current employee global to the user that logged in
@@ -246,7 +247,14 @@ function populateModal(inputs){
     document.querySelector("#nameEdit").value = inputs.querySelector(".LocationName").value;
     document.querySelector("#phoneEdit").value = inputs.querySelector(".Phone").value;
     document.querySelector("#postalCodeEdit").value = inputs.querySelector(".PostalCode").value;
-    document.querySelector("#deliveryDayEdit").value = inputs.querySelector(".DeliveryDay").value
+    let dayInput = inputs.querySelector(".DeliveryDay").value;
+    let daySelect = document.querySelector("#deliveryDayEdit");
+    let dayOptions = daySelect.querySelectorAll("option");
+    dayOptions.forEach((option)=>{
+        if(option.innerHTML === dayInput){
+            option.selected = true;
+        }
+    });
     let distanceInput = inputs.querySelector(".DistancefromWarehouse");
     if(distanceInput === null){
         document.querySelector("#distanceEdit").disabled = true;
@@ -286,14 +294,11 @@ function populateModal(inputs){
 
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
-    console.log(permissions);
     permissions.forEach((permission) =>{
         if(permission === "EDITSITE"){
             editFlag = true;
         }
         if(permission === "ADDSITE"){
-            console.log("found");
-            console.log(document.querySelector("#btnAddNewSite"));
             document.querySelector("#btnAddNewSite").classList.remove("d-none");
         }
     });
