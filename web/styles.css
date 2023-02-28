@@ -95,7 +95,7 @@ form {
     margin-right: 30px;
 }
 
-html, body, .container, .modal-card, .modal-card-body {
+html, body, .container, .modal-card, .modal-card-body{
     height: 100%;
 }
 
@@ -120,4 +120,29 @@ html, body, .container, .modal-card, .modal-card-body {
 
 td:hover {
     cursor: pointer;
+}
+
+/* creating css loader */
+
+#loading {
+    margin-top: 50px;
+    width: 4rem;
+    height: 4rem;
+    border: 5px solid #f3f3f3;
+    border-top: 6px solid #0d6efd;
+    border-radius: 100%;
+    margin: auto;
+    visibility: hidden;
+    animation: spin 1s infinite linear;
+}
+#loading.display {
+    visibility: visible;
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }

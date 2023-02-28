@@ -9,9 +9,10 @@ package Entity;
  * @author mattm
  */
 public class Inventory {
-    private int itemID, itemQuantityOnHand, reorderThreshold, caseSize;
-    private double weight;
-    private String name;
+    private int itemID, itemQuantityOnHand, reorderThreshold, caseSize, siteID, supplierID;
+    private double weight, costPrice, retailPrice;
+    private String name, notes, itemLocation, sku, description, category;
+    private boolean active;
     
     public Inventory(){
         
@@ -32,12 +33,41 @@ public class Inventory {
         this.caseSize = caseSize;
     }
     
+    public void setSiteID(int siteID){
+        this.siteID = siteID;
+    }
+    public void setSupplierID(int supplierID){
+        this.siteID = siteID;
+    }
     public void setName(String name){
         this.name = name;
     }
-    
+    public void setNotes(String notes){
+        this.notes = notes;
+    }
+    public void setItemLocation(String itemLocation){
+        this.itemLocation = itemLocation;
+    }
+    public void setSKU(String sku){
+        this.sku = sku;
+    }
+    public void setDescription(String description){
+        this.description = description;
+    }
+    public void setCategory(String category){
+        this.category = category;
+    }
     public void setWeight(double weight){
         this.weight = weight;
     }
+    public void setCostPrice(double costPrice){
+        this.costPrice = costPrice;
+    }
+    public void setRetailPrice(double retailPrice){
+        this.retailPrice = retailPrice;
+    }
     
+    public void setActive(boolean active){
+        this.active = active;
+    }
 }

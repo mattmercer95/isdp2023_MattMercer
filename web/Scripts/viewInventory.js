@@ -6,8 +6,10 @@ const redirectUrl = "../index.html";
 
 let allItems = null;
 let searchResults = null;
+let loader = null; 
 
 window.onload = async function () {
+    loader = document.querySelector("#loading");
     //set current employee global to the user that logged in
     currentEmployee = JSON.parse(sessionStorage.getItem("employeeInfo"));
     //load name and title on the nav bar
@@ -32,6 +34,22 @@ window.onload = async function () {
 
     await getAllItems();
 };
+
+// showing loading
+function displayLoading() {
+    //document.querySelector("#itemsTable").hidden = true
+    loader.classList.add("display");
+    // to stop loading after some time
+    setTimeout(() => {
+        loader.classList.remove("display");
+    }, 5000);
+}
+
+// hiding loading 
+function hideLoading() {
+    loader.classList.remove("display");
+    //document.querySelector("#itemsTable").hidden = false
+}
 
 //builds the add item table
 function buildTable(items){
@@ -75,14 +93,16 @@ function buildTable(items){
 
 //Makes API call to get all items and stores them in the global variable
 async function getAllItems(){
-    let url = `../InventoryService/newOrder`;
+    displayLoading();
+    let url = `../InventoryService/allDetailed`;
     let resp = await fetch(url, {
-        method: 'POST',
-        body: currentEmployee.siteID
+        method: 'GET'
     });
     allItems = await resp.json();
+    console.log(allItems);
     searchResults = allItems
     buildTable(searchResults);
+    hideLoading();
 }
 
 function itemHighlight(e){

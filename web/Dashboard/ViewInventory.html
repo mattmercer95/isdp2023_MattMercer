@@ -28,18 +28,18 @@
             <div class="row">
                 <a href="ViewOrders.html" class="col-3 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Orders</a>
             </div>
-            <div class="card">
+            <div class="card card-table">
                 <div class="card-title text-center">
                     <h3>Inventory</h3>
                 </div>
-                <div class="card-body">
+                <div class="card-body card-table">
                     <div class="form-group">
                         <label>Search</label>
                         <input id="itemSearch" class="form-control"/>
                     </div>
                     <br>
-                    <div class="table-responsive prevent-select row">
-                        <table class="table table-bordered table-striped ">
+                    <div class=" prevent-select row">
+                        <table  class="table table-bordered table-striped ">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -49,11 +49,15 @@
                                     <th>Case Size</th>
                                 </tr>
                             </thead>
+                            
                             <tbody id="itemsTable">
-
+                                
                             </tbody>
+                            
                         </table>
+                        <div id="loading"></div>
                     </div>
+                    
                 </div>
             </div>
 

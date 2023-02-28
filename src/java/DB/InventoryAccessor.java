@@ -20,6 +20,7 @@ public class InventoryAccessor {
     private static PreparedStatement getInventoryByID = null;
     private static PreparedStatement getAvailableInventory = null;
     private static PreparedStatement getWarehouseInventory = null;
+    private static PreparedStatement getAllDetailedInventory = null;
     
     private InventoryAccessor(){
         
@@ -35,6 +36,7 @@ public class InventoryAccessor {
                 getInventoryByID = conn.prepareStatement("call GetInventoryBySiteID(?)");
                 getAvailableInventory = conn.prepareStatement("call GetAvailableInventory(?)");
                 getWarehouseInventory = conn.prepareStatement("call GetWarehouseInventory(?)");
+                getAllDetailedInventory = conn.prepareStatement("SELECT * FROM inventory inner join item using (itemID)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -149,6 +151,53 @@ public class InventoryAccessor {
                 item.setReorderThreshold(rs.getInt("reorderThreshold"));
                 item.setCaseSize(rs.getInt("caseSize"));
                 item.setWeight(rs.getFloat("weight"));
+                inventory.add(item);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return inventory;
+    }
+    
+    public static ArrayList<Inventory> getAllDetailed(){
+        ArrayList<Inventory> inventory = new ArrayList<Inventory>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return inventory;
+            rs = getAllDetailedInventory.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return inventory;
+        }
+        
+        try {
+            while (rs.next()) {
+                Inventory item = new Inventory();
+                item.setItemID(rs.getInt("itemID"));
+                item.setSiteID(rs.getInt("siteID"));
+                item.setItemQuantityOnHand(rs.getInt("quantity"));
+                item.setItemLocation(rs.getString("itemLocation"));
+                item.setReorderThreshold(rs.getInt("reorderThreshold"));
+                item.setName(rs.getString("name"));
+                item.setSKU(rs.getString("sku"));
+                item.setDescription(rs.getString("description"));
+                item.setCategory(rs.getString("category"));
+                item.setWeight(rs.getFloat("weight"));
+                item.setCostPrice(rs.getFloat("costPrice"));
+                item.setRetailPrice(rs.getFloat("retailPrice"));
+                item.setSupplierID(rs.getInt("supplierID"));
+                item.setActive(rs.getBoolean("active"));
+                item.setNotes(rs.getString("notes"));
+                item.setCaseSize(rs.getInt("caseSize"));
                 inventory.add(item);
             }
         } catch(SQLException ex) {

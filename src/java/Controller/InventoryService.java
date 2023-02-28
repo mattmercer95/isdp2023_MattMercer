@@ -51,6 +51,10 @@ public class InventoryService extends HttpServlet {
                 ArrayList<Inventory> inventory = InventoryAccessor.getWarehouseInventory(txnID);
                 out.println(g.toJson(inventory));
             }
+            else if(uri.equals("/allDetailed")){
+                ArrayList<Inventory> inventory = InventoryAccessor.getAllDetailed();
+                out.println(g.toJson(inventory));
+            }
             else {
                 Scanner sc = new Scanner(request.getReader());
                 int siteID = Integer.parseInt(sc.nextLine());
