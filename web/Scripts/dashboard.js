@@ -35,9 +35,6 @@ function checkPermissions(){
         if(p === "VIEWORDERS" || p === "DELIVERY"){
             document.querySelector("#orders").hidden = false;
         }
-        if(p === "MOVEINVENTORY" || p === "PROCESSRETURN" || p === "ADDITEMTOBACKORDER"){
-            document.querySelector("#inventory").hidden = false;
-        }
     });
 }
 
