@@ -35,6 +35,8 @@
                     <div>
                         <div class="card">
                             <div class="card-body" id="locations">
+                                <button id="btnAddNewSite" type="button" class="btn btn-success d-none" data-bs-toggle="modal" data-bs-target="#addLocationModal" >Add Location</button>
+                                <br><br>
                                 <div class="accordion" id="locationAccordian">
                                     
                                 </div>
@@ -68,10 +70,22 @@
                                             </div>
                                             <div class="form-group">
                                                 <label><b>Delivery Day:</b></label>
-                                                <input class="form-control" id="deliveryDayEdit">
+                                                <select class="form-select" id="deliveryDayEdit">
+                                                    <option value = "0">MONDAY</option>
+                                                    <option value = "1">TUESDAY</option>
+                                                    <option value = "2">WEDNESDAY</option>
+                                                    <option value = "3">THURSDAY</option>
+                                                    <option value = "4">FRIDAY</option>
+                                                    <option value = "5">SATURDAY</option>
+                                                    <option value = "6">SUNDAY</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col">
+                                            <div class="form-group">
+                                                <label><b>Site Type:</b></label>
+                                                <select class="form-select" id="editSiteType"></select>
+                                            </div>
                                             <div class="form-group">
                                                 <label><b>Address:</b></label>
                                                 <input class="form-control" id="addressEdit">
@@ -86,11 +100,11 @@
                                             </div>
                                             <div class="form-group">
                                                 <label><b>Province:</b></label>
-                                                <input class="form-control" id="provinceEdit">
+                                                <select class="form-select" id="editProvinceSelect"></select>
                                             </div>
                                             <div class="form-group">
                                                 <label><b>Country:</b></label>
-                                                <input class="form-control" id="countryEdit">
+                                                <input class="form-control" id="countryEdit" disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -98,6 +112,79 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button id="saveChanges" type="button" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addLocationModal" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="addLocationModal">Add Location</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row justify-content-center">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label><b>Location Name:</b></label>
+                                                <input class="form-control" id="nameAdd">
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Phone:</b></label>
+                                                <input class="form-control" id="phoneAdd">
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Distance from Warehouse:</b></label>
+                                                <input class="form-control" id="distanceAdd">
+                                            </div><div class="form-group">
+                                                <label><b>Postal Code:</b></label>
+                                                <input class="form-control" id="postalCodeAdd">
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Delivery Day:</b></label>
+                                                <select class="form-select" id="deliveryDayAdd">
+                                                    <option value = "0">MONDAY</option>
+                                                    <option value = "1">TUESDAY</option>
+                                                    <option value = "2">WEDNESDAY</option>
+                                                    <option value = "3">THURSDAY</option>
+                                                    <option value = "4">FRIDAY</option>
+                                                    <option value = "5">SATURDAY</option>
+                                                    <option value = "6">SUNDAY</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label><b>Site Type:</b></label>
+                                                <select class="form-select" id="addSiteType"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Address:</b></label>
+                                                <input class="form-control" id="addressAdd">
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Address 2:</b></label>
+                                                <input class="form-control" id="address2Add">
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>City:</b></label>
+                                                <input class="form-control" id="cityAdd">
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Province:</b></label>
+                                                <select class="form-select" id="addProvinceSelect"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><b>Country:</b></label>
+                                                <input class="form-control" id="countryAdd" value="Canada" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button id="addNewLocation" type="button" class="btn btn-success">Add New Location</button>
                                 </div>
                             </div>
                         </div>

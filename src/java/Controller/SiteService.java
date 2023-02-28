@@ -6,6 +6,7 @@ package Controller;
 
 import Entity.Site;
 import DB.SiteAccessor;
+import Entity.Province;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -58,6 +59,20 @@ public class SiteService extends HttpServlet {
             else if(uri.equals("/allDetailed")){
                 ArrayList<Site> sites = SiteAccessor.getAllDetailed();
                 out.println(g.toJson(sites));
+            }
+            else if(uri.equals("/new")){
+                Scanner sc = new Scanner(request.getReader());
+                Site newSite = g.fromJson(sc.nextLine(), Site.class);
+                boolean result = SiteAccessor.insertSite(newSite);
+                out.println(g.toJson(result));
+            }
+            else if(uri.equals("/provinceList")){
+                ArrayList<Province> provinceList = SiteAccessor.getProvinceList();
+                out.println(g.toJson(provinceList));
+            }
+            else if(uri.equals("/typeList")){
+                ArrayList<String> typeList = SiteAccessor.getTypeList();
+                out.println(g.toJson(typeList));
             }
             else {
                 ArrayList<Site> sites = SiteAccessor.getAllSiteNamesIDs();

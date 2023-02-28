@@ -25,15 +25,140 @@ window.onload = async function () {
     document.addEventListener('mousemove', resetIdleTimeout, false);
     document.addEventListener('keydown', resetIdleTimeout, false);
     document.querySelector("#saveChanges").addEventListener('click', saveChanges);
+    document.querySelector("#addNewLocation").addEventListener('click', addNewLocation);
     //initialize idle timeout
     resetIdleTimeout();
     checkPermissions();
     await loadAllLocations();
+    await loadSiteTypes();
     buildAccordion();
     if(editFlag){
         addEditEvents();
     }
+    await loadProvinces();
 };
+
+async function addNewLocation(){
+    console.log(locations[0]);
+    let confirmNew = confirm("Add new location?");
+    if(!confirmNew){
+        //cancel
+        return;
+    }
+    
+    let name = document.querySelector("#nameAdd").value;
+    let phone = document.querySelector("#phoneAdd").value;
+    let distanceFromWH = +document.querySelector("#distanceAdd").value;
+    let postalCode = document.querySelector("#postalCodeAdd").value;
+    let deliveryDayID = +document.querySelector("#deliveryDayAdd").value;
+    let deliveryDay = getDayOfWeek(deliveryDayID);
+    let siteType = document.querySelector("#addSiteType").value;
+    let address = document.querySelector("#addressAdd").value;
+    let address2 = document.querySelector("#address2Add").value;
+    let city = document.querySelector("#cityAdd").value;
+    let provinceSelect = document.querySelector("#addProvinceSelect");
+    let provinceID = provinceSelect.value;
+    let country = document.querySelector("#countryAdd").value;
+    
+    let newLocation = {
+        active: true,
+        address: address,
+        address2: address2,
+        city: city,
+        country: country,
+        dayOfWeekID: deliveryDayID,
+        dayOfWeek: deliveryDay,
+        distanceFromWH: distanceFromWH,
+        name: name,
+        phone: phone,
+        postalCode: postalCode,
+        province: null,
+        provinceID: provinceID,
+        siteType: siteType,
+        siteID: -1
+    };
+    
+    let url = "../SiteService/new";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(newLocation)
+    });
+    let success = await resp.json();
+}
+
+function getDayOfWeek(x){
+    let result;
+    switch(x){
+        case 0:
+            result = "MONDAY";
+            break;
+        case 1:
+            result = "TUESDAY";
+            break;
+        case 2:
+            result = "WEDNESDAY";
+            break;
+        case 3:
+            result = "THURSDAY";
+            break;
+        case 4:
+            result = "FRIDAY";
+            break;
+        case 5:
+            result = "SATURDAY";
+            break;
+        case 6:
+            result = "SUNDAY";
+            break;
+        default:
+            break;
+    }
+    return result;
+}
+
+async function loadSiteTypes(){
+    let url = "../SiteService/typeList";
+    let resp = await fetch(url, {
+        method: 'GET'
+    });
+    let typeList = await resp.json();
+    let editSite = document.querySelector("#editSiteType");
+    let addSite = document.querySelector("#addSiteType");
+    
+    typeList.forEach((type)=>{
+        const editOptionEle = document.createElement("option");
+        editOptionEle.value = type;
+        editOptionEle.innerHTML = type;
+        editSite.appendChild(editOptionEle);
+        const addOptionEle = document.createElement("option");
+        addOptionEle.value = type;
+        addOptionEle.innerHTML = type;
+        addSite.appendChild(addOptionEle);
+    });
+}
+
+async function loadProvinces(){
+    let url = "../SiteService/provinceList";
+    let resp = await fetch(url, {
+        method: 'GET'
+    });
+    let provinceList = await resp.json();
+    let editProvinceSelect = document.querySelector("#editProvinceSelect");
+    let addProvinceSelect = document.querySelector("#addProvinceSelect");
+    
+    provinceList.forEach((province)=>{
+        const editOptionEle = document.createElement("option");
+        editOptionEle.value = province.code;
+        editOptionEle.innerHTML = province.name;
+        editProvinceSelect.appendChild(editOptionEle);
+        const addOptionEle = document.createElement("option");
+        addOptionEle.value = province.code;
+        addOptionEle.innerHTML = province.name;
+        addProvinceSelect.appendChild(addOptionEle);
+    });
+    
+    
+}
 
 async function saveChanges(){
     let confirmChanges = confirm("Save changes to location?");
@@ -45,11 +170,14 @@ async function saveChanges(){
     let phone = document.querySelector("#phoneEdit").value;
     let distanceFromWH = document.querySelector("#distanceEdit").value;
     let postalCode = document.querySelector("#postalCodeEdit").value;
-    let deliveryDay = document.querySelector("#deliveryDayEdit").value;
+    let deliveryDayID = document.querySelector("#deliveryDayEdit").value;
+    let deliveryDay = getDayOfWeek(deliveryDayID);
+    let siteType = document.querySelector("#editSiteType").value;
     let address = document.querySelector("#addressEdit").value;
     let address2 = document.querySelector("#address2Edit").value;
     let city = document.querySelector("#cityEdit").value;
-    let province = document.querySelector("#provinceEdit").value;
+    let provinceSelect = document.querySelector("#editProvinceSelect");
+    let provinceID = provinceSelect.value;
     let country = document.querySelector("#countryEdit").value;
     
     //get current location
@@ -68,13 +196,15 @@ async function saveChanges(){
     currentLocation.phone = phone;
     currentLocation.distanceFromWH = distanceFromWH;
     currentLocation.postalCode = postalCode;
+    currentLocation.dayOfWeekID = deliveryDayID;
     currentLocation.dayOfWeek = deliveryDay;
+    currentLocation.siteType = siteType;
     currentLocation.address = address;
     if(address2 !== ""){
        currentLocation.address2 = address2; 
     }
     currentLocation.city = city;
-    currentLocation.province = province;
+    currentLocation.provinceID = provinceID;
     currentLocation.country = country;
     
     await updateSite(currentLocation);
@@ -126,6 +256,14 @@ function populateModal(inputs){
         document.querySelector("#distanceEdit").disabled = false;
         document.querySelector("#distanceEdit").value = distanceInput.value;
     }
+    let typeSelect = document.querySelector("#editSiteType");
+    let typeOptions = typeSelect.querySelectorAll("option");
+    let originalType = inputs.querySelector(".Type").value;
+    typeOptions.forEach((option)=>{
+        if(option.innerHTML === originalType){
+            option.selected = true;
+        }
+    });
     document.querySelector("#addressEdit").value = inputs.querySelector(".Address").value;
     let address2Input = inputs.querySelector(".Address2");
     if(address2Input === null){
@@ -135,16 +273,28 @@ function populateModal(inputs){
         document.querySelector("#address2Edit").value = address2Input.value;
     }
     document.querySelector("#cityEdit").value = inputs.querySelector(".City").value;
-    document.querySelector("#provinceEdit").value = inputs.querySelector(".Province").value;
+    let provinceSelect = document.querySelector("#editProvinceSelect");
+    let provinceOptions = provinceSelect.querySelectorAll("option");
+    let originalProvince = inputs.querySelector(".Province").value;
+    provinceOptions.forEach((option)=>{
+        if(option.innerHTML === originalProvince){
+            option.selected = true;
+        }
+    });
     document.querySelector("#countryEdit").value = inputs.querySelector(".Country").value;
 }
 
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
-    let createFlag = false;
+    console.log(permissions);
     permissions.forEach((permission) =>{
         if(permission === "EDITSITE"){
             editFlag = true;
+        }
+        if(permission === "ADDSITE"){
+            console.log("found");
+            console.log(document.querySelector("#btnAddNewSite"));
+            document.querySelector("#btnAddNewSite").classList.remove("d-none");
         }
     });
 }
@@ -174,7 +324,7 @@ function loadContent(){
         locationIndex++;
         
         if(editFlag){
-            const editButtonString = `<div class='row'><button type="button" class="btn btn-warning editButton" data-bs-toggle="modal" data-bs-target="#editLocationModal">Edit Location</button></div>`;
+            const editButtonString = `<button type="button" class="btn btn-warning editButton" data-bs-toggle="modal" data-bs-target="#editLocationModal">Edit Location</button>`;
             e.innerHTML += editButtonString;
         }
         const row = document.createElement("div");
@@ -200,6 +350,8 @@ function loadContent(){
         row.appendChild(col1);
         
         //Column 2
+        let typeDiv = createInput(current, "Type", current.siteType);
+        col2.appendChild(typeDiv);
         let addressDiv = createInput(current, "Address", current.address);
         col2.appendChild(addressDiv);
         if(typeof current.address2 !== 'undefined'){

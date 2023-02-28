@@ -5,6 +5,7 @@
 package DB;
 
 import Entity.Position;
+import Entity.Province;
 import Entity.Site;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +24,9 @@ public class SiteAccessor {
     private static PreparedStatement getAllRetailLocations = null;
     private static PreparedStatement getAllDetailed = null;
     private static PreparedStatement updateSite = null;
+    private static PreparedStatement getProvinceList = null;
+    private static PreparedStatement getTypeList = null;
+    private static PreparedStatement insertSite = null;
 
     private SiteAccessor() {
         //no instantiation
@@ -43,6 +47,12 @@ public class SiteAccessor {
                     + "address = ?, address2 = ?, city = ?, country = ?, postalCode = ?, "
                     + "phone = ?, dayOfWeek = ?, distanceFromWH = ?, siteType = ?, "
                     + "notes = ?, active = ?, dayOfWeekID = ? where siteID = ?");
+            getProvinceList = conn.prepareStatement("select provinceID, provinceName from province");
+            getTypeList = conn.prepareStatement("select siteType from sitetype");
+            insertSite = conn.prepareStatement("insert into site (name, provinceID, "
+                    + "address, address2, city, country, postalCode, phone, dayOfWeek,"
+                    + "distanceFromWH, siteType, notes, active, dayOfWeekID) "
+                    + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             return true;
         } catch (SQLException ex) {
             System.err.println("************************");
@@ -55,6 +65,107 @@ public class SiteAccessor {
         return false;
     }
 
+    public static ArrayList<String> getTypeList(){
+        ArrayList<String> typeList = new ArrayList<String>();
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return typeList;
+            }
+            rs = getTypeList.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error retreiving Type List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return typeList;
+        }
+
+        try {
+            while (rs.next()) {
+                String temp = rs.getString("siteType");
+                typeList.add(temp);
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Type List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return typeList;
+    }
+    
+    public static ArrayList<Province> getProvinceList(){
+        ArrayList<Province> provinces = new ArrayList<Province>();
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return provinces;
+            }
+            rs = getProvinceList.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error retreiving Province List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return provinces;
+        }
+
+        try {
+            while (rs.next()) {
+                Province temp = new Province();
+                temp.setCode(rs.getString("provinceID"));
+                temp.setName(rs.getString("provinceName"));
+                provinces.add(temp);
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Province List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return provinces;
+    }
+    
+    public static boolean insertSite(Site s){
+        boolean result = false;
+        int rc = 0;
+        try {
+            if (!init()) {
+                return result;
+            }
+            insertSite.setString(1,s.getName());
+            insertSite.setString(2, s.getProvinceID());
+            insertSite.setString(3, s.getAddress());
+            insertSite.setString(4,s.getAddress2());
+            insertSite.setString(5, s.getCity());
+            insertSite.setString(6, s.getCountry());
+            insertSite.setString(7, s.getPostalCode());
+            insertSite.setString(8, s.getPhone());
+            insertSite.setString(9, s.getDayOfWeek());
+            insertSite.setInt(10, s.getDistanceFromWH());
+            insertSite.setString(11, s.getSiteType());
+            insertSite.setString(12, s.getNotes());
+            insertSite.setBoolean(13, s.isActive());
+            insertSite.setInt(14, s.getDayOfWeekID());
+            rc = insertSite.executeUpdate();
+            result = rc > 0 ? true : false;
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error inserting Site List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        
+        return result;
+    }
+    
     public static boolean updateSite(Site s){
         boolean result = false;
         int rc = 0;
