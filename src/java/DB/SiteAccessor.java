@@ -22,6 +22,7 @@ public class SiteAccessor {
     private static PreparedStatement getAllSitesStatement = null;
     private static PreparedStatement getAllRetailLocations = null;
     private static PreparedStatement getAllDetailed = null;
+    private static PreparedStatement updateSite = null;
 
     private SiteAccessor() {
         //no instantiation
@@ -38,6 +39,10 @@ public class SiteAccessor {
             getAllSitesStatement = conn.prepareStatement("call GetAllSiteNamesIDs()");
             getAllRetailLocations = conn.prepareStatement("call GetAllRetailLocations()");
             getAllDetailed = conn.prepareStatement("SELECT * FROM site inner join province using(provinceID) where name not in ('Truck', 'Warehouse Bay')");
+            updateSite = conn.prepareStatement("update site set name = ?, provinceID = ?, "
+                    + "address = ?, address2 = ?, city = ?, country = ?, postalCode = ?, "
+                    + "phone = ?, dayOfWeek = ?, distanceFromWH = ?, siteType = ?, "
+                    + "notes = ?, active = ?, dayOfWeekID = ? where siteID = ?");
             return true;
         } catch (SQLException ex) {
             System.err.println("************************");
@@ -50,6 +55,42 @@ public class SiteAccessor {
         return false;
     }
 
+    public static boolean updateSite(Site s){
+        boolean result = false;
+        int rc = 0;
+        try {
+            if (!init()) {
+                return result;
+            }
+            updateSite.setString(1,s.getName());
+            updateSite.setString(2, s.getProvinceID());
+            updateSite.setString(3, s.getAddress());
+            updateSite.setString(4,s.getAddress2());
+            updateSite.setString(5, s.getCity());
+            updateSite.setString(6, s.getCountry());
+            updateSite.setString(7, s.getPostalCode());
+            updateSite.setString(8, s.getPhone());
+            updateSite.setString(9, s.getDayOfWeek());
+            updateSite.setInt(10, s.getDistanceFromWH());
+            updateSite.setString(11, s.getSiteType());
+            updateSite.setString(12, s.getNotes());
+            updateSite.setBoolean(13, s.isActive());
+            updateSite.setInt(14, s.getDayOfWeekID());
+            updateSite.setInt(15, s.getSiteID());
+            rc = updateSite.executeUpdate();
+            result = rc > 0 ? true : false;
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error retreiving Retail Sites List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        
+        return result;
+    }
+    
     public static ArrayList<Site> getAllDetailed(){
         ArrayList<Site> allDetailed = new ArrayList<Site>();
 

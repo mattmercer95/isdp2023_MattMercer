@@ -76,6 +76,42 @@ public class Site {
     public String getName(){
         return this.name;
     }
+    public String getProvinceID(){
+        return this.provinceID;
+    }
+    public String getProvince(){
+        return this.province;
+    }
+    public String getAddress(){
+        return this.address;
+    }
+    public String getAddress2(){
+        return this.address2;
+    }
+    public String getCity(){
+        return this.city;
+    }
+    public String getCountry(){
+        return this.country;
+    }
+    public String getPostalCode(){
+        return this.postalCode;
+    }
+    public String getPhone(){
+        return this.phone;
+    }
+    public String getDayOfWeek(){
+        return this.dayOfWeek;
+    }
+    public String getSiteType(){
+        return this.siteType;
+    }
+    public String getNotes(){
+        return this.notes;
+    }
+    public boolean isActive(){
+        return this.active;
+    }
     public int getDistanceFromWH(){
         return this.distanceFromWH;
     }

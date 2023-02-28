@@ -36,6 +36,11 @@ window.onload = async function () {
 };
 
 async function saveChanges(){
+    let confirmChanges = confirm("Save changes to location?");
+    if(!confirmChanges){
+        //cancel
+        return;
+    }
     let name = document.querySelector("#nameEdit").value;
     let phone = document.querySelector("#phoneEdit").value;
     let distanceFromWH = document.querySelector("#distanceEdit").value;
@@ -72,8 +77,24 @@ async function saveChanges(){
     currentLocation.province = province;
     currentLocation.country = country;
     
-    console.log(currentLocation);
+    await updateSite(currentLocation);
     
+}
+
+async function updateSite(currentLocation){
+    let url = `../SiteService/`;
+    let resp = await fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(currentLocation)
+    });
+    let result = await resp.text();
+    if(result){
+        alert(`${currentLocation.name} record updated succesfully`);
+        window.location.href = "ViewLocations.html";
+    }
+    else {
+        alert("Error updating location. Please check server.");
+    }
 }
 
 function addEditEvents(){

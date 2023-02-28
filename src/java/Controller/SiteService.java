@@ -24,6 +24,18 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "SiteService", urlPatterns = {"/SiteService/*"})
 public class SiteService extends HttpServlet {
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try ( PrintWriter out = response.getWriter()) {
+            Gson g = new Gson();
+            Scanner sc = new Scanner(request.getReader());
+            Site s = g.fromJson(sc.nextLine(), Site.class);
+            boolean success = SiteAccessor.updateSite(s);
+            out.println(g.toJson(success));
+        }
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
