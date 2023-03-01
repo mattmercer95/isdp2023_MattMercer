@@ -25,11 +25,32 @@ window.onload = async function () {
     document.addEventListener('keydown', resetIdleTimeout, false);
     
     document.querySelector("#downloadPDF").addEventListener('click', generatePDF);
+    document.querySelector("#completeFulfillment").addEventListener('click', completeFulfillment);
     //initialize idle timeout
     resetIdleTimeout();
 
     await getCurrentOrder();
 };
+
+async function completeFulfillment(){
+    let completeConfirm = confirm("Complete fulfillment for this order?");
+    if(!completeConfirm){
+        return;
+    }
+    let url = `../TransactionService/fulfill`;
+    let resp1 = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(currentOrder)
+    });
+    let s1 = await resp1.json();
+    if(s1){
+        alert(`Order #${currentOrder.transactionID} successfully fulfilled`);
+        window.location.href = "ViewOrders.html";
+    }
+    else {
+        alert("Something went wrong, please check server");
+    }
+}
 
 function generatePDF() {
     // Choose the element that your content will be rendered to.

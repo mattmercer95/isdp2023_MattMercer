@@ -365,7 +365,7 @@ function buildTable(){
             document.querySelector("#viewDetails").disabled = false;
             let firstOrderStatus = filtered[0].status;
             switch(firstOrderStatus){
-                case "NEW":
+                case "SUBMITTED":
                     document.querySelector("#processOrder").disabled = false;
                     break;
                 case "RECEIVED":

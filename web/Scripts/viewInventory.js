@@ -45,7 +45,6 @@ window.onload = async function () {
 async function editDetails(){
     //populate modal
     let selected = getSelectedItem();
-    console.log(selected);
     document.querySelector("#detailsActive").checked = selected.active;
     document.querySelector("#detailsName").value = selected.name;
     document.querySelector("#detailsDesc").value = selected.description;
@@ -57,6 +56,17 @@ async function editDetails(){
     document.querySelector("#detailsWeight").value = selected.weight.toFixed(2);
     document.querySelector("#detailsCost").value = selected.costPrice.toFixed(2);
     document.querySelector("#detailsPrice").value = selected.retailPrice.toFixed(2);
+    //Warehouse manager can only set active
+    if(currentEmployee.positionID === 4){
+        document.querySelector("#detailsName").disabled = true;
+        document.querySelector("#detailsDesc").disabled = true;
+        document.querySelector("#detailsCat").disabled = true;
+        document.querySelector("#detailsNotes").disabled = true;
+        document.querySelector("#detailsCaseSize").disabled = true;
+        document.querySelector("#detailsWeight").disabled = true;
+        document.querySelector("#detailsCost").disabled = true;
+        document.querySelector("#detailsPrice").disabled = true;
+    }
 }   
 
 async function updateDetails(){
@@ -229,6 +239,19 @@ async function buildTable(items){
         const idCell = document.createElement("td");
         idCell.innerHTML = item.itemID;
         row.appendChild(idCell);
+        const activeCell = document.createElement("td");
+        const activeBadge = document.createElement("span");
+        activeBadge.classList.add("badge");
+        if(item.active){
+            activeBadge.innerHTML = "Active";
+            activeBadge.classList.add("text-bg-success");
+        }
+        else {
+            activeBadge.innerHTML = "Inactive";
+            activeBadge.classList.add("text-bg-danger");
+        }
+        activeCell.appendChild(activeBadge);
+        row.appendChild(activeCell);
         const siteCell = document.createElement("td");
         siteCell.innerHTML = item.siteName;
         row.appendChild(siteCell);
@@ -344,7 +367,7 @@ function itemHighlight(e){
 
 function checkValidSite(){
     let positionID = currentEmployee.positionID;
-    if(positionID === 3){
+    if(positionID === 3 || positionID === 4){
         let selectedSite = +document.querySelector("#siteSelect").value;
         if(selectedSite !== currentEmployee.siteID){
             document.querySelector("#btnEditThreshold").disabled = true;

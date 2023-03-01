@@ -36,12 +36,28 @@ window.onload = async function () {
     document.querySelector("#orderSave").addEventListener('click', saveOrder);
     document.querySelector("#add").addEventListener('click', addItem);
     document.querySelector("#orderSubmit").addEventListener('click', submitOrder);
+    document.querySelector("#downloadPDF").addEventListener('click', generatePDF);
     //unhide action buttons depending on user permission
     
     await getCurrentOrder();
     await getAllItems();
     checkPermissions();
 };
+
+function generatePDF() {
+    // Choose the element that your content will be rendered to.
+    const element = document.getElementById('orderPDF');
+    var opt = {
+        margin:0,
+        filename: `Order-${currentOrder.transactionID}`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    // Choose the element and save the PDF for your user.
+    html2pdf().set(opt).from(element).save();
+}
 
 async function logTransaction(){
     var today = new Date();

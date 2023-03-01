@@ -108,6 +108,14 @@ public class TransactionService extends HttpServlet {
                 boolean submitted = TransactionAccessor.updateTransaction(t);
                 out.println(g.toJson(submitted));
             }
+            else if(uri.equals("/fulfill")){
+                System.out.println("here");
+                Scanner sc = new Scanner(request.getReader());
+                Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
+                t.setStatus("ASSEMBLED");
+                boolean submitted = TransactionAccessor.updateTransaction(t);
+                out.println(g.toJson(submitted));
+            }
             else if(uri.equals("/orderStatusList")){
                 ArrayList<String> orderStatusList = TransactionAccessor.getOrderStatusList();
                 out.println(g.toJson(orderStatusList));

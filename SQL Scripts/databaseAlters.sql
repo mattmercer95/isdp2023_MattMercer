@@ -372,3 +372,4 @@ update employee set password = "279781e5bb67acf9e591f90ce75e4e695acea62e846ffade
 	Add transaction types
 */
 insert into txntype(txnType) values('Password Reset');
+insert into txnstatus(statusName, statusDescription) values('ASSEMBLED', 'Order prepared by warehouse and rdy for delivery');
