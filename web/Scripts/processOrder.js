@@ -260,7 +260,7 @@ async function getCurrentOrder() {
     document.querySelector("#shipDate").value = currentOrder.shipDate;
     document.querySelector("#deliveryID").value = (currentOrder.deliveryID === 0) ? "N/A" : currentOrder.deliveryID;
     document.querySelector("#totalQtyOrdered").value = currentOrder.quantity;
-    document.querySelector("#totalWeight").value = currentOrder.totalWeight;
+    document.querySelector("#totalWeight").value = currentOrder.totalWeight.toFixed(2);
 
     let typeLabel = document.querySelector("#typeLabel");
     const typeBadge = document.createElement("span");
@@ -319,7 +319,7 @@ function buildCart() {
         nameCell.innerHTML = item.name;
         row.appendChild(nameCell);
         const weightCell = document.createElement("td");
-        weightCell.innerHTML = (item.weight * item.caseQuantityOrdered * item.caseSize);
+        weightCell.innerHTML = (item.weight * item.caseQuantityOrdered * item.caseSize).toFixed(2);
         weightCell.id = `weight${item.itemID}`;
         row.appendChild(weightCell);
         const qtyOrderedCell = document.createElement("td");

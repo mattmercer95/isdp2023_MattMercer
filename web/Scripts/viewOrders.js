@@ -40,6 +40,11 @@ window.onload = async function () {
         sessionStorage.setItem("currentOrderID", selected.transactionID);
         window.location.href = "ProcessOrder.html";
     });
+    document.querySelector("#fulfillOrder").addEventListener('click', ()=>{
+        let selected = getSelectedOrder();
+        sessionStorage.setItem("currentOrderID", selected.transactionID);
+        window.location.href = "FulfillOrder.html";
+    });
     //unhide action buttons depending on user permission
     checkPermissions();
     await getOrderStatusList();
@@ -223,6 +228,7 @@ async function getAllOrders(){
         method: 'GET'
     });
     orders = await resp.json();
+    console.log(orders);
     if(currentEmployee.positionID === 3){
         allOrders = [];
         orders.forEach((order)=>{
@@ -260,16 +266,40 @@ function filterByStatus(filter){
     return filteredList;
 }
 
+function disableButtons(){
+    document.querySelector("#viewDetails").disabled = true;
+    document.querySelector("#processOrder").disabled = true;
+    document.querySelector("#fulfillOrder").disabled = true;
+}
+
 //builds the order table
 function buildTable(){
+    disableButtons();
     let filtered = [];
     let filter = document.querySelector("#statusSelect").value.trim();
     filtered = filterByStatus(filter);
     const table = document.querySelector("#ordersTable");
     table.innerHTML = "";
     filtered.sort((a,b)=>{
-        return a.transactionID - b.transactionID;
+        //Compares based on # of days, with a year rounded down to 360 (12 x 30) days
+        let aPieces = a.shipDate.split("-");
+        let aYear = +aPieces[0];
+        let aMonth = parseInt(aPieces[1]);
+        let aDay = parseInt(aPieces[2]);
+        
+        let bPieces = b.shipDate.split("-");
+        let bYear = +bPieces[0];
+        let bMonth = parseInt(bPieces[1]);
+        let bDay = parseInt(bPieces[2]);
+        
+        let aValue = aYear * 360 + aMonth * 30 + aDay;
+        let bValue = bYear * 360 + bMonth * 30 + bDay;
+        
+        return aValue - bValue;
     });
+    
+    //counter to track the first element
+    let c = 0;
     filtered.forEach((order)=>{
         //create row and data cells
         const row = document.createElement("tr");
@@ -282,18 +312,16 @@ function buildTable(){
         locationCell.innerHTML = order.destination;
         row.appendChild(locationCell);
         const typeCell = document.createElement("td");
-        const typePill = document.createElement("span");
-        typePill.classList.add("badge");
+        const typePill = document.createElement("b");
         if(order.emergencyDelivery === true){
-            typePill.classList.add("text-bg-danger");
+            typePill.style.color = "red";
             typePill.innerHTML = "Emergency";
         }
         else if(order.transactionType === "Back Order"){
-            typePill.classList.add("bg-dark");
+            typePill.style.color = "blue";
             typePill.innerHTML = order.transactionType;
         }
         else {
-            typePill.classList.add("text-bg-primary");
             typePill.innerHTML = "Regular";
         }
         typeCell.appendChild(typePill);
@@ -313,8 +341,11 @@ function buildTable(){
         else if(order.status === "SUBMITTED"){
             statusPill.classList.add("text-bg-warning");
         }
+        else if(order.status === "BACKORDER"){
+            statusPill.classList.add("text-bg-dark");
+        }
         else {
-            statusPill.classList.add("text-bg-info");
+            statusPill.classList.add("text-bg-primary");
         }
         statusPill.innerHTML = order.status;
         statusCell.appendChild(statusPill);
@@ -328,8 +359,25 @@ function buildTable(){
         const deliveryDateCell = document.createElement("td");
         deliveryDateCell.innerHTML = order.shipDate;
         row.appendChild(deliveryDateCell);
+        
+        if(c === 0 && filtered.length > 0){
+            row.classList.add("highlighted");
+            document.querySelector("#viewDetails").disabled = false;
+            let firstOrderStatus = filtered[0].status;
+            switch(firstOrderStatus){
+                case "NEW":
+                    document.querySelector("#processOrder").disabled = false;
+                    break;
+                case "RECEIVED":
+                    document.querySelector("#fulfillOrder").disabled = false;
+                    break;
+                default:
+                    break;
+            }
+        }
         //add row to table
         table.appendChild(row);
+        c++;
     });
     filteredOrders = filtered;
 }
@@ -343,6 +391,9 @@ function checkPermissions(){
         }
         if(permission === "RECEIVESTOREORDER"){
             document.querySelector("#processOrder").hidden = false;
+        }
+        if(permission === "FULFILSTOREORDER"){
+            document.querySelector("#fulfillOrder").hidden = false;
         }
     });
 }
@@ -363,14 +414,19 @@ function highlight(e){
         let selected = getSelectedOrder();
         if(selected.status === "SUBMITTED" || selected.status === "BACKORDER"){
             document.querySelector("#processOrder").disabled = false;
+            document.querySelector("#fulfillOrder").disabled = true;
+        }
+        else if(selected.status === "RECEIVED"){
+            document.querySelector("#fulfillOrder").disabled = false;
+            document.querySelector("#processOrder").disabled = true;
         }
         else {
             document.querySelector("#processOrder").disabled = true;
+            document.querySelector("#fulfillOrder").disabled = true;
         }
     }
     else {
-        document.querySelector("#viewDetails").disabled = true;
-        document.querySelector("#processOrder").disabled = true;
+        disableButtons();
     }
 }
 

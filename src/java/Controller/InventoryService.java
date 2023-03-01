@@ -6,6 +6,7 @@ package Controller;
 
 import DB.InventoryAccessor;
 import Entity.Inventory;
+import Entity.Item;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,6 +35,12 @@ public class InventoryService extends HttpServlet {
                 Scanner sc = new Scanner(request.getReader());
                 Inventory item = g.fromJson(sc.nextLine(), Inventory.class);
                 boolean success = InventoryAccessor.updateThreshold(item);
+                out.println(g.toJson(success));
+            }
+            else if(uri.equals("/updateItemDetails")){
+                Scanner sc = new Scanner(request.getReader());
+                Item item = g.fromJson(sc.nextLine(), Item.class);
+                boolean success = InventoryAccessor.updateItemDetails(item);
                 out.println(g.toJson(success));
             }
         }

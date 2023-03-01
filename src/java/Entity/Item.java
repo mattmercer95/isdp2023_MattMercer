@@ -38,6 +38,9 @@ public class Item {
     public int getItemID(){
         return this.itemID;
     }
+    public String getSKU(){
+        return this.sku;
+    }
     public int getSupplierID(){
         return this.supplierID;
     }
@@ -68,4 +71,5 @@ public class Item {
     public boolean isActive(){
         return this.active;
     }
+
 }

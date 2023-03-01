@@ -5,6 +5,7 @@
 package DB;
 
 import Entity.Inventory;
+import Entity.Item;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,6 +24,7 @@ public class InventoryAccessor {
     private static PreparedStatement getAllDetailedInventory = null;
     private static PreparedStatement getDetailedInventoryBySite = null;
     private static PreparedStatement updateThreshold = null;
+    private static PreparedStatement updateItemDetails = null;
     
     private InventoryAccessor(){
         
@@ -41,6 +43,7 @@ public class InventoryAccessor {
                 getAllDetailedInventory = conn.prepareStatement("SELECT inventory.*, item.*, site.name as siteName FROM inventory inner join item using (itemID) inner join site using(siteID)");
                 getDetailedInventoryBySite = conn.prepareStatement("SELECT inventory.*, item.*, site.name as siteName FROM inventory inner join item using (itemID) inner join site using(siteID) where siteID = ?");
                 updateThreshold = conn.prepareStatement("update inventory set reorderThreshold = ? where itemID = ? and siteID = ?");
+                updateItemDetails = conn.prepareStatement("update item set name = ?, sku = ?, description = ?, category = ?, weight = ?, costPrice = ?, retailPrice = ?, supplierID = ?, active = ?, notes = ?, caseSize = ? where itemID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -51,6 +54,38 @@ public class InventoryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean updateItemDetails(Item item){
+        boolean result = false;
+        
+        int rc;
+        try{
+            if (!init())
+                return result;
+            updateItemDetails.setString(1, item.getName());
+            updateItemDetails.setString(2, item.getSKU());
+            updateItemDetails.setString(3, item.getDescription());
+            updateItemDetails.setString(4, item.getCategory());
+            updateItemDetails.setDouble(5, item.getWeight());
+            updateItemDetails.setDouble(6, item.getCostPrice());
+            updateItemDetails.setDouble(7, item.getRetailPrice());
+            updateItemDetails.setInt(8, item.getSupplierID());
+            updateItemDetails.setBoolean(9, item.isActive());
+            updateItemDetails.setString(10, item.getNotes());
+            updateItemDetails.setInt(11, item.getCaseSize());
+            updateItemDetails.setInt(12, item.getItemID());
+            rc = updateItemDetails.executeUpdate();
+            result = rc > 0 ? true : false;
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error updating Item Details");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        return result;
     }
     
     public static boolean updateThreshold(Inventory item){

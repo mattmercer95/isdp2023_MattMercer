@@ -235,30 +235,34 @@ public class TransactionAccessor {
         }
         boolean b2 = rc2 > 0;
         
-        //update txnitems table
-        int rc3 = 0;
-        try {
-            ArrayList<TransactionItem> items = t.getTransactionItems();
-            insertTxnItems = "insert into txnitems (txnID, itemID, quantity) values";
-            int counter = 0;
-            for(TransactionItem item : items){
-                if(counter > 0){
-                    insertTxnItems += ",";
+        boolean b3 = true;
+        if(!t.getStatus().equals("REJECTED")){
+            //update txnitems table
+            int rc3 = 0;
+            try {
+                ArrayList<TransactionItem> items = t.getTransactionItems();
+                insertTxnItems = "insert into txnitems (txnID, itemID, quantity) values";
+                int counter = 0;
+                for(TransactionItem item : items){
+                    if(counter > 0){
+                        insertTxnItems += ",";
+                    }
+                    counter++;
+                    insertTxnItems += "(" + item.getTransactionID() + ", " +
+                            item.getItemID() + ", " + item.getCaseQuantityOrdered() + ")";
                 }
-                counter++;
-                insertTxnItems += "(" + item.getTransactionID() + ", " +
-                        item.getItemID() + ", " + item.getCaseQuantityOrdered() + ")";
+                System.out.println(insertTxnItems);
+                PreparedStatement insertTxnItemsStmt = conn.prepareStatement(insertTxnItems);
+                rc3 = insertTxnItemsStmt.executeUpdate();
+            } catch (SQLException ex) {
+                System.err.println("************************");
+                System.err.println("** Error inserting txnitems");
+                System.err.println("** " + ex.getMessage());
+                System.err.println("************************");
             }
-            System.out.println(insertTxnItems);
-            PreparedStatement insertTxnItemsStmt = conn.prepareStatement(insertTxnItems);
-            rc3 = insertTxnItemsStmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.err.println("************************");
-            System.err.println("** Error inserting txnitems");
-            System.err.println("** " + ex.getMessage());
-            System.err.println("************************");
+            b3 = rc3 > 0;
         }
-        boolean b3 = rc3 > 0;
+        
         
         result = (b1 && b2 && b3) ? true : false;
         

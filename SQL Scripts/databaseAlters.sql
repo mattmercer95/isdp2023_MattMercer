@@ -102,7 +102,7 @@ BEGIN
 		insert into txnitems (txnID, itemID, quantity)
 			select @orderID, itemID, ceiling((reorderThreshold - quantity) / caseSize) 
 			from inventory inner join item using (itemID)
-			where quantity < reorderThreshold and active = true;
+			where quantity < reorderThreshold and active = true and siteID = storeID;
 	end if;
 	commit;
     select @orderID;
@@ -261,7 +261,7 @@ Retreives the Information needed to display orders
 */
 drop procedure if exists GetZeroItemOrders;
 DELIMITER //
-create procedure GetZeroItemOrders()
+create procedure GetZeroItemOrders()txn
 BEGIN
     Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery
     from txn inner join site where siteIDTo = siteID and txnID not in (select distinct txnID from txnitems)

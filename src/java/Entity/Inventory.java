@@ -47,7 +47,7 @@ public class Inventory {
         this.siteID = siteID;
     }
     public void setSupplierID(int supplierID){
-        this.siteID = siteID;
+        this.supplierID = supplierID;
     }
     public void setName(String name){
         this.name = name;

@@ -35,10 +35,79 @@ window.onload = async function () {
     document.querySelector("#siteSelect").addEventListener('input', updateSite);
     document.querySelector("#btnEditThreshold").addEventListener('click', editThreshold);
     document.querySelector("#roSaveChanges").addEventListener('click', updateThreshold);
+    document.querySelector("#detailsSaveChanges").addEventListener('click', updateDetails);
+    document.querySelector("#btnEditItemDetails").addEventListener('click', editDetails);
     
     checkPermissions();
     await getAllItems();
 };
+
+async function editDetails(){
+    //populate modal
+    let selected = getSelectedItem();
+    console.log(selected);
+    document.querySelector("#detailsActive").checked = selected.active;
+    document.querySelector("#detailsName").value = selected.name;
+    document.querySelector("#detailsDesc").value = selected.description;
+    document.querySelector("#detailsCat").value = selected.category;
+    if(typeof selected.notes !== 'undefined'){
+        document.querySelector("#detailsNotes").value = selected.notes;
+    }
+    document.querySelector("#detailsCaseSize").value = selected.caseSize;
+    document.querySelector("#detailsWeight").value = selected.weight.toFixed(2);
+    document.querySelector("#detailsCost").value = selected.costPrice.toFixed(2);
+    document.querySelector("#detailsPrice").value = selected.retailPrice.toFixed(2);
+}   
+
+async function updateDetails(){
+    let confirmDet = confirm("Save changes to Item Details?");
+    if(!confirmDet){
+        return;
+    }
+    //get values
+    let selected = getSelectedItem();
+    let newName = document.querySelector("#detailsName").value;
+    let newNotes = document.querySelector("#detailsNotes").value;
+    let newActive = document.querySelector("#detailsActive").checked;
+    let newDesc = document.querySelector("#detailsDesc").value;
+    let newCat = document.querySelector("#detailsCat").value;
+    let newCS = document.querySelector("#detailsCaseSize").value;
+    let newWeight = document.querySelector("#detailsWeight").value;
+    let newCost = document.querySelector("#detailsCost").value;
+    let newPrice = document.querySelector("#detailsPrice").value;
+    //recreate an item object for API
+    let obj = {
+        itemID: selected.itemID,
+        name: newName,
+        sku: selected.sku,
+        description: newDesc,
+        category: newCat,
+        weight: newWeight,
+        costPrice: newCost,
+        retailPrice: newPrice,
+        supplierID: selected.supplierID,
+        active: newActive,
+        notes: newNotes,
+        caseSize: newCS
+    }
+    //Make API call
+    let url = `../InventoryService/updateItemDetails`;
+    let resp = await fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(obj)
+    });
+    success = await resp.json();
+    if(success){
+        alert("Item Details successfully updated");
+        let modal = document.querySelector("#editDetailsModal   ");
+        let modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance.hide()
+        await updateSite();
+    }
+    else {
+        alert("Something went wrong, please check server");
+    }
+}
 
 async function updateThreshold(){
     let confirmRO = confirm("Save changes to Reorder Threshold?");
@@ -82,6 +151,11 @@ function checkPermissions(){
     if(positionID === 3 || positionID === 4 || positionID === 99999999){
         document.querySelector("#btnEditThreshold").classList.remove("d-none");
     }
+    permissions.forEach((p)=>{
+        if(p === "EDITITEM"){
+            document.querySelector("#btnEditItemDetails").classList.remove("d-none");
+        }
+    });
 }
 
 async function editThreshold(){
@@ -113,7 +187,10 @@ async function updateSite(){
     table.hidden = true;
     await displayLoading();
     currentSite = +document.querySelector("#siteSelect").value;
+    //disabled edit buttons
     document.querySelector("#btnEditThreshold").disabled = true;
+    document.querySelector("#btnEditItemDetails").disabled = true;
+    
     let url = currentSite === -1 ? `../InventoryService/allDetailed` : `../InventoryService/detailedBySite`;
     let resp = await fetch(url, {
         method: 'POST',
@@ -255,9 +332,23 @@ function itemHighlight(e){
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
         document.querySelector("#btnEditThreshold").disabled = false;
+        //make sure button is only enabled for that manager's site
+        checkValidSite();
+        document.querySelector("#btnEditItemDetails").disabled = false;
     }
     else {
         document.querySelector("#btnEditThreshold").disabled = true;
+        document.querySelector("#btnEditItemDetails").disabled = true;
+    }
+}
+
+function checkValidSite(){
+    let positionID = currentEmployee.positionID;
+    if(positionID === 3){
+        let selectedSite = +document.querySelector("#siteSelect").value;
+        if(selectedSite !== currentEmployee.siteID){
+            document.querySelector("#btnEditThreshold").disabled = true;
+        }
     }
 }
 
