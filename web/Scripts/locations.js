@@ -393,6 +393,23 @@ function createInput(current, label, value){
 }
 
 function newAccordionObject(accordionEle, location){
+    let siteType = location.siteType;
+    console.log(siteType);
+    let iconName = "";
+    switch(siteType){
+        case "Retail":
+            iconName = "bi-shop";
+            break;
+        case "Warehouse":
+            iconName = "bi-truck";
+            break;
+        case "Office":
+            iconName = "bi-building";
+            break;
+        default:
+            break;
+    }
+    let iconString = `<i class="bi ${iconName} customIcon"></i>`;
     const accordionDiv = document.createElement("div");
     accordionDiv.classList.add("accordion-item");
     const accordionHeader = document.createElement("div");
@@ -400,7 +417,7 @@ function newAccordionObject(accordionEle, location){
     accordionHeader.id = `heading${location.siteID}`;
     let buttonString = `<button class="accordion-button collapsed" type="button"`+ 
         `data-bs-toggle="collapse" data-bs-target="#collapse${location.siteID}"` + 
-        `aria-expanded="true" aria-controls="collapse${location.siteID}">${location.name}</button>`;
+        `aria-expanded="true" aria-controls="collapse${location.siteID}">${iconString}${location.name}</button>`;
     accordionHeader.innerHTML = buttonString;
     accordionDiv.appendChild(accordionHeader);
     const collapseString = ` <div id="collapse${location.siteID}" class="accordion-collapse collapse"` + 
