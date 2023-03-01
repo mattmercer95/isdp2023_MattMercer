@@ -420,7 +420,7 @@ function checkPermissions(){
         }
     });
     let submitButton = document.querySelector("#orderSubmit");
-    if(createFlag){
+    if(createFlag && currentOrder.status === "NEW"){
         console.log("has permission");
         document.querySelector("#newOrderPanel").hidden = false;
     }
