@@ -54,10 +54,16 @@ public class Transaction {
         this.quantity = totalItemQuantity;
     }
     
+    public ArrayList<TransactionItem> getItems(){
+        return this.items;
+    }
+    
     public String getStatus(){
         return this.status;
     }
-    
+    public int getSiteIDTo(){
+        return this.siteIDTo;
+    }
     public int getDeliveryID(){
         return this.deliveryID;
     }

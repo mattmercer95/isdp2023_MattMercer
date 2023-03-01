@@ -25,8 +25,6 @@ public class InventoryAccessor {
     private static PreparedStatement getDetailedInventoryBySite = null;
     private static PreparedStatement updateThreshold = null;
     private static PreparedStatement updateItemDetails = null;
-    private static PreparedStatement updateWarehouseCount = null;
-    private static PreparedStatement updateStoreCount = null;
     
     private InventoryAccessor(){
         
@@ -46,6 +44,7 @@ public class InventoryAccessor {
                 getDetailedInventoryBySite = conn.prepareStatement("SELECT inventory.*, item.*, site.name as siteName FROM inventory inner join item using (itemID) inner join site using(siteID) where siteID = ?");
                 updateThreshold = conn.prepareStatement("update inventory set reorderThreshold = ? where itemID = ? and siteID = ?");
                 updateItemDetails = conn.prepareStatement("update item set name = ?, sku = ?, description = ?, category = ?, weight = ?, costPrice = ?, retailPrice = ?, supplierID = ?, active = ?, notes = ?, caseSize = ? where itemID = ?");
+                
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");

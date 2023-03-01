@@ -31,6 +31,7 @@ public class TransactionAccessor {
     private static PreparedStatement getZeroItemTransactions = null;
     private static PreparedStatement getCurrentBackOrder = null;
     private static PreparedStatement createNewBackOrder = null;
+    private static PreparedStatement moveInventoryOnReceived = null;
     
     private TransactionAccessor(){
         //no instant
@@ -63,6 +64,7 @@ public class TransactionAccessor {
                 getZeroItemTransactions = conn.prepareStatement("call GetZeroItemOrders()");
                 getCurrentBackOrder = conn.prepareStatement("call GetCurrentBackOrder(?)");
                 createNewBackOrder = conn.prepareStatement("call CreateNewBackOrder(?,?)");
+                moveInventoryOnReceived = conn.prepareStatement("call UpdateReceivedCount(?, ?, ?, ?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -263,6 +265,26 @@ public class TransactionAccessor {
             b3 = rc3 > 0;
         }
         
+        try {
+            //check for what type of inventory movement we need
+            if(t.getStatus().equals("RECEIVED")){
+                ArrayList<TransactionItem> items = t.getItems();
+                for(TransactionItem item : items){
+                    moveInventoryOnReceived.setInt(1, item.getTransactionID());
+                    moveInventoryOnReceived.setInt(2, item.getCaseQuantityOrdered() * item.getCaseSize());
+                    moveInventoryOnReceived.setInt(3, item.getItemID());
+                    moveInventoryOnReceived.setInt(4, t.getSiteIDTo());
+                    
+                    int rc = moveInventoryOnReceived.executeUpdate();
+                    System.out.println(rc);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Moving Iventory on Received");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
         
         result = (b1 && b2 && b3) ? true : false;
         
