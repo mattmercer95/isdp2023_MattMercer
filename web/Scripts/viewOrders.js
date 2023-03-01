@@ -228,7 +228,6 @@ async function getAllOrders(){
         method: 'GET'
     });
     orders = await resp.json();
-    console.log(orders);
     if(currentEmployee.positionID === 3){
         allOrders = [];
         orders.forEach((order)=>{

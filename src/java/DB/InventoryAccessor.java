@@ -25,6 +25,8 @@ public class InventoryAccessor {
     private static PreparedStatement getDetailedInventoryBySite = null;
     private static PreparedStatement updateThreshold = null;
     private static PreparedStatement updateItemDetails = null;
+    private static PreparedStatement updateWarehouseCount = null;
+    private static PreparedStatement updateStoreCount = null;
     
     private InventoryAccessor(){
         

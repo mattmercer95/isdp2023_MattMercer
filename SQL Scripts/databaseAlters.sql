@@ -269,6 +269,22 @@ BEGIN
 END //
 DELIMITER ;
 
+/*
+Updates inventory count on Received order
+*/
+drop procedure if exists UpdateReceivedCount;
+DELIMITER //
+create procedure UpdateReceivedCount(in orderID int, in curQty int, in curItem int, in locationID int)
+BEGIN
+	update inventory set quantity = quantity - curQty where itemID = curItem and siteID = locationID;
+	update inventory set quantity = quantity + curQty, itemLocation = orderID where itemID = curItem and siteID = 2;
+    select row_count() into @rc;
+    if @rc = 0 then
+		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 2, curQty, orderID, 0);
+    end if;
+END //
+DELIMITER ;
+
 /* -----------------------------
 			Triggers
    ------------------------------ 
