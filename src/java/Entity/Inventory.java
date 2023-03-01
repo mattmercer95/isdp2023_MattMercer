@@ -11,11 +11,21 @@ package Entity;
 public class Inventory {
     private int itemID, itemQuantityOnHand, reorderThreshold, caseSize, siteID, supplierID;
     private double weight, costPrice, retailPrice;
-    private String name, notes, itemLocation, sku, description, category;
+    private String name, notes, itemLocation, sku, description, category, siteName, supplierName;
     private boolean active;
     
     public Inventory(){
         
+    }
+    
+    public int getReorderThreshold(){
+        return this.reorderThreshold;
+    }
+    public int getItemID(){
+        return this.itemID;
+    }
+    public int getSiteID(){
+        return this.siteID;
     }
     
     public void setItemID(int itemID){
@@ -69,5 +79,11 @@ public class Inventory {
     
     public void setActive(boolean active){
         this.active = active;
+    }
+    public void setSiteName(String siteName){
+        this.siteName = siteName;
+    }
+    public void setSupplierName(String supplierName){
+        this.supplierName = supplierName;
     }
 }

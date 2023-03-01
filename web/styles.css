@@ -125,7 +125,6 @@ td:hover {
 /* creating css loader */
 
 #loading {
-    margin-top: 50px;
     width: 4rem;
     height: 4rem;
     border: 5px solid #f3f3f3;

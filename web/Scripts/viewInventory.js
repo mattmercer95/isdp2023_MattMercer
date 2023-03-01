@@ -6,7 +6,8 @@ const redirectUrl = "../index.html";
 
 let allItems = null;
 let searchResults = null;
-let loader = null; 
+let loader = null;
+let currentSite = null;
 
 window.onload = async function () {
     loader = document.querySelector("#loading");
@@ -31,13 +32,101 @@ window.onload = async function () {
 
     document.querySelector("#itemsTable").addEventListener('click', itemHighlight);
     document.querySelector("#itemSearch").addEventListener('input', itemSearch);
-
+    document.querySelector("#siteSelect").addEventListener('input', updateSite);
+    document.querySelector("#btnEditThreshold").addEventListener('click', editThreshold);
+    document.querySelector("#roSaveChanges").addEventListener('click', updateThreshold);
+    
+    checkPermissions();
     await getAllItems();
 };
 
+async function updateThreshold(){
+    let confirmRO = confirm("Save changes to Reorder Threshold?");
+    if(!confirmRO){
+        return;
+    }
+    //get values
+    let selected = getSelectedItem();
+    let newThreshold = document.querySelector("#roNum").value;
+    //recreate an inventory object for API
+    let obj = {
+        itemID: selected.itemID,
+        siteID: selected.siteID,
+        quantity: selected.quantity,
+        itemLocation: selected.itemLocation,
+        reorderThreshold: newThreshold
+    }
+    //Make API call
+    let url = `../InventoryService/updateThreshold`;
+    let resp = await fetch(url, {
+        method: 'PUT',
+        body: JSON.stringify(obj)
+    });
+    success = await resp.json();
+    if(success){
+        alert("Reorder Threshold successfully updated");
+        let modal = document.querySelector("#editThresholdModal");
+        let modalInstance = bootstrap.Modal.getInstance(modal);
+        modalInstance.hide()
+        await updateSite();
+    }
+    else {
+        alert("Something went wrong, please check server");
+    }
+    
+}
+
+function checkPermissions(){
+    let permissions = JSON.parse(sessionStorage.getItem("permissions"));
+    let positionID = currentEmployee.positionID;
+    if(positionID === 3 || positionID === 4 || positionID === 99999999){
+        document.querySelector("#btnEditThreshold").classList.remove("d-none");
+    }
+}
+
+async function editThreshold(){
+    //populate modal
+    let selected = getSelectedItem();
+    document.querySelector("#roLocation").innerHTML = selected.siteName;
+    document.querySelector("#roItemID").innerHTML = selected.itemID;
+    document.querySelector("#roName").innerHTML = selected.name;
+    document.querySelector("#roNum").value = selected.reorderThreshold;
+}
+
+//Helper function to get the selected item from the add items table
+function getSelectedItem(){
+    let table = document.querySelector("#itemsTable");
+    rows = table.querySelectorAll("tr");
+    let selectedItem;
+    let selectedIndex;
+    for(let i = 0; i < rows.length; i++){
+        row = rows[i];
+        if(row.classList.contains("highlighted")){
+            selectedItem = searchResults[i];
+        }
+    }
+    return selectedItem;
+}
+
+async function updateSite(){
+    let table = document.querySelector("#itemsTable");
+    table.hidden = true;
+    await displayLoading();
+    currentSite = +document.querySelector("#siteSelect").value;
+    document.querySelector("#btnEditThreshold").disabled = true;
+    let url = currentSite === -1 ? `../InventoryService/allDetailed` : `../InventoryService/detailedBySite`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: currentSite
+    });
+    allItems = await resp.json();
+    itemSearch();
+    await itemSearch();
+    await hideLoading();
+    table.hidden = false;
+}
 // showing loading
-function displayLoading() {
-    //document.querySelector("#itemsTable").hidden = true
+async function displayLoading() {
     loader.classList.add("display");
     // to stop loading after some time
     setTimeout(() => {
@@ -46,13 +135,13 @@ function displayLoading() {
 }
 
 // hiding loading 
-function hideLoading() {
+async function hideLoading() {
     loader.classList.remove("display");
-    //document.querySelector("#itemsTable").hidden = false
 }
 
 //builds the add item table
-function buildTable(items){
+async function buildTable(items){
+    await displayLoading();
     //get search value for highlighting
     let query = document.querySelector("#itemSearch").value;
     const table = document.querySelector("#itemsTable");
@@ -63,6 +152,9 @@ function buildTable(items){
         const idCell = document.createElement("td");
         idCell.innerHTML = item.itemID;
         row.appendChild(idCell);
+        const siteCell = document.createElement("td");
+        siteCell.innerHTML = item.siteName;
+        row.appendChild(siteCell);
         const nameCell = document.createElement("td");
         //check for search term highlighting
         if(query !== ""){
@@ -77,6 +169,21 @@ function buildTable(items){
             nameCell.innerHTML = item.name;
         }
         row.appendChild(nameCell);
+        const descriptionCell = document.createElement("td");
+        descriptionCell.innerHTML = item.description;
+        row.appendChild(descriptionCell);
+        const catCell = document.createElement("td");
+        catCell.innerHTML = item.category;
+        row.appendChild(catCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = item.weight.toFixed(2);
+        row.appendChild(weightCell);
+        const costCell = document.createElement("td");
+        costCell.innerHTML = item.costPrice.toFixed(2);
+        row.appendChild(costCell);
+        const retailCell = document.createElement("td");
+        retailCell.innerHTML = item.retailPrice.toFixed(2);
+        row.appendChild(retailCell);
         const qtyCell = document.createElement("td");
         qtyCell.innerHTML = item.itemQuantityOnHand;
         row.appendChild(qtyCell);
@@ -89,20 +196,53 @@ function buildTable(items){
         //add row to table
         table.appendChild(row);
     });
+     await hideLoading();
 }
 
 //Makes API call to get all items and stores them in the global variable
 async function getAllItems(){
-    displayLoading();
-    let url = `../InventoryService/allDetailed`;
+    await displayLoading();
+    await loadSelector();
+    let siteID = currentEmployee.siteID;
+    let url = `../InventoryService/detailedBySite`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: siteID
+    });
+    allItems = await resp.json();
+    itemSearch();
+//    searchResults = allItems
+    await hideLoading();
+    await buildTable(searchResults);
+    
+}
+
+async function loadSelector(allItems){
+    //get site list
+    let url = `../SiteService/`;
     let resp = await fetch(url, {
         method: 'GET'
     });
-    allItems = await resp.json();
-    console.log(allItems);
-    searchResults = allItems
-    buildTable(searchResults);
-    hideLoading();
+    allSites = await resp.json();
+    populateSiteSelector(allSites);
+}
+
+function populateSiteSelector(allSites){
+    let selector = document.querySelector("#siteSelect");
+    const optionAllEle = document.createElement("option");
+    optionAllEle.value = "-1";
+    optionAllEle.innerHTML = "All";
+    selector.appendChild(optionAllEle);
+    currentSite = currentEmployee.siteID;
+    allSites.forEach((site)=>{
+        const optionEle = document.createElement("option");
+        optionEle.value = String(site.siteID);
+        optionEle.innerHTML = site.name;
+        if(site.siteID === currentSite){
+            optionEle.selected = true;
+        }
+        selector.appendChild(optionEle);
+    });
 }
 
 function itemHighlight(e){
@@ -114,25 +254,29 @@ function itemHighlight(e){
     let target = e.target.parentElement;
     if(target.tagName === "TR"){
         target.classList.add("highlighted");
+        document.querySelector("#btnEditThreshold").disabled = false;
     }
     else {
-        //
+        document.querySelector("#btnEditThreshold").disabled = true;
     }
 }
 
 //auto-complete search for add item
-function itemSearch(){
+async function itemSearch(){
     let query = document.querySelector("#itemSearch").value.trim();
     let results = [];
     allItems.forEach((item) => {
+        let correctSite = (currentSite === -1) ? true : item.siteID === currentSite;
         let containsID = item.itemID === +query;
         let containsName = item.name.toUpperCase().includes(query.toUpperCase());
-        if(containsID || containsName){
+        let containsDescription = item.description.toUpperCase().includes(query.toUpperCase());
+        let containsTerm = containsID || containsName;
+        if(containsTerm && correctSite){
             results.push(item);
         }
     })
     searchResults = results;
-    buildTable(searchResults);
+    await buildTable(searchResults);
 }
 
 function resetIdleTimeout(){

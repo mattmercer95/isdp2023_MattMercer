@@ -24,6 +24,21 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "InventoryService", urlPatterns = {"/InventoryService/*"})
 public class InventoryService extends HttpServlet {
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String uri = request.getPathInfo();
+        try ( PrintWriter out = response.getWriter()) {
+            Gson g = new Gson();
+            if(uri.equals("/updateThreshold")){
+                Scanner sc = new Scanner(request.getReader());
+                Inventory item = g.fromJson(sc.nextLine(), Inventory.class);
+                boolean success = InventoryAccessor.updateThreshold(item);
+                out.println(g.toJson(success));
+            }
+        }
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -53,6 +68,12 @@ public class InventoryService extends HttpServlet {
             }
             else if(uri.equals("/allDetailed")){
                 ArrayList<Inventory> inventory = InventoryAccessor.getAllDetailed();
+                out.println(g.toJson(inventory));
+            }
+            else if(uri.equals("/detailedBySite")){
+                Scanner sc = new Scanner(request.getReader());
+                int siteID = Integer.parseInt(sc.nextLine());
+                ArrayList<Inventory> inventory = InventoryAccessor.getDetailedInventoryBySite(siteID);
                 out.println(g.toJson(inventory));
             }
             else {

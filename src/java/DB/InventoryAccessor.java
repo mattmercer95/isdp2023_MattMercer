@@ -21,6 +21,8 @@ public class InventoryAccessor {
     private static PreparedStatement getAvailableInventory = null;
     private static PreparedStatement getWarehouseInventory = null;
     private static PreparedStatement getAllDetailedInventory = null;
+    private static PreparedStatement getDetailedInventoryBySite = null;
+    private static PreparedStatement updateThreshold = null;
     
     private InventoryAccessor(){
         
@@ -36,7 +38,9 @@ public class InventoryAccessor {
                 getInventoryByID = conn.prepareStatement("call GetInventoryBySiteID(?)");
                 getAvailableInventory = conn.prepareStatement("call GetAvailableInventory(?)");
                 getWarehouseInventory = conn.prepareStatement("call GetWarehouseInventory(?)");
-                getAllDetailedInventory = conn.prepareStatement("SELECT * FROM inventory inner join item using (itemID)");
+                getAllDetailedInventory = conn.prepareStatement("SELECT inventory.*, item.*, site.name as siteName FROM inventory inner join item using (itemID) inner join site using(siteID)");
+                getDetailedInventoryBySite = conn.prepareStatement("SELECT inventory.*, item.*, site.name as siteName FROM inventory inner join item using (itemID) inner join site using(siteID) where siteID = ?");
+                updateThreshold = conn.prepareStatement("update inventory set reorderThreshold = ? where itemID = ? and siteID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -47,6 +51,29 @@ public class InventoryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean updateThreshold(Inventory item){
+        boolean result = false;
+        
+        int rc;
+        try{
+            if (!init())
+                return result;
+            updateThreshold.setInt(1, item.getReorderThreshold());
+            updateThreshold.setInt(2, item.getItemID());
+            updateThreshold.setInt(3, item.getSiteID());
+            rc = updateThreshold.executeUpdate();
+            result = rc > 0 ? true : false;
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        return result;
     }
     
     public static ArrayList<Inventory> getWarehouseInventory(int txnID){
@@ -163,6 +190,55 @@ public class InventoryAccessor {
         return inventory;
     }
     
+    public static ArrayList<Inventory> getDetailedInventoryBySite(int siteID){
+        ArrayList<Inventory> inventory = new ArrayList<Inventory>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return inventory;
+            getDetailedInventoryBySite.setInt(1, siteID);
+            rs = getDetailedInventoryBySite.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return inventory;
+        }
+        
+        try {
+            while (rs.next()) {
+                Inventory item = new Inventory();
+                item.setItemID(rs.getInt("itemID"));
+                item.setSiteID(rs.getInt("siteID"));
+                item.setItemQuantityOnHand(rs.getInt("quantity"));
+                item.setItemLocation(rs.getString("itemLocation"));
+                item.setReorderThreshold(rs.getInt("reorderThreshold"));
+                item.setName(rs.getString("name"));
+                item.setSKU(rs.getString("sku"));
+                item.setDescription(rs.getString("description"));
+                item.setCategory(rs.getString("category"));
+                item.setWeight(rs.getFloat("weight"));
+                item.setCostPrice(rs.getFloat("costPrice"));
+                item.setRetailPrice(rs.getFloat("retailPrice"));
+                item.setSupplierID(rs.getInt("supplierID"));
+                item.setActive(rs.getBoolean("active"));
+                item.setNotes(rs.getString("notes"));
+                item.setCaseSize(rs.getInt("caseSize"));
+                item.setSiteName(rs.getString("siteName"));
+                inventory.add(item);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Inventory To Add List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return inventory;
+    }
+    
     public static ArrayList<Inventory> getAllDetailed(){
         ArrayList<Inventory> inventory = new ArrayList<Inventory>();
         
@@ -198,6 +274,7 @@ public class InventoryAccessor {
                 item.setActive(rs.getBoolean("active"));
                 item.setNotes(rs.getString("notes"));
                 item.setCaseSize(rs.getInt("caseSize"));
+                item.setSiteName(rs.getString("siteName"));
                 inventory.add(item);
             }
         } catch(SQLException ex) {
