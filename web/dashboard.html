@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <title>Bullseye Inventory Portal</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
         <link href="styles.css" rel="stylesheet">        
     </head>
     <body>
@@ -25,59 +25,38 @@
     </nav>
     <br>
     <div class="row justify-content-center">
-        <br>
-        <div class="card col-10">
-            <br>
-            <div class="card-title">
-                <h2 class="text-center">Dashboard</h2>
+        <div class="col-4">
+            <h1 class="text-center">Bullseye Inventory Management</h1>
+            <div class="row justify-content-center dashboardPanel">
+                <ul class="list-group">
+                    <li class="list-group-item text-center" id="userAccounts" hidden>
+                        <h2 class="card-title"><i class="bi bi-people-fill"></i>User Accounts</h2>
+                        <br>
+                        <p class="fs-6 card-text">View user account information. Create, update, or deactivate user accounts.</p>
+                    </li>
+                    <li class="list-group-item text-center" id="locations">
+                        <h2 class="card-title"><i class="bi bi-globe-americas"></i>Locations</h2>
+                        <br>
+                        <p class="fs-6 card-text">View or edit information about Bullseye Locations </p>
+                    </li>
+                    <li class="list-group-item text-center" id="orders" hidden>
+                        <h2 class="card-title"><i class="bi bi-receipt"></i>Orders</h2>
+                        <br>
+                        <p class="fs-6 card-text">
+                            View store orders, create a new store order or emergency order,
+                            receive orders, fulfill orders, and handle back-orders.
+                        </p>
+                    </li>
+                    <li class="list-group-item text-center" id="inventory">
+                        <h2 class="card-title"><i class="bi bi-boxes"></i>Inventory</h2>
+                        <br>
+                        <p class="fs-6 card-text">View or edit inventory information based on location.</p>
+                    </li>
+                </ul>
             </div>
-            <div class="card-body">
-               <div class="row">
-                    <div class="col-sm" id="userAccounts" hidden>
-                      <div class="card cursor-pointer">
-                        <div class="card-body">
-                          <h5 class="card-title">User Accounts</h5>
-                          <p class="card-text">View user account information. Create, update, or deactivate user accounts.</p>
-                          <a href="Dashboard/UserAccounts.html" class="btn btn-primary">Go To Accounts</a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-sm" id="locations">
-                        <div class="card cursor-pointer">
-                            <div class="card-body">
-                            <h5 class="card-title">Location</h5>
-                            <p class="card-text">View or edit information about Bullseye Locations </p>
-                            <a href="Dashboard/ViewLocations.html" class="btn btn-primary">Go To Locations</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm" id="orders" hidden>
-                      <div class="card cursor-pointer">
-                        <div class="card-body">
-                          <h5 class="card-title">Orders</h5>
-                            <p class="card-text">
-                                View store orders, create a new store order or emergency order,
-                                receive orders, fulfill orders, and handle back-orders.
-                            </p>
-                            <a href="Dashboard/ViewOrders.html" class="btn btn-primary">Go To Orders</a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-sm" id="inventory">
-                      <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Inventory</h5>
-                            <p class="card-text">View or edit inventory information based on location.</p>
-                            <a href="Dashboard/ViewInventory.html" class="btn btn-primary">Go To Inventory</a>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-        </div> 
+        </div>
     </div>
+    
     <script src="Scripts/dashboard.js">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>

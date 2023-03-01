@@ -4,7 +4,22 @@
 .modal-search{
     display: block;
 }
-
+.list-group-item {
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+.list-group-item:hover{
+    background-color: #0d6efd;
+    color: white;
+    cursor: pointer;
+}
+.customHeading {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+.dashboardPanel {
+    padding-top: 50px;
+}
 .card {
     margin: 10px;
 }

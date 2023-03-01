@@ -18,6 +18,18 @@ window.onload = function () {
     document.addEventListener('click', resetIdleTimeout, false);
     document.addEventListener('mousemove', resetIdleTimeout, false);
     document.addEventListener('keydown', resetIdleTimeout, false);
+    document.querySelector("#userAccounts").addEventListener('click', ()=>{
+        window.location.href = "Dashboard/UserAccounts.html";
+    });
+    document.querySelector("#locations").addEventListener('click', ()=>{
+        window.location.href = "Dashboard/ViewLocations.html";
+    });
+    document.querySelector("#orders").addEventListener('click', ()=>{
+        window.location.href = "Dashboard/ViewOrders.html";
+    });
+    document.querySelector("#inventory").addEventListener('click', ()=>{
+        window.location.href = "Dashboard/ViewInventory.html";
+    });
     //initialize idle timeout
     resetIdleTimeout();
     checkPermissions();
