@@ -1,6 +1,6 @@
 -- Bullseye DB SQL Script
--- version 1.5
--- January 31, 2023
+-- version 1.71
+-- February 28, 2023
 -- 
 
 -- ********************************************
@@ -194,10 +194,11 @@ CREATE TABLE `txn` (
   `status` varchar(20) NOT NULL,
   `shipDate` datetime NOT NULL,
   `txnType` varchar(20) NOT NULL,
-  `barCode` varchar(50) NOT NULL,
+  `barCode` varchar(50),
   `createdDate` datetime NOT NULL,
   `deliveryID` int(11) DEFAULT NULL,
   `emergencyDelivery` tinyint(1) DEFAULT NULL,
+  `notes` varchar(255) NOT NULL,
   FOREIGN KEY (`siteIDTo`) REFERENCES `site` (`siteID`),
   FOREIGN KEY (`siteIDFrom`) REFERENCES `site` (`siteID`),
   FOREIGN KEY (`status`) REFERENCES `txnstatus` (`statusName`),
@@ -281,10 +282,10 @@ INSERT INTO `posn` (`positionID`, `permissionLevel`) VALUES
 -- Insert data for table `province`
 --
 INSERT INTO `province` (`provinceID`, `provinceName`, `countryCode`) VALUES
+('NB', 'New Brunswick', 'Canada'),
 ('AB', 'Alberta', 'Canada'),
 ('BC', 'British Columbia', 'Canada'),
 ('MB', 'Manitoba', 'Canada'),
-('NB', 'New Brunswick', 'Canada'),
 ('NL', 'Newfoundland and Lab', 'Canada'),
 ('NS', 'Nova Scotia', 'Canada'),
 ('NT', 'Northwest Territorie', 'Canada'),
@@ -304,8 +305,6 @@ INSERT INTO `sitetype` (`siteType`, `notes`) VALUES
 ('Retail', 'Retail Location'),
 ('Office', 'Office Location'),
 ('Truck', 'Delivery Truck');
-
-
 --
 -- Insert data for table `site`
 --
@@ -320,6 +319,7 @@ INSERT INTO `site` (`siteID`, `name`, `provinceID`, `address`, `address2`, `city
 (8, 'Oromocto Retail', 'NB', '273 Restigouche Road', NULL, 'Oromocto', 'Canada', 'E2V2H1', 5066966233, 'WEDNESDAY', 96, 'Retail', NULL, 1),
 (9, 'Fredericton Retail', 'NB', '1381 Regent Street', 'Unit Y200A', 'Fredericton', 'Canada', 'E3C1A2', 5066966234, 'WEDNESDAY', 116, 'Retail', NULL, 1),
 (10, 'Miramichi Retail', 'NB', '2441 King George Highway', NULL, 'Miramichi', 'Canada', 'E1V6W2', 5066966235, 'THURSDAY', 270, 'Retail', NULL, 1),
+(11, 'Curbside', 'NB', 'Curbside', NULL, 'Curbside', 'Canada', '', 0 , '',0, 'Retail', NULL, 1),
 (9999, 'Truck', 'NB', '1063 Bayside Drive', NULL, 'Saint John', 'Canada', 'E2J4Y2', 5066966236, 'SUNDAY', 0, 'Truck', NULL,1);
 
 --
@@ -414,6 +414,8 @@ INSERT INTO `user_permission` (`employeeID`, `permissionID`) VALUES
 -- Insert data for table `txntype`
 --
 INSERT INTO `txntype` (`txnType`) VALUES
+('Store Order'),
+('Emergency Order'),
 ('Back Order'),
 ('Damage'),
 ('Gain'),
@@ -421,7 +423,6 @@ INSERT INTO `txntype` (`txnType`) VALUES
 ('Rejected'),
 ('Return'),
 ('Sale'),
-('Store Order'),
 ('Supplier Order'),
 ('Correction'),
 ('Curbside'),
