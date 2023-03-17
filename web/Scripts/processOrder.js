@@ -42,6 +42,29 @@ window.onload = async function () {
     await getCurrentOrder();
 };
 
+async function logTransaction(status){
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = `${yyyy}-${mm}-${dd}`;
+    let obj = {
+        txnID: currentOrder.transactionID,
+        txnType: (currentOrder.emergencyDelivery) ? 'Emergency' : 'Regular',
+        status: status,
+        txnDate: today,
+        siteID: currentOrder.siteIDTo,
+        employeeID: currentEmployee.employeeID
+    }
+    let url = (status === "RECEIVED") ? `../AuditService/received` : `../AuditService/rejected`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    });
+    console.log(await resp.text());
+}
+
 async function rejectOrder(){
     let confirmReject = confirm(`Confirm rejection of order #${currentOrder.transactionID}`);
     if(!confirmReject){
@@ -54,8 +77,11 @@ async function rejectOrder(){
         body: JSON.stringify(currentOrder)
     });
     let success = await resp.json();
+    console.log("fuck shit piss");
+    console.log(success);
     if(success){
         alert("Successfully Rejected Order");
+        await logTransaction("REJECTED");
         window.location.href = "ViewOrders.html";
     }
 }
@@ -74,6 +100,7 @@ async function approveOrder(){
     let success = await resp.json();
     if(success){
         alert("Successfully Received Order");
+        await logTransaction("RECEIVED");
         window.location.href = "ViewOrders.html";
     }
 }

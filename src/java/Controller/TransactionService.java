@@ -112,7 +112,7 @@ public class TransactionService extends HttpServlet {
                 System.out.println("here");
                 Scanner sc = new Scanner(request.getReader());
                 Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
-                t.setStatus("ASSEMBLED");
+                t.setStatus("READY");
                 boolean submitted = TransactionAccessor.updateTransaction(t);
                 out.println(g.toJson(submitted));
             }

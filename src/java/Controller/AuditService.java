@@ -44,6 +44,24 @@ public class AuditService extends HttpServlet {
                 boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
                 out.println(g.toJson(result));
             }
+            else if(uri.equals("/fulfil")){
+                Scanner sc = new Scanner(request.getReader());
+                TxnAudit auditItem = g.fromJson(sc.nextLine(), TxnAudit.class);
+                boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
+                out.println(g.toJson(result));
+            }
+            else if(uri.equals("/received")){
+                Scanner sc = new Scanner(request.getReader());
+                TxnAudit auditItem = g.fromJson(sc.nextLine(), TxnAudit.class);
+                boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
+                out.println(g.toJson(result));
+            }
+            else if(uri.equals("/rejected")){
+                Scanner sc = new Scanner(request.getReader());
+                TxnAudit auditItem = g.fromJson(sc.nextLine(), TxnAudit.class);
+                boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
+                out.println(g.toJson(result));
+            }
             else {
                 System.out.println(":(");
             }
