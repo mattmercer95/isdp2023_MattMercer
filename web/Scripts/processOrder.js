@@ -77,8 +77,6 @@ async function rejectOrder(){
         body: JSON.stringify(currentOrder)
     });
     let success = await resp.json();
-    console.log("fuck shit piss");
-    console.log(success);
     if(success){
         alert("Successfully Rejected Order");
         await logTransaction("REJECTED");

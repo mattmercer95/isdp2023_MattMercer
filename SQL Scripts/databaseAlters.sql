@@ -9,6 +9,46 @@
 */ 
 
 /*
+Creates a delivery record for a transaction if none is currently open
+*/
+drop procedure if exists GetVehicleByWeight;
+DELIMITER //
+create procedure GetVehicleByWeight(in totalWeight double, out currentVehicleType varchar(20))
+BEGIN
+    set currentVehicleType := (select vehicleType from vehicle where maxWeight >= totalWeight and vehicleType != 'Courier' order by maxWeight limit 1);
+END //
+DELIMITER ;
+
+/*
+Creates a delivery record for a transaction if none is currently open
+*/
+drop procedure if exists OpenDelivery;
+DELIMITER //
+create procedure OpenDelivery(in orderID int, in totalWeight double)
+BEGIN
+	declare OpenDeliveryCount integer;
+    declare vehicleTypeSelected varchar(20);
+    declare distance int;
+    declare costPerKMSelected decimal(10,2);
+    declare varDistanceCost decimal(10,2);
+    
+    set OpenDeliveryCount := (select count(*) from txn where txnID = orderID and deliveryID is not null);
+    
+    if OpenDeliveryCount = 0 then
+		start transaction;
+		call GetVehicleByWeight(totalWeight, vehicleTypeSelected);
+        set distance := (select distanceFromWH from site inner join txn on site.siteID = txn.siteIDTo where txnID = orderID);
+        set costPerKMSelected := (select costPerKm from vehicle where vehicleType = vehicleTypeSelected);
+        set varDistanceCost := distance * costPerKMSelected;
+        select distance, costPerKMSelected, varDistanceCost, vehicleTypeSelected;
+		insert into delivery (distanceCost, vehicleType, notes) values (varDistanceCost, vehicleTypeSelected, null);
+        update txn set deliveryID = last_insert_id() where txnID = orderID;
+        commit;
+    end if;
+END //
+DELIMITER ;
+
+/*
 Gets the inventory from the warehouse based on items in a transaction. Used to determine back orders.
 */
 drop procedure if exists GetWarehouseInventory;
@@ -390,3 +430,4 @@ update employee set password = "279781e5bb67acf9e591f90ce75e4e695acea62e846ffade
 insert into txntype(txnType) values('Password Reset');
 insert into txnstatus(statusName, statusDescription) values('ASSEMBLED', 'Order prepared by warehouse and rdy for delivery');
 ALTER TABLE txn modify notes varchar(255) NULL;
+alter table delivery add deliveryStart datetime null, add deliveryEnd datetime null;

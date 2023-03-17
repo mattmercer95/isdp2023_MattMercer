@@ -61,6 +61,7 @@ async function completeFulfillment(){
     if(!completeConfirm){
         return;
     }
+    console.log(currentOrder);
     let url = `../TransactionService/fulfill`;
     let resp1 = await fetch(url, {
         method: 'POST',
@@ -70,7 +71,7 @@ async function completeFulfillment(){
     if(s1){
         alert(`Order #${currentOrder.transactionID} successfully fulfilled`);
         await logTransaction();
-        window.location.href = "ViewOrders.html";
+        //window.location.href = "ViewOrders.html";
     }
     else {
         alert("Something went wrong, please check server");
