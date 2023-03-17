@@ -95,8 +95,8 @@ create procedure CreateNewStoreOrder(in storeID int, in orderDate date, in emg t
 BEGIN
 	start transaction;
     call GetNextDeliveryDate(storeID, @nextShipDate);
-	insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery)
-		values(storeID, 1, 'NEW', @nextShipDate, 'Store Order', 'X', orderDate, null, emg);
+	insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, notes)
+		values(storeID, 1, 'NEW', @nextShipDate, 'Store Order', 'X', orderDate, null, emg, "x");
 	select LAST_INSERT_ID() into @orderID;
     if emg = false then
 		insert into txnitems (txnID, itemID, quantity)
@@ -389,3 +389,4 @@ update employee set password = "279781e5bb67acf9e591f90ce75e4e695acea62e846ffade
 */
 insert into txntype(txnType) values('Password Reset');
 insert into txnstatus(statusName, statusDescription) values('ASSEMBLED', 'Order prepared by warehouse and rdy for delivery');
+ALTER TABLE txn modify notes varchar(255) NULL;
