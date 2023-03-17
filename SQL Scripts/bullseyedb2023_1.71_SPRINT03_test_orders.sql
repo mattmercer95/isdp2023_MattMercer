@@ -23,14 +23,14 @@ VALUES
 --
 INSERT INTO txnitems (txnID, itemID, quantity)
 VALUES
-	(1001,10439,10),
-	(1001,10748,5),
-	(1002,10439,5);
+	(1001,10439,1),
+	(1001,10748,1),
+	(1002,10439,1);
 
 --
 -- Insert test records into inventory table
 --
 INSERT INTO inventory (itemID, quantity, siteID)
 VALUES
-	(10439,5,2),
-	(10748,5,2);
+	(10439,16,2),
+	(10748,12,2);
