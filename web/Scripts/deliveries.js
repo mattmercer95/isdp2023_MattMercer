@@ -4,6 +4,8 @@ const idleDurationMins = 15;
 const redirectUrl = "../index.html";
 let idleTimeout;
 
+let allDeliveries = [];
+
 window.onload = async function () {
     //set current employee global to the user that logged in
     currentEmployee = JSON.parse(sessionStorage.getItem("employeeInfo"));
@@ -26,7 +28,12 @@ window.onload = async function () {
 
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
 
+    await loadAllDeliveries();
 };
+
+async function loadAllDeliveries(){
+    
+}
 
 function returnToDash(){
     window.location.href = "../dashboard.html";
