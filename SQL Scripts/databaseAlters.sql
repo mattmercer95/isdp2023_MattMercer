@@ -9,7 +9,63 @@
 */ 
 
 /*
-Creates a delivery record for a transaction if none is currently open
+Adds a transaction to an open delivery; Creates a new delivery if max weight is reached
+*/
+drop procedure if exists AddToDelivery;
+DELIMITER //
+create procedure AddToDelivery(in orderID int, in weightToAdd double)
+BEGIN
+    declare currDate datetime;
+    declare currTotalWeight decimal(10,2);
+    declare currDeliveryID integer;
+    declare combinedWeight decimal(10,2);
+    declare currVehicleType varchar(20);
+    declare currDistance integer;
+    declare distanceToAdd integer;
+    declare curCostPerKM decimal(10,2);
+    declare costPerKMToAdd decimal(10,2);
+    declare currDistanceCost decimal(10,2);
+    declare distanceCostToAdd decimal(10,2);
+
+    
+    /*Get the next available delivery with available weight room*/
+    select shipDate, totalWeight, deliveryID 
+    into currDate, currTotalWeight, currDeliveryID
+    from txn inner join delivery using (deliveryID)
+    where shipDate = (select shipDate from txn where txnID = orderID)
+    order by totalWeight limit 1;
+    
+    /*check if combined weight exceeds the maximum truck size (20,000 kg)*/
+    set combinedWeight := currTotalWeight + weightToAdd;
+    if combinedWeight >= 20000 then
+		/*Create a new delivery record*/
+        start transaction;
+		call GetVehicleByWeight(weightToAdd, currVehicleType);
+        set currDistance := (select distanceFromWH from site inner join txn on site.siteID = txn.siteIDTo where txnID = orderID);
+        set curCostPerKM := (select costPerKm from vehicle where vehicleType = currVehicleType);
+        set currDistanceCost := currDistance * curCostPerKM;
+		insert into delivery (distanceCost, vehicleType, notes, totalWeight) values (currDistanceCost, currVehicleType, null, weightToAdd);
+        update txn set deliveryID = last_insert_id() where txnID = orderID;
+        commit;
+	else 
+		/*Add transaction to delivery*/
+        call GetVehicleByWeight(combinedWeight, currVehicleType);
+        /*Adjust distance cost for the additional destination and/or change of truck type*/
+        select sum(distanceFromWH) into currDistance 
+			from txn inner join delivery using (deliveryID) inner join site on txn.siteIDTo = site.siteID 
+			where deliveryID = currDeliveryID;
+        set distanceToAdd := (select distanceFromWH from site inner join txn on site.siteID = txn.siteIDTo where txnID = orderID);
+        set costPerKMToAdd := (select costPerKm from vehicle where vehicleType = currVehicleType);
+        set distanceCostToAdd := (distanceToAdd + currDistance) * costPerKMToAdd;
+        update delivery set distanceCost = distanceCostToAdd, vehicleType = currVehicleType, totalWeight = combinedWeight where deliveryID = currDeliveryID;
+        update txn set deliveryID = currDeliveryID where txnID = orderID;
+    end if;
+    
+END //
+DELIMITER ;
+
+/*
+Gets the optimal vehicle by weight
 */
 drop procedure if exists GetVehicleByWeight;
 DELIMITER //
@@ -24,26 +80,34 @@ Creates a delivery record for a transaction if none is currently open
 */
 drop procedure if exists OpenDelivery;
 DELIMITER //
-create procedure OpenDelivery(in orderID int, in totalWeight double)
+create procedure OpenDelivery(in orderID int, in inTotalWeight double)
 BEGIN
-	declare OpenDeliveryCount integer;
+    declare OpenDeliveriesOnDate integer;
     declare vehicleTypeSelected varchar(20);
     declare distance int;
     declare costPerKMSelected decimal(10,2);
     declare varDistanceCost decimal(10,2);
     
-    set OpenDeliveryCount := (select count(*) from txn where txnID = orderID and deliveryID is not null);
+    set OpenDeliveriesOnDate := (select count(*) from txn where deliveryID is not null and shipDate = (select shipDate from txn where txnID = orderID));
     
-    if OpenDeliveryCount = 0 then
-		start transaction;
-		call GetVehicleByWeight(totalWeight, vehicleTypeSelected);
+    /*
+    Add transaction to an already open delivery for that date
+    */
+    if OpenDeliveriesOnDate = 0 then
+		select "in first";
+        start transaction;
+		call GetVehicleByWeight(inTotalWeight, vehicleTypeSelected);
         set distance := (select distanceFromWH from site inner join txn on site.siteID = txn.siteIDTo where txnID = orderID);
         set costPerKMSelected := (select costPerKm from vehicle where vehicleType = vehicleTypeSelected);
         set varDistanceCost := distance * costPerKMSelected;
-        select distance, costPerKMSelected, varDistanceCost, vehicleTypeSelected;
-		insert into delivery (distanceCost, vehicleType, notes) values (varDistanceCost, vehicleTypeSelected, null);
+		insert into delivery (distanceCost, vehicleType, notes, totalWeight) values (varDistanceCost, vehicleTypeSelected, null, inTotalWeight);
         update txn set deliveryID = last_insert_id() where txnID = orderID;
         commit;
+	/*
+	Create a new delivery entry
+    */
+	else
+		call AddToDelivery(orderID, inTotalWeight);
     end if;
 END //
 DELIMITER ;
@@ -431,3 +495,4 @@ insert into txntype(txnType) values('Password Reset');
 insert into txnstatus(statusName, statusDescription) values('ASSEMBLED', 'Order prepared by warehouse and rdy for delivery');
 ALTER TABLE txn modify notes varchar(255) NULL;
 alter table delivery add deliveryStart datetime null, add deliveryEnd datetime null;
+alter table delivery add totalWeight decimal(10,2);
