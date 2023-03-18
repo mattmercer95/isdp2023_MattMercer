@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import DB.DeliveryAccessor;
 import DB.InventoryAccessor;
 import DB.SiteAccessor;
 import DB.TransactionAccessor;
@@ -114,6 +115,8 @@ public class TransactionService extends HttpServlet {
                 Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
                 t.setStatus("READY");
                 boolean submitted = TransactionAccessor.updateTransaction(t);
+                //create a delivery record for this transaction
+                DeliveryAccessor.openDelivery(t);
                 out.println(g.toJson(submitted));
             }
             else if(uri.equals("/orderStatusList")){

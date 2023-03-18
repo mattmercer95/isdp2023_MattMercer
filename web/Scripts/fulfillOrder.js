@@ -71,7 +71,7 @@ async function completeFulfillment(){
     if(s1){
         alert(`Order #${currentOrder.transactionID} successfully fulfilled`);
         await logTransaction();
-        //window.location.href = "ViewOrders.html";
+        window.location.href = "ViewOrders.html";
     }
     else {
         alert("Something went wrong, please check server");

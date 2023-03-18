@@ -54,6 +54,10 @@ public class Transaction {
         this.quantity = totalItemQuantity;
     }
     
+    public double getTotalWeight(){
+        return this.totalWeight;
+    }
+    
     public ArrayList<TransactionItem> getItems(){
         return this.items;
     }
