@@ -274,6 +274,7 @@ function disableButtons(){
     document.querySelector("#viewDetails").disabled = true;
     document.querySelector("#processOrder").disabled = true;
     document.querySelector("#fulfillOrder").disabled = true;
+    document.querySelector("#receiveDelivery").disabled = true;
 }
 
 //builds the order table
@@ -438,7 +439,7 @@ function highlight(e){
             document.querySelector("#receiveDelivery").disabled = false;
         }
         else {
-            document.querySelector("#recieveDelivery").disabled = true;
+            document.querySelector("#receiveDelivery").disabled = true;
         }
     }
     else {

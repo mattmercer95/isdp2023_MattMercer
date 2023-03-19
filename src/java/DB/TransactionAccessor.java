@@ -34,6 +34,7 @@ public class TransactionAccessor {
     private static PreparedStatement moveInventoryOnReceived = null;
     private static PreparedStatement getTransactionsByDeliveryID = null;
     private static PreparedStatement changeStatusToDelivered = null;
+    private static PreparedStatement moveInventoryFromTruckToStore = null;
     
     private TransactionAccessor(){
         //no instant
@@ -69,6 +70,7 @@ public class TransactionAccessor {
                 moveInventoryOnReceived = conn.prepareStatement("call UpdateReceivedCount(?, ?, ?, ?)");
                 getTransactionsByDeliveryID = conn.prepareStatement("call GetOrdersByDeliveryID(?)");
                 changeStatusToDelivered = conn.prepareStatement("update txn set status = 'DELIVERED' where txnID = ?");
+                moveInventoryFromTruckToStore = conn.prepareStatement("call MoveInventoryFromTruckToStore(?,?,?,?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -79,6 +81,41 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean completeTransaction(Transaction t){
+        boolean result = false;
+        
+        //move items from truck to store, update 
+        try {
+            if (!init()) {
+                return result;
+            }
+            //move items to store
+            ArrayList<TransactionItem> items = t.getItems();
+            for(TransactionItem i : items){
+                moveInventoryFromTruckToStore.setInt(1, t.getTransactionID());
+                moveInventoryFromTruckToStore.setInt(2, i.getCaseQuantityOrdered() * i.getCaseSize());
+                moveInventoryFromTruckToStore.setInt(3, i.getItemID());
+                moveInventoryFromTruckToStore.setInt(4, t.getSiteIDTo());
+                moveInventoryFromTruckToStore.executeUpdate();
+            }
+            //set transaction status as In Transit
+            PreparedStatement updateStatusInTransit = conn.prepareStatement("update txn set status = 'CLOSED' where txnID = ?");
+            updateStatusInTransit.setInt(1, t.getTransactionID());
+            int rc = updateStatusInTransit.executeUpdate();
+            if(rc > 0){
+                result = true;
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Moving items to Store");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        return result;
     }
     
     public static boolean changeStatusToDelivered(int transactionID){

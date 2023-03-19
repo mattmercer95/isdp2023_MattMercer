@@ -165,7 +165,7 @@ function isComplete(){
             complete = false;
         }
     });
-    document.querySelector("#completeFulfillment").disabled = !complete;
+    document.querySelector("#acceptOrder").disabled = !complete;
 }
 
 function generatePDF() {

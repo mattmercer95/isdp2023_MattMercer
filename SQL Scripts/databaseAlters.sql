@@ -175,7 +175,7 @@ create procedure GetAllDeliveries()
 BEGIN
 	select deliveryID, status, count(siteIDTo) as numLocations, distanceCost, totalWeight, shipDate, deliveryStart, deliveryEnd, vehicleType 
     from delivery inner join txn using (deliveryID)  
-    where status in ('READY', 'IN TRANSIT', 'DELIVERED') group by deliveryID;
+	group by deliveryID;
 END //
 DELIMITER ;
 
@@ -450,6 +450,22 @@ BEGIN
     if @rc = 0 then
 		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 9999, curQty, orderID, 0);
     end if;
+END //
+DELIMITER ;
+
+/*
+Moves inventory from the truck to store
+*/
+drop procedure if exists MoveInventoryFromTruckToStore;
+DELIMITER //
+create procedure MoveInventoryFromTruckToStore(in orderID int, in curQty int, in curItem int, in locationID int)
+BEGIN
+	update inventory set quantity = quantity - curQty where itemID = curItem and siteID = 9999;
+	update inventory set quantity = quantity + curQty, itemLocation = 'Stock' where itemID = curItem and siteID = locationID;
+    select row_count() into @rc;
+--     if @rc = 0 then
+-- 		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 9999, curQty, orderID, 0);
+--    end if;
 END //
 DELIMITER ;
 
