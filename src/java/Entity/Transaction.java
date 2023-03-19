@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Transaction {
     private int transactionID, siteIDTo, siteIDFrom, deliveryID, quantity;
     private double totalWeight;
-    private String origin, destination, status, shipDate, transactionType, barCode, 
+    private String origin, destination, destinationAddress, status, shipDate, transactionType, barCode, 
             createdDate;
     private boolean emergencyDelivery;
     private ArrayList<TransactionItem> items;
@@ -39,6 +39,14 @@ public class Transaction {
         this.createdDate = createdDate;
         this.emergencyDelivery = emergencyDelivery;
         this.items = items;
+    }
+
+    public String getDestinationAddress() {
+        return destinationAddress;
+    }
+
+    public void setDestinationAddress(String destinationAddress) {
+        this.destinationAddress = destinationAddress;
     }
     
     //Cals the total weight and item quantity based on item list

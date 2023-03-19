@@ -303,9 +303,7 @@ drop procedure if exists GetAllSiteNamesIDs;
 DELIMITER //
 create procedure GetAllSiteNamesIDs()
 BEGIN
-    Select siteID, name from site
-    where siteID not in (
-		select siteID from site where siteID = 9999);
+    Select siteID, name from site;
 END //
 DELIMITER ;
 
@@ -366,8 +364,11 @@ drop procedure if exists GetOrdersByDeliveryID;
 DELIMITER //
 create procedure GetOrdersByDeliveryID(in inDeliveryID int)
 BEGIN
-    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
-    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and deliveryID = inDeliveryID
+    Select txnID, site.address, site.address2, site.city, site.provinceID, 
+    site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, 
+    deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and deliveryID = inDeliveryID 
+    and status in ('READY', 'IN TRANSIT', 'DELIVERED')
     group by txnID;
 END //
 DELIMITER ;
@@ -399,6 +400,17 @@ END //
 DELIMITER ;
 
 /*
+Updates pickuptime for a delivery
+*/
+drop procedure if exists SetDeliveryPickupTime;
+DELIMITER //
+create procedure SetDeliveryPickupTime(in id int)
+BEGIN
+	update delivery set deliveryStart = now() where deliveryID = id;
+END //
+DELIMITER ;
+
+/*
 Updates inventory count on Received order
 */
 drop procedure if exists UpdateReceivedCount;
@@ -410,6 +422,22 @@ BEGIN
     select row_count() into @rc;
     if @rc = 0 then
 		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 2, curQty, orderID, 0);
+    end if;
+END //
+DELIMITER ;
+
+/*
+Moves inventory from the warehouse bay onto the truck
+*/
+drop procedure if exists MoveInventoryFromBayToTruck;
+DELIMITER //
+create procedure MoveInventoryFromBayToTruck(in orderID int, in curQty int, in curItem int, in locationID int)
+BEGIN
+	update inventory set quantity = quantity - curQty where itemID = curItem and siteID = 2;
+	update inventory set quantity = quantity + curQty, itemLocation = orderID where itemID = curItem and siteID = 9999;
+    select row_count() into @rc;
+    if @rc = 0 then
+		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 9999, curQty, orderID, 0);
     end if;
 END //
 DELIMITER ;

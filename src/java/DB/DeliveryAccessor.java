@@ -5,7 +5,9 @@
 package DB;
 
 import Entity.Delivery;
+import Entity.Item;
 import Entity.Transaction;
+import Entity.TransactionItem;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,6 +22,8 @@ public class DeliveryAccessor {
     private static Connection conn = null;
     private static PreparedStatement openDelivery = null;
     private static PreparedStatement getAllDeliveries = null;
+    private static PreparedStatement pickupDelivery = null;
+    private static PreparedStatement moveInventoryFromBayToTruck = null;
     
     private DeliveryAccessor(){
         
@@ -34,6 +38,8 @@ public class DeliveryAccessor {
                 System.out.println("Connection was not null");
                 openDelivery = conn.prepareStatement("call OpenDelivery(?,?)");
                 getAllDeliveries = conn.prepareStatement("call GetAllDeliveries()");
+                pickupDelivery = conn.prepareStatement("call SetDeliveryPickupTime(?)");
+                moveInventoryFromBayToTruck = conn.prepareStatement("call MoveInventoryFromBayToTruck(?,?,?,?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -44,6 +50,59 @@ public class DeliveryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean pickupDelivery(Delivery d){
+        boolean result = false;
+        
+        //move items from warehouse bay to the truck, update 
+        ArrayList<Transaction> transactions = d.getTransactions();
+        try {
+            if (!init()) {
+                return result;
+            }
+            for(Transaction t: transactions){
+                //move items to truck
+                ArrayList<TransactionItem> items = t.getItems();
+                for(TransactionItem i : items){
+                    moveInventoryFromBayToTruck.setInt(1, t.getTransactionID());
+                    moveInventoryFromBayToTruck.setInt(2, i.getCaseQuantityOrdered() * i.getCaseSize());
+                    moveInventoryFromBayToTruck.setInt(3, i.getItemID());
+                    moveInventoryFromBayToTruck.setInt(4, t.getSiteIDTo());
+                    moveInventoryFromBayToTruck.executeUpdate();
+                }
+                //set transaction status as In Transit
+                PreparedStatement updateStatusInTransit = conn.prepareStatement("update txn set status = 'IN TRANSIT' where txnID = ?");
+                updateStatusInTransit.setInt(1, t.getTransactionID());
+                updateStatusInTransit.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Moving items to truck");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        //set pickup time
+        try {
+            if (!init()) {
+                return result;
+            }
+            pickupDelivery.setInt(1, d.getDeliveryID());
+            int rc = pickupDelivery.executeUpdate();
+            //if it made it this far, and is true, the entire function was successful
+            if(rc > 0) result = true;
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error picking up Delivery");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        
+        return result;
     }
     
     public static void openDelivery(Transaction t){

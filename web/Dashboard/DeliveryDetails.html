@@ -27,14 +27,15 @@
             <br>
             <div class="row">
                 <a href="Deliveries.html" class="col-3 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Deliveries</a>
-                <button class="col-3 btn btn-primary btnSpacing" id="downloadPDF">Download Printable List</button>;
+                <button class="col-3 btn btn-primary btnSpacing" id="downloadPDF">Download Printable List</button>
+                <button class="col-3 btn btn-success btnSpacing" id="pickupDeliveryBtn" hidden>Pickup Delivery</button>
             </div>
-            <div id="orderPDF" class="card">
+            <div id="deliveryPDF" class="card">
                 <div class="card-title text-center">
                     <h3>Delivery Details</h3>
                 </div>
                 <div class="card-body">
-                    <div>
+                    <div id="cardContainer">
                         <div class="card">
                             <div class="card-body">
                                 <div class="row justify-content-center">
@@ -81,28 +82,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class= "prevent-select">
-                        <table class="table table-bordered table-striped ">
-                            <thead>
-                                <tr>
-                                    <th>Item ID</th>
-                                    <th>Description</th>
-                                    <th>Weight(kg)</th>
-                                    <th># Cases Ordered</th>
-                                    <th>Item Loaded</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orderTable">
-
-                            </tbody>
-                        </table>
-                    </div>
-                    
                 </div>
-            </div>
-            <br>
-            <div id="processOrderPanel" class="row justify-content-center">
-                <button id="completeFulfillment" type="button" class="btn btn-success col-5 btnSpacing" disabled>Complete Order Fulfillment</button>
             </div>
             <!-- Button trigger modal -->
 

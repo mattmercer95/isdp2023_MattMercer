@@ -101,6 +101,9 @@ public class TransactionAccessor {
                 Transaction temp = new Transaction();
                 temp.setTransactionID(rs.getInt("txnID"));
                 temp.setDestination(rs.getString("Location"));
+                String address2 = (rs.getString("site.address2") == null) ? "" : rs.getString("site.address2");
+                String destinationAddress = rs.getString("site.address") + " " + address2 + " " + rs.getString("site.city") + ", " + rs.getString("provinceID");
+                temp.setDestinationAddress(destinationAddress);
                 temp.setSiteIDTo(rs.getInt("siteIDTo"));
                 temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
                 temp.setStatus(rs.getString("status"));

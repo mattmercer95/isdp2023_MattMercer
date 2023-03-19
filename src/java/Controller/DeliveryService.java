@@ -50,6 +50,12 @@ public class DeliveryService extends HttpServlet {
                 }
                 out.println(g.toJson(transactions));
             }
+            else if(uri.equals("/pickupDelivery")){
+                Scanner sc = new Scanner(request.getReader());
+                Delivery d = g.fromJson(sc.nextLine(), Delivery.class);
+                boolean result = DeliveryAccessor.pickupDelivery(d);
+                out.println(g.toJson(result));
+            }
             else {
                 ArrayList<Delivery> deliveries = DeliveryAccessor.getAllDeliveries();
                 out.println(g.toJson(deliveries));
