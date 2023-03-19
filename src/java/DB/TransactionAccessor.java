@@ -32,6 +32,7 @@ public class TransactionAccessor {
     private static PreparedStatement getCurrentBackOrder = null;
     private static PreparedStatement createNewBackOrder = null;
     private static PreparedStatement moveInventoryOnReceived = null;
+    private static PreparedStatement getTransactionsByDeliveryID = null;
     
     private TransactionAccessor(){
         //no instant
@@ -65,6 +66,7 @@ public class TransactionAccessor {
                 getCurrentBackOrder = conn.prepareStatement("call GetCurrentBackOrder(?)");
                 createNewBackOrder = conn.prepareStatement("call CreateNewBackOrder(?,?)");
                 moveInventoryOnReceived = conn.prepareStatement("call UpdateReceivedCount(?, ?, ?, ?)");
+                getTransactionsByDeliveryID = conn.prepareStatement("call GetOrdersByDeliveryID(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -77,6 +79,50 @@ public class TransactionAccessor {
         return false;
     }
     
+    public static ArrayList<Transaction> getOrdersByDeliveryID(int deliveryID){
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            getTransactionsByDeliveryID.setInt(1,deliveryID);
+            rs = getTransactionsByDeliveryID.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
     public static Transaction createNewBackOrder(int siteID){
         Transaction result = null;
         

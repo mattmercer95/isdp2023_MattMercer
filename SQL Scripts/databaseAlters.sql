@@ -167,6 +167,18 @@ END //
 DELIMITER ;
 
 /*
+Gets all Deliveries
+*/
+drop procedure if exists GetAllDeliveries;
+DELIMITER //
+create procedure GetAllDeliveries()
+BEGIN
+	select deliveryID, status, count(siteIDTo) as numLocations, distanceCost, totalWeight, shipDate, deliveryStart, deliveryEnd, vehicleType 
+    from delivery inner join txn using (deliveryID) group by deliveryID;
+END //
+DELIMITER ;
+
+/*
 Gets the items for a transaction by transactionID
 */
 drop procedure if exists GetTransactionItemsByID;
@@ -344,6 +356,19 @@ BEGIN
     Select permissionID from permission
     where permissionID not in (
 		select permissionID from user_permission where employeeID = id);
+END //
+DELIMITER ;
+
+/*
+Retreives orders assoicated with a delivery
+*/
+drop procedure if exists GetOrdersByDeliveryID;
+DELIMITER //
+create procedure GetOrdersByDeliveryID(in inDeliveryID int)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and deliveryID = inDeliveryID
+    group by txnID;
 END //
 DELIMITER ;
 

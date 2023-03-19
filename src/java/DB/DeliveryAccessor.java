@@ -4,6 +4,7 @@
  */
 package DB;
 
+import Entity.Delivery;
 import Entity.Transaction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 public class DeliveryAccessor {
     private static Connection conn = null;
     private static PreparedStatement openDelivery = null;
+    private static PreparedStatement getAllDeliveries = null;
     
     private DeliveryAccessor(){
         
@@ -31,6 +33,7 @@ public class DeliveryAccessor {
             try {
                 System.out.println("Connection was not null");
                 openDelivery = conn.prepareStatement("call OpenDelivery(?,?)");
+                getAllDeliveries = conn.prepareStatement("call GetAllDeliveries()");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -60,4 +63,50 @@ public class DeliveryAccessor {
         }
 
     }
+    
+    public static ArrayList<Delivery> getAllDeliveries(){
+        ArrayList<Delivery> deliveries = new ArrayList<Delivery>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return deliveries;
+            rs = getAllDeliveries.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return deliveries;
+        }
+        
+        try {
+            while (rs.next()) {
+                Delivery temp = new Delivery();
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setStatus(rs.getString("status"));
+                temp.setNumLocations(rs.getInt("numLocations"));
+                temp.setDistanceCost(rs.getDouble("distanceCost"));
+                temp.setWeight(rs.getDouble("totalWeight"));
+                temp.setTruckSize(rs.getString("vehicleType"));
+                String shipDateString = rs.getString("shipDate");
+                temp.setDeliveryDate(shipDateString.substring(0, shipDateString.length() - 9));
+                String pickupTime = (rs.getDate("deliveryStart") == null) ? "N/A" : rs.getDate("deliveryStart").toString();
+                temp.setPickupTime(pickupTime);
+                String deliveredTime = (rs.getDate("deliveryEnd") == null) ? "N/A" : rs.getDate("deliveryEnd").toString();
+                temp.setDeliveredTime(deliveredTime);
+                deliveries.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return deliveries;
+    }
+
 }
+    
+

@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author Matt
  */
 public class Delivery {
-    private int deliveryID, originID, destinationID;
+    private int deliveryID, numLocations;
     private double distanceCost, hourlyCost, totalCost, weight;
     private String status, origin, destination, truckSize, deliveryDate, pickupTime, deliveredTime;
     private ArrayList<Transaction> transactions;
@@ -33,12 +33,8 @@ public class Delivery {
         this.deliveryID = deliveryID;
     }
 
-    public void setOriginID(int originID) {
-        this.originID = originID;
-    }
-
-    public void setDestinationID(int destinationID) {
-        this.destinationID = destinationID;
+    public void setNumLocations(int numLocations) {
+        this.numLocations = numLocations;
     }
 
     public void setDistanceCost(double distanceCost) {
@@ -89,12 +85,8 @@ public class Delivery {
         return deliveryID;
     }
 
-    public int getOriginID() {
-        return originID;
-    }
-
-    public int getDestinationID() {
-        return destinationID;
+    public int getNumLocations() {
+        return numLocations;
     }
 
     public double getDistanceCost() {
