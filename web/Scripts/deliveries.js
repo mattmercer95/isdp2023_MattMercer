@@ -5,6 +5,7 @@ const redirectUrl = "../index.html";
 let idleTimeout;
 
 let allDeliveries = [];
+let filteredDeliveries = [];
 let selectedDelivery = null;
 
 //currency formatter
@@ -40,9 +41,9 @@ window.onload = async function () {
        sessionStorage.setItem("currentDelivery", JSON.stringify(selectedDelivery));
        window.location.href = "DeliveryDetails.html";
     });
+    document.querySelector("#statusSelect").addEventListener('input', filterDeliveries);
 
     await loadAllDeliveries();
-    buildTable(allDeliveries);
 };
 
 async function loadAllDeliveries(){
@@ -51,9 +52,33 @@ async function loadAllDeliveries(){
         method: 'GET'
     });
     allDeliveries = await resp.json();
-    console.log(allDeliveries);
+    //check if open
+    allDeliveries.forEach((d)=>{
+        if(d.pickupTime === "N/A" || d.deliveredTime === "N/A"){
+            d.status = "OPEN";
+        }
+        else {
+            d.status = "CLOSED";
+        }
+    });
+    filterDeliveries();
 }
 
+function filterDeliveries(){
+    filteredDeliveries = [];
+    let filter = document.querySelector("#statusSelect").value;
+    if(filter === "ALL"){
+        filteredDeliveries = allDeliveries;
+    }
+    else {
+        allDeliveries.forEach((d)=>{
+            if(d.status === filter){
+                filteredDeliveries.push((d));
+            }
+        });
+    }
+    buildTable(filteredDeliveries);
+}
 function disableButtons(){
     document.querySelector("#viewDetails").disabled = true;
 }
@@ -61,6 +86,7 @@ function disableButtons(){
 function buildTable(deliveries){
     disableButtons();
     let tableEle = document.querySelector("#deliveriesTable");
+    tableEle.innerHTML = "";
     deliveries.forEach((delivery)=>{
         const rowEle = document.createElement("tr");
         const deliveryIDEle = document.createElement("td");
@@ -119,7 +145,7 @@ function getSelectedDelivery(){
     for(let i = 0; i < rows.length; i++){
         row = rows[i];
         if(row.classList.contains("highlighted")){
-            selectedItem = allDeliveries[i];
+            selectedItem = filteredDeliveries[i];
         }
     }
     return selectedItem;

@@ -174,7 +174,8 @@ DELIMITER //
 create procedure GetAllDeliveries()
 BEGIN
 	select deliveryID, status, count(siteIDTo) as numLocations, distanceCost, totalWeight, shipDate, deliveryStart, deliveryEnd, vehicleType 
-    from delivery inner join txn using (deliveryID) group by deliveryID;
+    from delivery inner join txn using (deliveryID)  
+    where status in ('READY', 'IN TRANSIT', 'DELIVERED') group by deliveryID;
 END //
 DELIMITER ;
 
@@ -368,7 +369,6 @@ BEGIN
     site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, 
     deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
     from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and deliveryID = inDeliveryID 
-    and status in ('READY', 'IN TRANSIT', 'DELIVERED')
     group by txnID;
 END //
 DELIMITER ;
@@ -407,6 +407,17 @@ DELIMITER //
 create procedure SetDeliveryPickupTime(in id int)
 BEGIN
 	update delivery set deliveryStart = now() where deliveryID = id;
+END //
+DELIMITER ;
+
+/*
+Updates pickuptime for a delivery
+*/
+drop procedure if exists SetDeliveredTime;
+DELIMITER //
+create procedure SetDeliveredTime(in id int)
+BEGIN
+	update delivery set deliveryEnd = now() where deliveryID = id;
 END //
 DELIMITER ;
 

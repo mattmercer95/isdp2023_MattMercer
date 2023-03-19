@@ -33,6 +33,7 @@ public class TransactionAccessor {
     private static PreparedStatement createNewBackOrder = null;
     private static PreparedStatement moveInventoryOnReceived = null;
     private static PreparedStatement getTransactionsByDeliveryID = null;
+    private static PreparedStatement changeStatusToDelivered = null;
     
     private TransactionAccessor(){
         //no instant
@@ -67,6 +68,7 @@ public class TransactionAccessor {
                 createNewBackOrder = conn.prepareStatement("call CreateNewBackOrder(?,?)");
                 moveInventoryOnReceived = conn.prepareStatement("call UpdateReceivedCount(?, ?, ?, ?)");
                 getTransactionsByDeliveryID = conn.prepareStatement("call GetOrdersByDeliveryID(?)");
+                changeStatusToDelivered = conn.prepareStatement("update txn set status = 'DELIVERED' where txnID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -77,6 +79,26 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean changeStatusToDelivered(int transactionID){
+        boolean result = false;
+        try{
+            if (!init())
+                return result;
+            changeStatusToDelivered.setInt(1,transactionID);
+            int rc = changeStatusToDelivered.executeUpdate();
+            if(rc > 0){
+                result = true;
+            }
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error updating Transaction status to Delivered");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        return result;
     }
     
     public static ArrayList<Transaction> getOrdersByDeliveryID(int deliveryID){

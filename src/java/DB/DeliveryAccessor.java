@@ -24,6 +24,7 @@ public class DeliveryAccessor {
     private static PreparedStatement getAllDeliveries = null;
     private static PreparedStatement pickupDelivery = null;
     private static PreparedStatement moveInventoryFromBayToTruck = null;
+    private static PreparedStatement setDeliveredTime = null;
     
     private DeliveryAccessor(){
         
@@ -40,6 +41,7 @@ public class DeliveryAccessor {
                 getAllDeliveries = conn.prepareStatement("call GetAllDeliveries()");
                 pickupDelivery = conn.prepareStatement("call SetDeliveryPickupTime(?)");
                 moveInventoryFromBayToTruck = conn.prepareStatement("call MoveInventoryFromBayToTruck(?,?,?,?)");
+                setDeliveredTime = conn.prepareStatement("call SetDeliveredTime(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -105,6 +107,26 @@ public class DeliveryAccessor {
         return result;
     }
     
+    public static boolean completeDelivery(Delivery d){
+        boolean result = false;
+        try {
+            if (!init()) {
+                return result;
+            }
+            setDeliveredTime.setInt(1, d.getDeliveryID());
+            int rc = setDeliveredTime.executeUpdate();
+            //if it made it this far, and is true, the entire function was successful
+            if(rc > 0) result = true;
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Completing Delivery");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        return result;
+    }
+    
     public static void openDelivery(Transaction t){
         try {
             if (!init()) {
@@ -143,16 +165,16 @@ public class DeliveryAccessor {
             while (rs.next()) {
                 Delivery temp = new Delivery();
                 temp.setDeliveryID(rs.getInt("deliveryID"));
-                temp.setStatus(rs.getString("status"));
+                temp.setStatus("OPEN");
                 temp.setNumLocations(rs.getInt("numLocations"));
                 temp.setDistanceCost(rs.getDouble("distanceCost"));
                 temp.setWeight(rs.getDouble("totalWeight"));
                 temp.setTruckSize(rs.getString("vehicleType"));
                 String shipDateString = rs.getString("shipDate");
                 temp.setDeliveryDate(shipDateString.substring(0, shipDateString.length() - 9));
-                String pickupTime = (rs.getDate("deliveryStart") == null) ? "N/A" : rs.getDate("deliveryStart").toString();
+                String pickupTime = (rs.getTime("deliveryStart") == null) ? "N/A" : rs.getTime("deliveryStart").toString();
                 temp.setPickupTime(pickupTime);
-                String deliveredTime = (rs.getDate("deliveryEnd") == null) ? "N/A" : rs.getDate("deliveryEnd").toString();
+                String deliveredTime = (rs.getTime("deliveryEnd") == null) ? "N/A" : rs.getTime("deliveryEnd").toString();
                 temp.setDeliveredTime(deliveredTime);
                 deliveries.add(temp);
             }

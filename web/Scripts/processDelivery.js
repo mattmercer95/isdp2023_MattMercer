@@ -43,13 +43,23 @@ window.onload = async function () {
 };
 
 async function pickupDelivery(){
+    let confirmPickup = confirm("Confirm pickup of delivery?");
+    if(!confirmPickup){
+        return;
+    }
     let url = `../DeliveryService/pickupDelivery`;
     let resp = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(currentDelivery)
     });
     let result = await resp.json();
-    console.log(result);
+    if(result){
+        alert("Delivery successfully picked up from warehouse");
+        window.location.href = "DeliveryDetails.html";
+    }
+    else {
+        alert("Something went wrong, please check server");
+    }
 }
 
 function checkIfDelivered(){
@@ -64,7 +74,6 @@ function checkIfDelivered(){
         }
         index++;
     });
-    
 }
 
 function checkIfReady(){
@@ -122,6 +131,61 @@ function populateTransactionItems(id, items){
     });
 }
 
+var deliverOrder = function(id) {
+    return function curried_deliverOrder(e){
+        confirmDelivery = confirm("Confirm delivery of this order?");
+        if(!confirmDelivery){
+            return;
+        }
+        deliveredAPICall(id);
+    }
+}
+
+async function checkIfDeliveryCompleted(){
+    let url = `../DeliveryService/checkIfComplete`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(currentDelivery)
+    });
+    let result = await resp.text();
+    let completed = true;
+    currentDelivery.transactions.forEach((t)=>{
+       if(t.status !== 'DELIVERED'){
+           completed = false;
+       } 
+    });
+    if(completed === true){
+        window.location.href = "Deliveries.html";
+    }
+}
+
+async function deliveredAPICall(id){
+    let url = `../DeliveryService/deliveredStatusChange`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(id)
+    });
+    let result = await resp.json();
+    console.log(result);
+    if(result === true){
+        alert(`Order #${id} successfully delivered`);
+        changeLocalStatusToDelivered(id); //need to update this for the completion check on the backend
+        await checkIfDeliveryCompleted();
+        window.location.href = "DeliveryDetails.html";
+    }
+    else {
+        alert("Something went wrong, please check server");
+    }
+}
+
+function changeLocalStatusToDelivered(id){
+    currentDelivery.transactions.forEach((t)=>{
+       if(t.transactionID === +id){
+           t.status = 'DELIVERED';
+       } 
+    });
+}
+
 function populateTransactionCards(){
     let transactions = currentDelivery.transactions;
     let transactionCards = document.querySelectorAll(".transaction-card");
@@ -137,6 +201,8 @@ function populateTransactionCards(){
         weightEle.value = numberFormat.format(t.totalWeight);
         let numItemsEle = document.querySelector(`#numItems${t.transactionID}`);
         numItemsEle.value = t.items.length;
+        let confirmBtn = document.querySelector(`#confirm${t.transactionID}`);
+        confirmBtn.addEventListener('click', deliverOrder(t.transactionID));
         populateTransactionItems(t.transactionID, t.items);
     });
 }
@@ -147,7 +213,7 @@ function generateTransactionCards(){
     transactions.forEach((t)=>{
         let transactionCard = `<div class= "card transaction-card page-break" id="${t.transactionID}Card"> <div class="card-body"> 
 <div class="row justify-content-center"> <h3 class="card-title col" id="Name${t.transactionID}">
-</h3> <button class="btn btn-success col-3 btnSpacing" id="confirm${t.transactionID}" disabled>Confirm Delivery</button></div> 
+</h3> <button class="btn btn-success col-3 btnSpacing confirmButton" id="confirm${t.transactionID}" disabled>Confirm Delivery</button></div> 
 <div class="row"><div class="form-group"><label><b>Destination Address: </b></label><input id="address${t.transactionID}" class="form-control" readonly></div></div>
 <div class="row"> <div class="form-group col"> <label><b>Status:</b></label> 
 <input class="form-control" value="" id="Status${t.transactionID}" readonly> </div> <div class="form-group col"> 

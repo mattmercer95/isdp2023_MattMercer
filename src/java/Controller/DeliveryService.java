@@ -56,6 +56,29 @@ public class DeliveryService extends HttpServlet {
                 boolean result = DeliveryAccessor.pickupDelivery(d);
                 out.println(g.toJson(result));
             }
+            else if(uri.equals("/deliveredStatusChange")){
+                Scanner sc = new Scanner(request.getReader());
+                int transactionID = Integer.parseInt(sc.nextLine());
+                boolean result = TransactionAccessor.changeStatusToDelivered(transactionID);
+                out.println(g.toJson(result));
+            }
+            else if(uri.equals("/checkIfComplete")){
+                Scanner sc = new Scanner(request.getReader());
+                Delivery d = g.fromJson(sc.nextLine(), Delivery.class);
+                boolean isComplete = true;
+                ArrayList<Transaction> txns = d.getTransactions();
+                for(Transaction t : txns){
+                    String currStatus = t.getStatus();
+                    if(!currStatus.equals("DELIVERED")){
+                        isComplete = false;
+                    }
+                }
+                boolean result = false;
+                if(isComplete){
+                    result = DeliveryAccessor.completeDelivery(d);
+                }
+                out.println(g.toJson(result));
+            }
             else {
                 ArrayList<Delivery> deliveries = DeliveryAccessor.getAllDeliveries();
                 out.println(g.toJson(deliveries));

@@ -45,6 +45,11 @@ window.onload = async function () {
         sessionStorage.setItem("currentOrderID", selected.transactionID);
         window.location.href = "FulfillOrder.html";
     });
+    document.querySelector("#receiveDelivery").addEventListener('click', ()=>{
+        let selected = getSelectedOrder();
+        sessionStorage.setItem("currentOrderID", selected.transactionID);
+        window.location.href = "AcceptStoreOrder.html";
+    });
     //unhide action buttons depending on user permission
     checkPermissions();
     await getOrderStatusList();
@@ -370,6 +375,9 @@ function buildTable(){
                 case "RECEIVED":
                     document.querySelector("#fulfillOrder").disabled = false;
                     break;
+                case "DELIVERED":
+                    document.querySelector("#receiveDelivery").disabled = false;
+                    break;
                 default:
                     break;
             }
@@ -390,6 +398,9 @@ function checkPermissions(){
         }
         if(permission === "RECEIVESTOREORDER"){
             document.querySelector("#processOrder").hidden = false;
+        }
+        if(permission === "ACCEPTSTOREORDER"){
+            document.querySelector("#receiveDelivery").hidden = false;
         }
         if(permission === "FULFILSTOREORDER"){
             document.querySelector("#fulfillOrder").hidden = false;
@@ -422,6 +433,12 @@ function highlight(e){
         else {
             document.querySelector("#processOrder").disabled = true;
             document.querySelector("#fulfillOrder").disabled = true;
+        }
+        if(selected.status === "DELIVERED"){
+            document.querySelector("#receiveDelivery").disabled = false;
+        }
+        else {
+            document.querySelector("#recieveDelivery").disabled = true;
         }
     }
     else {

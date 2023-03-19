@@ -26,55 +26,63 @@
         <div class="container">
             <br>
             <div class="row">
-                <a href="Deliveries.html" class="col-3 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Deliveries</a>
-                <button class="col-3 btn btn-primary btnSpacing" id="downloadPDF">Download Shipping Manifest</button>
-                <button class="col-3 btn btn-success btnSpacing" id="pickupDeliveryBtn" hidden>Pickup Delivery</button>
+                <a href="ViewOrders.html" class="col-3 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Orders</a>
+                <button class="col-3 btn btn-primary btnSpacing" id="downloadPDF">Download Printable List</button>;
             </div>
-            <div id="deliveryPDF" class="card">
+            <div id="orderPDF" class="card">
                 <div class="card-title text-center">
-                    <h3>Delivery Details</h3>
+                    <h3>Accept Order</h3>
                 </div>
                 <div class="card-body">
-                    <div id="cardContainer">
+                    <div>
                         <div class="card">
                             <div class="card-body">
+                                <div class="form-check">
+                                    <label class="form-check-label"><b>Order Type:</b></label>
+                                    <label class="form-check-label" id="typeLabel"></label>
+                                </div>
+                                <br>
                                 <div class="row justify-content-center">
                                     <div class="col createOrderPanelCol">
                                         <div class="form-group">
-                                            <label><b>Delivery ID:</b></label>
-                                            <input id="deliveryID" class="form-control" readonly/>
+                                            <label><b>Order ID:</b></label>
+                                            <input id="orderID" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><b>Creation Date:</b></label>
+                                            <input id="creationDate" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><b>Total Items Ordered:</b></label>
+                                            <input id="totalQtyOrdered" class="form-control" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col createOrderPanelCol">
+                                        <div class="form-group">
+                                            <label><b>Site of Origin:</b></label>
+                                            <input id="originSite" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><b>Destination Site:</b></label>
+                                            <input id="destinationSite" class="form-control" readonly/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><b>Total Weight(kg):</b></label>
+                                            <input id="totalWeight" class="form-control" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col createOrderPanelCol">
+                                        <div class="form-group">
+                                            <label><b>Status:</b></label>
+                                            <input id="status" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
                                             <label><b>Ship Date:</b></label>
-                                            <input id="shipDate" class="form-control" readonly/>
+                                            <input type="date" id="shipDate" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
-                                            <label><b>Truck Size:</b></label>
-                                            <input id="truckSize" class="form-control" readonly/>
-                                        </div>
-                                    </div>
-                                    <div class="col createOrderPanelCol">
-                                        <div class="form-group">
-                                            <label><b>Number of Locations:</b></label>
-                                            <input id="numLocations" class="form-control" readonly/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><b>Weight(Kg):</b></label>
-                                            <input id="weight" class="form-control" readonly/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><b>Distance Cost ($):</b></label>
-                                            <input id="distanceCost" class="form-control" readonly/>
-                                        </div>
-                                    </div>
-                                    <div class="col createOrderPanelCol">
-                                        <div class="form-group">
-                                            <label><b>Pickup Time:</b></label>
-                                            <input id="pickupTime" class="form-control" readonly/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><b>Delivered Time:</b></label>
-                                            <input id="deliveredTime" class="form-control" readonly/>
+                                            <label><b>Delivery ID:</b></label>
+                                            <input id="deliveryID" class="form-control" readonly/>
                                         </div>
                                     </div>
                                 </div>
@@ -82,14 +90,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class= "prevent-select">
+                        <table class="table table-bordered table-striped ">
+                            <thead>
+                                <tr>
+                                    <th>Item ID</th>
+                                    <th>Description</th>
+                                    <th>Weight(kg)</th>
+                                    <th># Cases Ordered</th>
+                                    <th>Item Loaded</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTable">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    
                 </div>
+            </div>
+            <br>
+            <div id="processOrderPanel" class="row justify-content-center">
+                <button id="completeFulfillment" type="button" class="btn btn-success col-5 btnSpacing" disabled>Accept Store Order</button>
             </div>
             <!-- Button trigger modal -->
 
 
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="../Scripts/processDelivery.js"></script>
+        <script src="../Scripts/acceptOrder.js"></script>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>     </body>
