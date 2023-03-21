@@ -263,9 +263,9 @@ drop procedure if exists GetAllRetailLocations;
 DELIMITER //
 create procedure GetAllRetailLocations()
 BEGIN
-    SELECT siteID, name 
+    SELECT siteID, name, address, address2, city, provinceID
     from site 
-    where siteType = 'Retail';
+    where siteType = 'Retail' and siteID not in (2, 11);
 END //
 DELIMITER ;
 
@@ -280,6 +280,19 @@ BEGIN
     from inventory inner join item using (itemID)
     where siteID = id and active = true
     and itemID not in (select distinct itemID from txnitems inner join txn using(txnID) where status not in ('CLOSED', 'CANCELLED', 'REJECTED') and siteIDTo = id);
+END //
+DELIMITER ;
+
+/*
+Retrieves the availbible inventory for an online order
+*/
+drop procedure if exists GetAvailableOnlineInventory;
+DELIMITER //
+create procedure GetAvailableOnlineInventory(in id int)
+BEGIN
+    Select itemID, name, quantity, retailPrice, caseSize, weight   
+    from inventory inner join item using (itemID)
+    where siteID = id and active = true;
 END //
 DELIMITER ;
 

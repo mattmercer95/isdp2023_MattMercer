@@ -29,20 +29,40 @@
                 <div class="card-title text-center">
                     <h3>Order Details</h3>
                 </div>
+                <form id="onlineOrderForm">
                 <div class="card-body">
                     <div>
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-6">
-                                        <label><b>Select Location:</b></label>
-                                        <select id="siteSelect" class="form-select">
+                                        <div class="form-group">
+                                            <label><b>Select Location:</b></label>
+                                            <select id="siteSelect" class="form-select">
 
-                                        </select>
+                                            </select>
+                                        </div>
+                                        <br>
+                                        <div class="form-group">
+                                            <label><b>Name:</b></label>
+                                            <input id="name" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><b>Phone:</b></label>
+                                            <input id="phone" type="tel" class="form-control" placeholder="123-456-7890" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+                                            <div class="form-text">Format: 123-456-7890</div>
+                                        </div>
                                     </div>
                                     <div class="col-6">
-                                        <label><b>Address:</b></label>
-                                        <input id="address" class="form-control" readonly>
+                                        <div class="form-group">
+                                            <label><b>Address:</b></label>
+                                            <input id="address" class="form-control" readonly required>
+                                        </div>
+                                        <br>
+                                        <div class="form-group">
+                                            <label><b>E-mail:</b></label>
+                                            <input id="email" class="form-control" type="email" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -52,8 +72,11 @@
                         <table class="table table-bordered table-striped ">
                             <thead>
                                 <tr>
+                                    <th>Item Name</th>
+                                    <th>Item Category</th>
                                     <th>Item Description</th>
                                     <th>Price Per Item</th>
+                                    <th># Items In-Stock</th>
                                     <th># Items Ordered</th>
                                     <th>Total Item Price</th>
                                 </tr>
@@ -63,10 +86,31 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="totalRow" class="row">
+                        <div class="col-3 offset-9">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label><b>Subtotal:</b></label>
+                                    <br>
+                                    <label><b>HST:</b></label>
+                                    <br>
+                                    <label><b>Total:</b></label>
+                                </div>
+                                <div class="col-6">
+                                    <label id="subTotal">XXXX</label>
+                                    <br>
+                                    <label id="HST">XXXX</label>
+                                    <br>
+                                    <label id="total">XXXX</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div id="newOrderPanel" class="row justify-content-center">
                         <button id="addItemToOrder" type="button" class="btn btn-success col btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
                         <button id="removeItem" type="button" class="btn btn-danger col btnSpacing" disabled>Remove Item</button>
-                        <button id="orderSubmit" type="button" class="btn btn-primary col btnSpacing" disabled>Submit Order</button>
+                        <button id="orderSubmit" type="submit" class="btn btn-primary col btnSpacing">Submit Order</button>
                     </div>
                     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -95,12 +139,11 @@
                                             <table class="table table-bordered table-striped ">
                                                 <thead>
                                                     <tr>
-                                                        <th>ID</th>
                                                         <th>Item Name</th>
-                                                        <th>Item Category</th>
+                                                        <th>Category</th>
+                                                        <th>Description</th>
                                                         <th>Qty On-Hand</th>
-                                                        <th>Threshold</th>
-                                                        <th>Case Size</th>
+                                                        <th>Price per Item</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="itemsTable">
@@ -114,6 +157,7 @@
                         </div>
                     </div>
                 </div>
+                </form>
             </div>
 
         </div>
