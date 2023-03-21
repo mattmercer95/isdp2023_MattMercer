@@ -269,9 +269,15 @@ public class SiteAccessor {
 
         try {
             while (rs.next()) {
-                int siteID = rs.getInt("siteID");
-                String name = rs.getString("name");
-                retailSites.add(new Site(siteID, name));
+                Site temp = new Site();
+                temp.setSiteID(rs.getInt("siteID"));
+                temp.setName(rs.getString("name"));
+                String address1 = rs.getString("address");
+                String address2 = (rs.getString("address2") == null) ? "" : rs.getString("address2");
+                String city = rs.getString("city");
+                String provinceID = rs.getString("provinceID");
+                temp.setAddress(address1 + " " + address2 + " " + city + ", " + provinceID);
+                retailSites.add(temp);
             }
         } catch (SQLException ex) {
             System.err.println("************************");
