@@ -195,6 +195,17 @@ END //
 DELIMITER ;
 
 /*
+Gets the online ids for all open orders
+*/
+drop procedure if exists GetOpenOnlineIDs;
+DELIMITER //
+create procedure GetOpenOnlineIDs()
+BEGIN
+	select txnID, SUBSTRING_INDEX(SUBSTRING_INDEX(notes, ':', 2), ':', -1) as email from txn where siteIDTo = 11 and status in ('PROCESSING', 'READY');
+END //
+DELIMITER ;
+
+/*
 Gets the next delivery date for a store location
 */
 drop procedure if exists GetNextDeliveryDate;
@@ -498,6 +509,17 @@ BEGIN
     if @rc = 0 then
 		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 11, curQty, orderID, 0);
 	end if;
+END //
+DELIMITER ;
+
+/*
+Moves inventory from curbside
+*/
+drop procedure if exists MoveInventoryFromCurb;
+DELIMITER //
+create procedure MoveInventoryFromCurb(in orderID int, in curQty int, in curItem int)
+BEGIN
+	update inventory set quantity = quantity - curQty where itemID = curItem and siteID = 11;
 END //
 DELIMITER ;
 

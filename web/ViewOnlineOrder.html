@@ -27,7 +27,7 @@
             </div>
             <div id="orderPDF" class="card">
                 <div class="card-title text-center">
-                    <h3>Order Details</h3>
+                    <h3 id="orderTitle">Order Details</h3>
                 </div>
                 <form id="onlineOrderForm">
                 <div class="card-body">
@@ -103,10 +103,21 @@
                 </div>
                 </form>
             </div>
+            <br>
+            <div class="row" id="pickupRow" hidden>
+                <div class="form-check col-5 offset-5">
+                    <input class="form-check-input" type="checkbox" value="" id="customerSignature">
+                    <label class="form-check-label" for="defaultCheck1">
+                      Customer Sign For Order
+                    </label>
+                    <br>
+                    <button class="btn btn-success" id="pickupOrderbtn" disabled>Pickup Order</button>
+                </div>
+            </div>
             <div id="newOrderPanel" class="row justify-content-center">
                 <button id="downloadPDF" type="submit" class="btn btn-primary col btnSpacing col-3">Download Invoice</button>
             </div>
-
+            <br>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="Scripts/viewOnlineOrder.js"></script>

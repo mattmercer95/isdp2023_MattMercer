@@ -8,6 +8,7 @@ import DB.DeliveryAccessor;
 import DB.InventoryAccessor;
 import DB.SiteAccessor;
 import DB.TransactionAccessor;
+import Entity.OnlineOrderID;
 import Entity.Transaction;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -143,9 +144,20 @@ public class TransactionService extends HttpServlet {
                 boolean submitted = TransactionAccessor.completeTransaction(t);
                 out.println(g.toJson(submitted));
             }
+            else if(uri.equals("/completeOnlineOrder")){
+                Scanner sc = new Scanner(request.getReader());
+                Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
+                t.setStatus("CLOSED");
+                boolean submitted = TransactionAccessor.completeOnlineTransaction(t);
+                out.println(g.toJson(submitted));
+            }
             else if(uri.equals("/orderStatusList")){
                 ArrayList<String> orderStatusList = TransactionAccessor.getOrderStatusList();
                 out.println(g.toJson(orderStatusList));
+            }
+            else if(uri.equals("/onlineOrderIDs")){
+                ArrayList<OnlineOrderID> onlineOrderIDs = TransactionAccessor.getOnlineOrderIDs();
+                out.println(g.toJson(onlineOrderIDs));
             }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();

@@ -8,9 +8,49 @@ const currency = new Intl.NumberFormat('en-US', {
 
 window.onload = async function(){
     await loadCurrentOrder();
+    console.log(currentOrder);
     populateOrder();
     document.querySelector("#downloadPDF").addEventListener('click', generatePDF);
+    checkIfReady();
+    document.querySelector("#pickupOrderbtn").addEventListener('click', completeOrder);
+    document.querySelector("#customerSignature").addEventListener('input', togglePickup);
 };
+
+function togglePickup(){
+    let checked = document.querySelector("#customerSignature").checked;
+    if(checked){
+        document.querySelector("#pickupOrderbtn").disabled = false;
+    }
+    else {
+        document.querySelector("#pickupOrderbtn").disabled = true;
+    }
+}
+
+async function completeOrder(){
+    let confirmPickup = confirm("Confirm pickup of online order?");
+    if(confirmPickup){
+        let url = "TransactionService/completeOnlineOrder";
+        let resp = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(currentOrder)
+        });
+        let result = await resp.json();
+        if(result){
+            alert("Order succesfully completed");
+            window.location.href = "index.html";
+        }
+        else {
+            alert("Something went wrong, please check server");
+        }
+    }
+}
+
+function checkIfReady(){
+    let currStatus = currentOrder.status;
+    if(currStatus === "READY"){
+        document.querySelector("#pickupRow").hidden = false;
+    }
+}
 
 function generatePDF() {
     // Choose the element that your content will be rendered to.
@@ -85,6 +125,7 @@ function calculateTotals(items){
 }
 
 function populateOrder(){
+    document.querySelector("#orderTitle").innerHTML = `Order #${currentOrder.transactionID}`;
     document.querySelector("#location").value = currentOrder.origin;
     document.querySelector("#address").value = currentOrder.destinationAddress;
     let customer = getCustFromNotes(currentOrder.notes);

@@ -29,48 +29,34 @@
     <div class="container">
         <br>
         <div class="row justify-content-center">
-            <div class="card col-lg-4 me-5 ms-5" id="onlineOrdering">
-                <div class="card-body">
-                    <h2 class="card-title">Online Ordering</h2>
-                    <br>
-                    <p class="card-text">Proceed to online ordering. Choose your location and place a curbside order.</p>
-                    <a class="btn btn-primary" href="OnlineOrdering.html">Place An Order</a>
-                    <a class="btn btn-primary" href="SearchOnlineOrder.html">View/Pickup Order</a>
-                </div>
-            </div>
             <div class="card col-lg-4 me-5 ms-5">
 
                 <div class="card-body">
-                    <h2 class="card-title" >Employee Sign-In</h2>
+                    <h2 class="card-title" >Online Order Search</h2>
                     <br>
-                    <form id="signIn">
+                    <p class="card-text">Enter your email and the Order ID associated with the order you are looking for. Email must match the one placed at time of ordering.</p>
+                    <form id="search">
                         <div class="form-group row">
-                            <label for="username">Username:</label>
+                            <label for="username">E-mail:</label>
                             <div>
-                                <input class="form-control" id="username" required>
+                                <input type="email" class="form-control" id="email" required>
                             </div>
                         </div>
-                        <br>
                         <div class="form-group row">
-                            <label for="password">Password:</label>
+                            <label for="password">Order ID:</label>
                             <div>
-                                <input class="form-control" id="password" type="password" required>
-                                <i class="bi bi-eye-slash passwordIcon" id="togglePassword"></i>
+                                <input class="form-control" type="number" id="orderID" required>
                             </div>
                         </div>
                         <div class="form-group text-center">
-                            <button class="btn btn-primary" type="submit">Sign-In</button>
+                            <button class="btn btn-primary" type="submit">Search</button>
                         </div>                                        
                     </form>
-                    <br>
-                    <div>
-                        <a href="resetPassword.html" id="resetPasswordLink">Forgot password?</a>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="Scripts/signIn.js">
+    <script src="Scripts/searchOnlineOrder.js">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
     

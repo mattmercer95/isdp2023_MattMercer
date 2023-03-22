@@ -4,6 +4,7 @@
  */
 package DB;
 
+import Entity.OnlineOrderID;
 import Entity.Transaction;
 import Entity.TransactionItem;
 import java.sql.Connection;
@@ -37,6 +38,8 @@ public class TransactionAccessor {
     private static PreparedStatement moveInventoryFromTruckToStore = null;
     private static PreparedStatement newOnlineOrder = null;
     private static PreparedStatement moveInventoryFromStoreToCurb = null;
+    private static PreparedStatement getOnlineOrderIDs = null;
+    private static PreparedStatement moveInventoryFromCurb = null;
     
     private TransactionAccessor(){
         //no instant
@@ -76,6 +79,8 @@ public class TransactionAccessor {
                 newOnlineOrder = conn.prepareStatement("insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, notes)"
                         + " values (?,?,?,?,?,'X',?,null,false, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 moveInventoryFromStoreToCurb = conn.prepareStatement("call MoveInventoryFromStoreToCurb(?, ?, ?, ?)");
+                getOnlineOrderIDs = conn.prepareStatement("call GetOpenOnlineIDs()");
+                moveInventoryFromCurb = conn.prepareStatement("call MoveInventoryFromCurb(?,?,?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -86,6 +91,39 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<OnlineOrderID> getOnlineOrderIDs(){
+        ArrayList<OnlineOrderID> orderIDs = new ArrayList<OnlineOrderID>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return orderIDs;
+            rs = getOnlineOrderIDs.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Online Order IDs");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return orderIDs;
+        }
+        
+        try {
+            while (rs.next()) {
+                OnlineOrderID temp = new OnlineOrderID();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setEmail(rs.getString("email"));
+                orderIDs.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Online Order IDs");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return orderIDs;
     }
     
     public static int newOnlineOrder(Transaction t){
@@ -142,6 +180,40 @@ public class TransactionAccessor {
             System.err.println("************************");
         }
 
+        return result;
+    }
+    
+    public static boolean completeOnlineTransaction(Transaction t){
+        boolean result = false;
+        
+        //remove items from curbside 
+        try {
+            if (!init()) {
+                return result;
+            }
+            //move items to store
+            ArrayList<TransactionItem> items = t.getItems();
+            for(TransactionItem i : items){
+                moveInventoryFromCurb.setInt(1, t.getTransactionID());
+                moveInventoryFromCurb.setInt(2, i.getCaseQuantityOrdered());
+                moveInventoryFromCurb.setInt(3, i.getItemID());
+                moveInventoryFromCurb.executeUpdate();
+            }
+            //set transaction status as In Transit
+            PreparedStatement updateStatusClosed = conn.prepareStatement("update txn set status = 'CLOSED' where txnID = ?");
+            updateStatusClosed.setInt(1, t.getTransactionID());
+            int rc = updateStatusClosed.executeUpdate();
+            if(rc > 0){
+                result = true;
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Compling Online Order");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
         return result;
     }
     
