@@ -40,6 +40,7 @@ public class TransactionAccessor {
     private static PreparedStatement moveInventoryFromStoreToCurb = null;
     private static PreparedStatement getOnlineOrderIDs = null;
     private static PreparedStatement moveInventoryFromCurb = null;
+    private static PreparedStatement cancelTransaction = null;
     
     private TransactionAccessor(){
         //no instant
@@ -81,6 +82,7 @@ public class TransactionAccessor {
                 moveInventoryFromStoreToCurb = conn.prepareStatement("call MoveInventoryFromStoreToCurb(?, ?, ?, ?)");
                 getOnlineOrderIDs = conn.prepareStatement("call GetOpenOnlineIDs()");
                 moveInventoryFromCurb = conn.prepareStatement("call MoveInventoryFromCurb(?,?,?)");
+                cancelTransaction = conn.prepareStatement("update txn set status = 'CANCELLED' where txnID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -91,6 +93,30 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean cancelTransaction(Transaction t){
+        boolean result = false;
+        
+        try {
+            if (!init()) {
+                return result;
+            }
+            //move items to store
+            cancelTransaction.setInt(1, t.getTransactionID());
+            int rc = cancelTransaction.executeUpdate();
+            if(rc > 0){
+                result = true;
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Cancelling Order");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        return result;
     }
     
     public static ArrayList<OnlineOrderID> getOnlineOrderIDs(){

@@ -144,6 +144,13 @@ public class TransactionService extends HttpServlet {
                 boolean submitted = TransactionAccessor.completeTransaction(t);
                 out.println(g.toJson(submitted));
             }
+            else if(uri.equals("/cancelOrder")){
+                Scanner sc = new Scanner(request.getReader());
+                Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
+                t.setStatus("CANCELLED");
+                boolean submitted = TransactionAccessor.cancelTransaction(t);
+                out.println(g.toJson(submitted));
+            }
             else if(uri.equals("/completeOnlineOrder")){
                 Scanner sc = new Scanner(request.getReader());
                 Transaction t = g.fromJson(sc.nextLine(), Transaction.class);

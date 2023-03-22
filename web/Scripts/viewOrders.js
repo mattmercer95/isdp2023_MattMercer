@@ -35,6 +35,7 @@ window.onload = async function () {
     document.querySelector("#newEmergency").addEventListener('click', newEmergency);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     document.querySelector("#statusSelect").addEventListener('input', buildTable);
+    document.querySelector("#cancelOrder").addEventListener('click', cancelOrder);
     document.querySelector("#processOnlineOrder").addEventListener('click', ()=>{
         let selected = getSelectedOrder();
         sessionStorage.setItem("currentOrderID", selected.transactionID);
@@ -61,6 +62,27 @@ window.onload = async function () {
     await getAllOrders();
     await getAllSites();
 };
+
+async function cancelOrder(){
+    console.log("hello");
+    let selected = getSelectedOrder();
+    let cancelConfirm = confirm("Cancel Order #" + selected.transactionID + "?");
+    if(cancelConfirm){
+        let url = `../TransactionService/cancelOrder`;
+        let resp = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(selected)
+        });
+        let result = await resp.json();
+        if(result){
+            alert("Order successfully cancelled");
+            window.location.href = "ViewOrders.html";
+        }
+        else {
+            alert("Something went wrong, please check server");
+        }
+    }
+}
 
 async function newEmergency(){
     //get the site of origin
@@ -412,6 +434,9 @@ function checkPermissions(){
         if(permission === "FULFILSTOREORDER"){
             document.querySelector("#fulfillOrder").hidden = false;
         }
+        if(permission === "MODIFYRECORD"){
+            document.querySelector("#cancelOrder").hidden = false;
+        }
     });
 }
 
@@ -452,6 +477,13 @@ function highlight(e){
         }
         else {
             document.querySelector("#processOnlineOrder").disabled = true;
+        }
+        let openOrder = selected.status === "NEW" || selected.status === "SUBMITTED" || selected.status === "RECEIVED" || selected.status === "PROCESSING" || selected.status === "BACKORDER";
+        if(openOrder){
+            document.querySelector("#cancelOrder").disabled = false;
+        }
+        else {
+            document.querySelector("#cancelOrder").disabled = true;
         }
     }
     else {
