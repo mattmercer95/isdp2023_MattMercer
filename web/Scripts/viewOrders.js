@@ -35,6 +35,11 @@ window.onload = async function () {
     document.querySelector("#newEmergency").addEventListener('click', newEmergency);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     document.querySelector("#statusSelect").addEventListener('input', buildTable);
+    document.querySelector("#processOnlineOrder").addEventListener('click', ()=>{
+        let selected = getSelectedOrder();
+        sessionStorage.setItem("currentOrderID", selected.transactionID);
+        window.location.href = "ProcessOnlineOrder.html";
+    });
     document.querySelector("#processOrder").addEventListener('click', ()=>{
         let selected = getSelectedOrder();
         sessionStorage.setItem("currentOrderID", selected.transactionID);
@@ -402,6 +407,7 @@ function checkPermissions(){
         }
         if(permission === "ACCEPTSTOREORDER"){
             document.querySelector("#receiveDelivery").hidden = false;
+            document.querySelector("#processOnlineOrder").hidden = false;
         }
         if(permission === "FULFILSTOREORDER"){
             document.querySelector("#fulfillOrder").hidden = false;
@@ -440,6 +446,12 @@ function highlight(e){
         }
         else {
             document.querySelector("#receiveDelivery").disabled = true;
+        }
+        if(selected.destination === "Curbside" && selected.status === "PROCESSING"){
+            document.querySelector("#processOnlineOrder").disabled = false;
+        }
+        else {
+            document.querySelector("#processOnlineOrder").disabled = true;
         }
     }
     else {

@@ -128,6 +128,14 @@ public class TransactionService extends HttpServlet {
                 DeliveryAccessor.openDelivery(t);
                 out.println(g.toJson(submitted));
             }
+            else if(uri.equals("/fulfillOnline")){
+                Scanner sc = new Scanner(request.getReader());
+                Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
+                t.setStatus("READY");
+                boolean submitted = TransactionAccessor.updateTransaction(t);
+                //create a delivery record for this transaction
+                out.println(g.toJson(submitted));
+            }
             else if(uri.equals("/complete")){
                 Scanner sc = new Scanner(request.getReader());
                 Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
