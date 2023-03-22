@@ -236,7 +236,7 @@ async function getAllOrders(){
     if(currentEmployee.positionID === 3){
         allOrders = [];
         orders.forEach((order)=>{
-            if(currentEmployee.siteID === order.siteIDTo){
+            if(currentEmployee.siteID === order.siteIDTo || currentEmployee.siteID === order.siteIDFrom){
                 allOrders.push(order);
             }
         });

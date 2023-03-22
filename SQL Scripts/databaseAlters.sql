@@ -133,7 +133,10 @@ drop procedure if exists GetTransactionByID;
 DELIMITER //
 create procedure GetTransactionByID(in orderID int)
 BEGIN
-	select *, (select name from site where siteIDTo = siteID) as destination, (select name as origin from site where siteIDFrom = siteID) as origin from txn where txnID = orderID;
+	select *, (select name from site where siteIDTo = siteID) as destination, 
+    (select name as origin from site where siteIDFrom = siteID) as origin,
+    (select concat(address, " ", city, ", ", provinceID) from site where siteIDFrom = siteID) as address
+    from txn where txnID = orderID;
 END //
 DELIMITER ;
 
@@ -290,7 +293,7 @@ drop procedure if exists GetAvailableOnlineInventory;
 DELIMITER //
 create procedure GetAvailableOnlineInventory(in id int)
 BEGIN
-    Select itemID, name, quantity, retailPrice, caseSize, weight   
+    Select itemID, name, quantity, retailPrice, category, description  
     from inventory inner join item using (itemID)
     where siteID = id and active = true;
 END //
@@ -479,6 +482,22 @@ BEGIN
 --     if @rc = 0 then
 -- 		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 9999, curQty, orderID, 0);
 --    end if;
+END //
+DELIMITER ;
+
+/*
+Moves inventory from store to curbside
+*/
+drop procedure if exists MoveInventoryFromStoreToCurb;
+DELIMITER //
+create procedure MoveInventoryFromStoreToCurb(in orderID int, in curQty int, in curItem int, in locationID int)
+BEGIN
+	update inventory set quantity = quantity - curQty where itemID = curItem and siteID = locationID;
+	update inventory set quantity = quantity + curQty where itemID = curItem and siteID = 11;
+    select row_count() into @rc;
+    if @rc = 0 then
+		insert into inventory (itemID, siteID, quantity, itemLocation, reorderThreshold) values(curItem, 11, curQty, orderID, 0);
+	end if;
 END //
 DELIMITER ;
 

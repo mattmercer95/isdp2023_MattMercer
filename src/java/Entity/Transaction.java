@@ -14,12 +14,20 @@ public class Transaction {
     private int transactionID, siteIDTo, siteIDFrom, deliveryID, quantity;
     private double totalWeight;
     private String origin, destination, destinationAddress, status, shipDate, transactionType, barCode, 
-            createdDate;
+            createdDate, notes;
     private boolean emergencyDelivery;
     private ArrayList<TransactionItem> items;
     
     public Transaction(){
         //empty constructor
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getNotes() {
+        return notes;
     }
     
     public Transaction(int transactionID, int siteIDTo, int siteIDFrom,
@@ -39,6 +47,18 @@ public class Transaction {
         this.createdDate = createdDate;
         this.emergencyDelivery = emergencyDelivery;
         this.items = items;
+    }
+
+    public int getSiteIDFrom() {
+        return siteIDFrom;
+    }
+
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
     }
 
     public String getDestinationAddress() {

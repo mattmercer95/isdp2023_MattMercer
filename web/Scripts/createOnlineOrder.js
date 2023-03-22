@@ -18,8 +18,123 @@ window.onload = async function(){
     document.querySelector("#itemSearch").addEventListener('input', itemSearch);
     document.querySelector("#add").addEventListener('click', addItem);
     document.querySelector("#itemsTable").addEventListener('click', itemHighlight);
+    document.querySelector("#orderTable").addEventListener('click', orderHighlight);
+    document.querySelector("#removeItem").addEventListener('click', removeItem);
+    document.querySelector("#onlineOrderForm").addEventListener('submit', submitOrder);
     resetSubtotal();
 };
+
+function checkSubmitButton(){
+    let btn = document.querySelector("#orderSubmit");
+    if(cart.length > 0){
+        btn.disabled = false;
+    }
+    else {
+        btn.disabled = true;
+    }
+}
+function getItemQuantities(cart){
+    const table = document.querySelector("#orderTable");
+    let rows = table.querySelectorAll("tr");
+    let index = 0;
+    cart.forEach((item)=>{
+        let qty = document.querySelector(`#qty${item.itemID}`).value;
+        item.quantity = qty;
+    });
+    return cart;
+}
+
+async function submitOrder(e){
+    e.preventDefault();
+    let name = document.querySelector("#name").value;
+    let email = document.querySelector("#email").value;
+    let phone = document.querySelector("#phone").value;
+    let notes = `${name}:${email}:${phone}`;
+    let siteID = document.querySelector("#siteSelect").value;
+    let items = getItemQuantities(cart);
+    let obj = {
+        siteIDTo: 11,
+        siteIDFrom: siteID,
+        status: "PROCESSING",
+        transactionType: "Online",
+        barCode: "X",
+        notes: notes,
+        items: items
+    }
+    
+    let url = "TransactionService/newOnlineOrder";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    });
+    let result = await resp.json();
+    if(result > 0){
+        alert(`Order submitted successfully`);
+        sessionStorage.setItem("currentOnlineOrderID", result);
+        window.location.href = "ViewOnlineOrder.html";
+    }
+    else {
+        alert('Something went wrong, please check server');
+    }
+}
+
+//removes an item from the order and returns it to the item list
+function removeItem(){
+    //get selected item to remove
+    let itemToRemove = getSelectedOrderItem();
+    //remove item from cart
+    let index;
+    let counter = 0;
+    cart.forEach((item) =>{
+       if(item.itemID === itemToRemove.itemID){
+           index = counter;
+       } 
+       counter++;
+    });
+    cart.splice(index, 1);
+    //add item to allItems
+    currentInventory.push(itemToRemove);
+    //sort and rebuild
+    currentInventory.sort((a,b) => a.itemID - b.itemID);
+    alert(`Item ${itemToRemove.name} removed from order`);
+    //check for emergency order item limit
+    document.querySelector("#removeItem").disabled = true;
+    buildTable(currentInventory);
+    buildCart();
+    updateSubtotal();
+    checkSubmitButton();
+}
+
+//Helper function to get the selected order item from the order table
+function getSelectedOrderItem(){
+    let table = document.querySelector("#orderTable");
+    rows = table.querySelectorAll("tr");
+    let selectedItem;
+    let selectedIndex;
+    for(let i = 0; i < rows.length; i++){
+        row = rows[i];
+        if(row.classList.contains("highlighted")){
+            selectedItem = cart[i];
+        }
+    }
+    return selectedItem;
+}
+
+function orderHighlight(e){
+    const table = document.querySelector("#orderTable");
+    let trs = table.querySelectorAll("tr");
+    for (let i = 0; i < trs.length; i++) {
+        trs[i].classList.remove("highlighted");
+    }
+    let target = e.target.parentElement;
+    if(target.tagName === "TR"){
+        target.classList.add("highlighted");
+        document.querySelector("#removeItem").disabled = false;
+    }
+    else {
+        document.querySelector("#removeItem").disabled = true;
+    }
+}
 
 function updateSubtotal(){
     const table = document.querySelector("#orderTable");
@@ -74,7 +189,7 @@ function buildCart(){
         qtyUpDown.increment = 1;
         qtyUpDown.min = 1;
         qtyUpDown.id = `qty${item.itemID}`;
-        qtyUpDown.value = item.itemQuantity;
+        qtyUpDown.value = item.quantity;
         //Changes the quantity of items ordered based on their case size
         qtyUpDown.addEventListener('input', function(){
            //updatetotal price cell
@@ -110,7 +225,7 @@ function buildCart(){
 
 function addItem(){
     let selectedItem = getSelectedItem();
-    selectedItem.itemQuantity = 1;
+    selectedItem.quantity = 1;
     //add selecteditem to cart
     cart.push(selectedItem);
     cart.sort((a,b) => a.itemID - b.itemID);
@@ -134,6 +249,7 @@ function addItem(){
     //deactivate add button
     document.querySelector("#add").disabled = true;
     updateSubtotal();
+    checkSubmitButton();
 }
 
 //Helper function to get the selected item from the add items table

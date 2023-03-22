@@ -35,6 +35,8 @@ public class TransactionAccessor {
     private static PreparedStatement getTransactionsByDeliveryID = null;
     private static PreparedStatement changeStatusToDelivered = null;
     private static PreparedStatement moveInventoryFromTruckToStore = null;
+    private static PreparedStatement newOnlineOrder = null;
+    private static PreparedStatement moveInventoryFromStoreToCurb = null;
     
     private TransactionAccessor(){
         //no instant
@@ -71,6 +73,9 @@ public class TransactionAccessor {
                 getTransactionsByDeliveryID = conn.prepareStatement("call GetOrdersByDeliveryID(?)");
                 changeStatusToDelivered = conn.prepareStatement("update txn set status = 'DELIVERED' where txnID = ?");
                 moveInventoryFromTruckToStore = conn.prepareStatement("call MoveInventoryFromTruckToStore(?,?,?,?)");
+                newOnlineOrder = conn.prepareStatement("insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, notes)"
+                        + " values (?,?,?,?,?,'X',?,null,false, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                moveInventoryFromStoreToCurb = conn.prepareStatement("call MoveInventoryFromStoreToCurb(?, ?, ?, ?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -81,6 +86,63 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static int newOnlineOrder(Transaction t){
+        int result = -1;
+
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            newOnlineOrder.setInt(1, t.getSiteIDTo());
+            newOnlineOrder.setInt(2, t.getSiteIDFrom());
+            newOnlineOrder.setString(3, t.getStatus());
+            newOnlineOrder.setString(4, t.getShipDate());
+            newOnlineOrder.setString(5, t.getTransactionType());
+            newOnlineOrder.setString(6, t.getCreatedDate());
+            newOnlineOrder.setString(7, t.getNotes());
+            newOnlineOrder.executeUpdate();
+            rs = newOnlineOrder.getGeneratedKeys();
+            rs.next();
+            result = rs.getInt(1);
+            t.setTransactionID(result);
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating Online Order");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        try {
+            ArrayList<TransactionItem> items = t.getTransactionItems();
+            insertTxnItems = "insert into txnitems (txnID, itemID, quantity) values";
+            int counter = 0;
+            for(TransactionItem item : items){
+                if(counter > 0){
+                    insertTxnItems += ",";
+                }
+                counter++;
+                insertTxnItems += "(" + t.getTransactionID() + ", " +
+                        item.getItemID() + ", " + item.getQuantity() + ")";
+                moveInventoryFromStoreToCurb.setInt(1, result);
+                moveInventoryFromStoreToCurb.setInt(2, item.getQuantity());
+                moveInventoryFromStoreToCurb.setInt(3, item.getItemID());
+                moveInventoryFromStoreToCurb.setInt(4, t.getSiteIDFrom());
+                moveInventoryFromStoreToCurb.executeUpdate();
+            }
+            PreparedStatement insertTxnItemsStmt = conn.prepareStatement(insertTxnItems);
+            insertTxnItemsStmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error inserting Online Order items");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
     }
     
     public static boolean completeTransaction(Transaction t){
@@ -428,9 +490,12 @@ public class TransactionAccessor {
                     item.setName(rs.getString("name"));
                     item.setWeight(rs.getFloat("weight"));
                     item.setCaseSize(rs.getInt("caseSize"));
+                    item.setCategory(rs.getString("category"));
+                    item.setDescription(rs.getString("description"));
                     item.setSiteID(rs.getInt("siteID"));
                     item.setItemQuantityOnHand(rs.getInt(16));
                     item.setReorderThreshold(rs.getInt("reorderThreshold"));
+                    item.setRetailPrice(rs.getDouble("retailPrice"));
                     result.add(item);
                 };
             }
@@ -474,11 +539,13 @@ public class TransactionAccessor {
                     result.setShipDate(shipDateString.substring(0, shipDateString.length() - 9));
                     result.setTransactionType(rs.getString("txnType"));
                     String createdDateString = rs.getString("createdDate");
+                    result.setDestinationAddress(rs.getString("address"));
                     result.setCreatedDate(createdDateString.substring(0, createdDateString.length() - 9));
                     result.setDeliveryID(rs.getInt("deliveryID"));
                     result.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
                     result.setDestination(rs.getString("destination"));
                     result.setOrigin(rs.getString("origin"));
+                    result.setNotes(rs.getString("notes"));
                 };
             }
         } catch (SQLException ex) {

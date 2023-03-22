@@ -9,12 +9,32 @@ package Entity;
  * @author Matt
  */
 public class TransactionItem {
-    private int itemID, txnID, caseQuantityOrdered, caseSize, siteID, itemQuantityOnHand, reorderThreshold;
-    private String name;
-    private double weight;
+    private int itemID, txnID, caseQuantityOrdered, caseSize, siteID, itemQuantityOnHand, reorderThreshold, quantity;
+    private String name, category, description;
+    private double weight, retailPrice;
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
     
     public TransactionItem(){
     
+    }
+
+    public void setRetailPrice(double retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
     
     public int getItemID(){

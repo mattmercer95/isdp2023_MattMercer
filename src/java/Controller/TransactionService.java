@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -109,6 +110,14 @@ public class TransactionService extends HttpServlet {
                 boolean submitted = TransactionAccessor.updateTransaction(t);
                 out.println(g.toJson(submitted));
             }
+            else if(uri.equals("/newOnlineOrder")){
+                Scanner sc = new Scanner(request.getReader());
+                Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
+                t.setCreatedDate(getCurrentTimeStamp());
+                t.setShipDate(getNextDayTimeStamp());
+                int transactionID = TransactionAccessor.newOnlineOrder(t);
+                out.println(g.toJson(transactionID));
+            }
             else if(uri.equals("/fulfill")){
                 System.out.println("here");
                 Scanner sc = new Scanner(request.getReader());
@@ -140,6 +149,23 @@ public class TransactionService extends HttpServlet {
         }
     }
 
+    //Helper function for getting the current time in the MySQL datetime format
+    private String getCurrentTimeStamp(){
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = 
+             new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(dt);
+    }
+    private String getNextDayTimeStamp(){
+        java.util.Date dt = new java.util.Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.DATE, 1);
+        java.util.Date result = c.getTime();
+        java.text.SimpleDateFormat sdf = 
+             new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(result);
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

@@ -37,20 +37,16 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label><b>Select Location:</b></label>
-                                            <select id="siteSelect" class="form-select">
-
-                                            </select>
+                                            <label><b>Location:</b></label>
+                                            <input id="location" class="form-control" readonly required>
                                         </div>
-                                        <br>
                                         <div class="form-group">
                                             <label><b>Name:</b></label>
-                                            <input id="name" class="form-control" required>
+                                            <input id="name" class="form-control" readonly required>
                                         </div>
                                         <div class="form-group">
                                             <label><b>Phone:</b></label>
-                                            <input id="phone" type="tel" class="form-control" placeholder="123-456-7890" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
-                                            <div class="form-text">Format: 123-456-7890</div>
+                                            <input id="phone" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" readonly required>
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -58,10 +54,13 @@
                                             <label><b>Address:</b></label>
                                             <input id="address" class="form-control" readonly required>
                                         </div>
-                                        <br>
                                         <div class="form-group">
                                             <label><b>E-mail:</b></label>
-                                            <input id="email" class="form-control" type="email" required>
+                                            <input id="email" class="form-control" type="email" readonly required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label><b>Status:</b></label>
+                                            <input id="status" class="form-control" type="email" readonly required>
                                         </div>
                                     </div>
                                 </div>
@@ -76,7 +75,6 @@
                                     <th>Item Category</th>
                                     <th>Item Description</th>
                                     <th>Price Per Item</th>
-                                    <th># Items In-Stock</th>
                                     <th># Items Ordered</th>
                                     <th>Total Item Price</th>
                                 </tr>
@@ -87,7 +85,7 @@
                         </table>
                     </div>
                     <div id="totalRow" class="row">
-                        <div class="col-3 offset-9">
+                        <div class="col-3 offset-8">
                             <div class="row">
                                 <div class="col-6">
                                     <p><b>Subtotal:</b></p>
@@ -102,63 +100,16 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div id="newOrderPanel" class="row justify-content-center">
-                        <button id="addItemToOrder" type="button" class="btn btn-success col btnSpacing" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="bi bi-plus-square" id="togglePassword"></i>    Add Item</button>
-                        <button id="removeItem" type="button" class="btn btn-danger col btnSpacing" disabled>Remove Item</button>
-                        <button id="orderSubmit" type="submit" class="btn btn-primary col btnSpacing" disabled>Submit Order</button>
-                    </div>
-                    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-scrollable modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title" id="myLargeModalLabel">Add Items To Order</h4>
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-
-                                </div>
-                                <div class="modal-header modal-search">
-                                    <div class="form-group">
-                                        <label>Search</label>
-                                        <input id="itemSearch" class="form-control"/>
-                                    </div>
-                                    <br>
-                                    <div class="form-group">
-                                        <button id="add" class="btn btn-success col-2" disabled>Add Item</button>
-                                    </div>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="card-body">
-                                        <br>
-                                        <div class="table-responsive prevent-select row">
-                                            <table class="table table-bordered table-striped ">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Item Name</th>
-                                                        <th>Category</th>
-                                                        <th>Description</th>
-                                                        <th>Qty On-Hand</th>
-                                                        <th>Price per Item</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="itemsTable">
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 </form>
+            </div>
+            <div id="newOrderPanel" class="row justify-content-center">
+                <button id="downloadPDF" type="submit" class="btn btn-primary col btnSpacing col-3">Download Invoice</button>
             </div>
 
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="Scripts/createOnlineOrder.js"></script>
+        <script src="Scripts/viewOnlineOrder.js"></script>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    </body>
