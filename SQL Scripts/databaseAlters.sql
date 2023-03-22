@@ -94,7 +94,6 @@ BEGIN
     Add transaction to an already open delivery for that date
     */
     if OpenDeliveriesOnDate = 0 then
-		select "in first";
         start transaction;
 		call GetVehicleByWeight(inTotalWeight, vehicleTypeSelected);
         set distance := (select distanceFromWH from site inner join txn on site.siteID = txn.siteIDTo where txnID = orderID);
@@ -109,6 +108,18 @@ BEGIN
 	else
 		call AddToDelivery(orderID, inTotalWeight);
     end if;
+END //
+DELIMITER ;
+
+/*
+Creates a delivery record for an emergency order
+*/
+drop procedure if exists OpenEmergencyDelivery;
+DELIMITER //
+create procedure OpenEmergencyDelivery(in orderID int, in weight decimal(10,2))
+BEGIN
+	insert into delivery (distanceCost, vehicleType, notes, totalWeight) values (0.0, 'Courier', null, weight);
+    update txn set deliveryID = last_insert_id() where txnID = orderID;
 END //
 DELIMITER ;
 

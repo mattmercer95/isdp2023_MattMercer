@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class DeliveryAccessor {
     private static Connection conn = null;
     private static PreparedStatement openDelivery = null;
+    private static PreparedStatement openEmergencyDelivery = null;
     private static PreparedStatement getAllDeliveries = null;
     private static PreparedStatement pickupDelivery = null;
     private static PreparedStatement moveInventoryFromBayToTruck = null;
@@ -38,6 +39,7 @@ public class DeliveryAccessor {
             try {
                 System.out.println("Connection was not null");
                 openDelivery = conn.prepareStatement("call OpenDelivery(?,?)");
+                openEmergencyDelivery = conn.prepareStatement("call OpenEmergencyDelivery(?, ?)");
                 getAllDeliveries = conn.prepareStatement("call GetAllDeliveries()");
                 pickupDelivery = conn.prepareStatement("call SetDeliveryPickupTime(?)");
                 moveInventoryFromBayToTruck = conn.prepareStatement("call MoveInventoryFromBayToTruck(?,?,?,?)");
@@ -138,6 +140,24 @@ public class DeliveryAccessor {
         } catch (SQLException ex) {
             System.err.println("************************");
             System.err.println("** Error Creating new Back Order Transaction");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return;
+        }
+
+    }
+    
+    public static void openEmergencyDelivery(Transaction t){
+        try {
+            if (!init()) {
+                return;
+            }
+            openEmergencyDelivery.setInt(1, t.getTransactionID());
+            openEmergencyDelivery.setDouble(2, t.getTotalWeight());
+            openEmergencyDelivery.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating new Emergency Delivery");
             System.err.println("** " + ex.getMessage());
             System.err.println("************************");
             return;

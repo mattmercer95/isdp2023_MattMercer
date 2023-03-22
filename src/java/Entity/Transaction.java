@@ -17,6 +17,10 @@ public class Transaction {
             createdDate, notes;
     private boolean emergencyDelivery;
     private ArrayList<TransactionItem> items;
+
+    public boolean isEmergencyDelivery() {
+        return emergencyDelivery;
+    }
     
     public Transaction(){
         //empty constructor
