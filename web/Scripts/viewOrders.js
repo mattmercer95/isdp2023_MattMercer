@@ -32,6 +32,7 @@ window.onload = async function () {
     document.querySelector("#returnToDash").addEventListener('click', returnToDash);
     document.querySelector("#ordersTable").addEventListener('click', highlight);
     document.querySelector("#newOrder").addEventListener('click', newOrder);
+    document.querySelector("#newSupplierOrder").addEventListener('click', newSupplierOrder);
     document.querySelector("#newEmergency").addEventListener('click', newEmergency);
     document.querySelector("#viewDetails").addEventListener('click', viewDetails);
     document.querySelector("#statusSelect").addEventListener('input', buildTable);
@@ -62,6 +63,42 @@ window.onload = async function () {
     await getAllOrders();
     await getAllSites();
 };
+
+async function newSupplierOrder(){
+    //check if supplier order is open
+    let url = `../TransactionService/isSupplierOrderOpen`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: origin
+    });
+    let isSupplierOrderOpen = await resp.json();
+    if(isSupplierOrderOpen){
+        alert("Error: Cannot create new supplier order while one is currently open.");
+    }
+    else {
+        let newSupplierOrder = confirm(`Create a new supplier order?`);
+        if(newSupplierOrder){
+            await createNewSupplierOrder();
+        }
+    }
+}
+
+async function createNewSupplierOrder(){
+    let url = `../TransactionService/newSupplierOrder`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: 1
+    });
+    let newOrderID = await resp.json();
+    if(newOrderID > 0){
+        //successful order creation
+        sessionStorage.setItem("currentSupplierOrderID", newOrderID);
+        window.location.href = "CreateSupplierOrder.html";
+    }
+    else {
+        alert("Error creating new order, check server status");
+    }
+}
 
 async function cancelOrder(){
     console.log("hello");
@@ -353,6 +390,18 @@ function buildTable(){
             typePill.style.color = "blue";
             typePill.innerHTML = order.transactionType;
         }
+        else if(order.transactionType === "Return"){
+            typePill.innerHTML = "Return";
+        }
+        else if(order.transactionType === "Loss"){
+            typePill.innerHTML = "Loss";
+        }
+        else if(order.transactionType === "Damage"){
+            typePill.innerHTML = "Damage";
+        }
+        else if(order.transactionType === "Supplier Order"){
+            typePill.innerHTML = "Supplier Order";
+        }
         else {
             typePill.innerHTML = "Regular";
         }
@@ -437,6 +486,9 @@ function checkPermissions(){
         if(permission === "MODIFYRECORD"){
             document.querySelector("#cancelOrder").hidden = false;
         }
+        if(permission === "CREATESUPPLIERORDER"){
+            document.querySelector("#newSupplierOrder").hidden = false;
+        }
     });
 }
 
@@ -455,8 +507,13 @@ function highlight(e){
         document.querySelector("#viewDetails").disabled = false;
         let selected = getSelectedOrder();
         if(selected.status === "SUBMITTED" || selected.status === "BACKORDER"){
-            document.querySelector("#processOrder").disabled = false;
-            document.querySelector("#fulfillOrder").disabled = true;
+            if(selected.transactionType !== "Supplier Order"){
+                document.querySelector("#processOrder").disabled = false;
+                document.querySelector("#fulfillOrder").disabled = true;               
+            }
+            else {
+                document.querySelector("#processOrder").disabled = true;
+            }
         }
         else if(selected.status === "RECEIVED"){
             document.querySelector("#fulfillOrder").disabled = false;

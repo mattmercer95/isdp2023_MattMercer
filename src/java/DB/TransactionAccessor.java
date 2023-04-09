@@ -23,6 +23,7 @@ public class TransactionAccessor {
     private static PreparedStatement getAllOpenStoreOrders = null;
     private static PreparedStatement getAllOpenEmergencyStoreOrders = null;
     private static PreparedStatement createNewStoreOrder = null;
+    private static PreparedStatement createNewSupplierOrder = null;
     private static PreparedStatement getTransactionByID = null;
     private static PreparedStatement getTransactionItems = null;
     private static PreparedStatement updateTransaction = null;
@@ -68,6 +69,7 @@ public class TransactionAccessor {
                 getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
                 getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
                 createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                createNewSupplierOrder = conn.prepareStatement("call CreateNewSupplierOrder(?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 getTransactionByID = conn.prepareStatement("call GetTransactionByID(?)");
                 getTransactionItems = conn.prepareStatement("call GetTransactionItemsByID(?)");
                 updateTransaction = conn.prepareStatement("update txn set status = ?, shipDate = ? where txnID = ?");
@@ -723,6 +725,42 @@ public class TransactionAccessor {
         } catch (SQLException ex) {
             System.err.println("************************");
             System.err.println("** Error Creating Transaction object");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return result;
+    }
+    
+    public static int createNewSupplierOrder(int siteID, boolean type){
+        int result = -1;
+
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            createNewSupplierOrder.setInt(1, siteID);
+            //create date of order creation
+            String timestamp = getCurrentTimeStamp();
+            createNewSupplierOrder.setString(2, timestamp);
+            createNewSupplierOrder.setBoolean(3, type);
+            rs = createNewSupplierOrder.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating New Supplier Order");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                result = rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Creating New Supplier Order");
             System.err.println("** " + ex.getMessage());
             System.err.println("************************");
         }

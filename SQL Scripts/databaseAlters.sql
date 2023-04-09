@@ -252,6 +252,29 @@ END //
 DELIMITER ;
 
 /*
+Creates a supplier order and adds the inventory items that are below the threshold
+*/
+drop procedure if exists CreateNewSupplierOrder;
+DELIMITER //
+create procedure CreateNewSupplierOrder(in storeID int, in orderDate date, in emg tinyint)
+BEGIN
+	start transaction;
+    call GetNextDeliveryDate(storeID, @nextShipDate);
+	insert into txn (siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, notes)
+		values(storeID, 1, 'NEW', @nextShipDate, 'Supplier Order', 'X', orderDate, null, emg, "x");
+	select LAST_INSERT_ID() into @orderID;
+    if emg = false then
+		insert into txnitems (txnID, itemID, quantity)
+			select @orderID, itemID, ceiling((reorderThreshold - quantity) / caseSize) 
+			from inventory inner join item using (itemID)
+			where quantity < reorderThreshold and active = true and siteID = storeID;
+	end if;
+	commit;
+    select @orderID;
+END //
+DELIMITER ;
+
+/*
 Returns how many emergency store orders are NEW for a location
 */
 drop procedure if exists GetOpenEmergencyStoreOrderCount;
