@@ -33,6 +33,12 @@ window.onload = async function () {
     document.querySelector("#itemsTable").addEventListener('click', itemHighlight);
     document.querySelector("#itemSearch").addEventListener('input', itemSearch);
     document.querySelector("#siteSelect").addEventListener('input', updateSite);
+    document.querySelector("#btnLossReturn").addEventListener('click', ()=>{
+        //store selected item in storage and forward to the returns/loss page
+        let item = getSelectedItem();
+        sessionStorage.setItem("currentItem", JSON.stringify(item));
+        window.location.href = "ReturnsLosses.html";
+    });
     document.querySelector("#btnEditThreshold").addEventListener('click', editThreshold);
     document.querySelector("#roSaveChanges").addEventListener('click', updateThreshold);
     document.querySelector("#detailsSaveChanges").addEventListener('click', updateDetails);
@@ -155,6 +161,20 @@ async function updateThreshold(){
     
 }
 
+//Check permissions for processing returns/loss. Can be admin or the site of the current employee
+function checkReturnLossPermission(){
+    let button = document.querySelector("#btnLossReturn");
+    console.log(`currentSite: ${currentSite}, employeeSite: ${currentEmployee.siteID}`);
+    if(currentEmployee.positionID === 99999999 || +currentEmployee.siteID === +currentSite){
+        console.log("In condition");
+        button.hidden = false;
+    }
+    else {
+        button.hidden = true;
+        document.querySelector("#btnLossReturn").disabled = true;
+    }
+}
+
 function checkPermissions(){
     let permissions = JSON.parse(sessionStorage.getItem("permissions"));
     let positionID = currentEmployee.positionID;
@@ -211,6 +231,7 @@ async function updateSite(){
     await itemSearch();
     await hideLoading();
     table.hidden = false;
+    checkReturnLossPermission();
 }
 // showing loading
 async function displayLoading() {
@@ -343,6 +364,7 @@ function populateSiteSelector(allSites){
         }
         selector.appendChild(optionEle);
     });
+    checkReturnLossPermission();
 }
 
 function itemHighlight(e){
@@ -358,10 +380,12 @@ function itemHighlight(e){
         //make sure button is only enabled for that manager's site
         checkValidSite();
         document.querySelector("#btnEditItemDetails").disabled = false;
+        document.querySelector("#btnLossReturn").disabled = false;
     }
     else {
         document.querySelector("#btnEditThreshold").disabled = true;
         document.querySelector("#btnEditItemDetails").disabled = true;
+        document.querySelector("#btnLossReturn").disabled = true;
     }
 }
 
