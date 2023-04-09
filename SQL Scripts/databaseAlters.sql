@@ -275,7 +275,7 @@ create procedure GetOpenStoreOrderCount(in id int)
 BEGIN
     select count(*) as ordersOpen 
     from txn 
-    where status not in ('CLOSED', 'REJECTED', 'BACKORDER') 
+    where status not in ('CLOSED', 'REJECTED', 'BACKORDER', 'CANCELLED') 
     and siteIDTO = id 
     and emergencyDelivery = false;
 END //

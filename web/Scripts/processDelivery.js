@@ -39,7 +39,6 @@ window.onload = async function () {
     checkIfDelivered();
     checkIfReady();
     populateDetailsPanel();
-    console.log(currentDelivery);
 };
 
 async function pickupDelivery(){
@@ -55,7 +54,7 @@ async function pickupDelivery(){
     let result = await resp.json();
     if(result){
         alert("Delivery successfully picked up from warehouse");
-        window.location.href = "DeliveryDetails.html";
+        window.location.href = "Deliveries.html";
     }
     else {
         alert("Something went wrong, please check server");
@@ -171,7 +170,7 @@ async function deliveredAPICall(id){
         alert(`Order #${id} successfully delivered`);
         changeLocalStatusToDelivered(id); //need to update this for the completion check on the backend
         await checkIfDeliveryCompleted();
-        window.location.href = "DeliveryDetails.html";
+        window.location.href = "Deliveries.html";
     }
     else {
         alert("Something went wrong, please check server");
