@@ -92,8 +92,8 @@ async function createNewSupplierOrder(){
     let newOrderID = await resp.json();
     if(newOrderID > 0){
         //successful order creation
-        sessionStorage.setItem("currentSupplierOrderID", newOrderID);
-        window.location.href = "CreateSupplierOrder.html";
+        sessionStorage.setItem("currentOrderID", newOrderID);
+        window.location.href = "CreateOrder.html";
     }
     else {
         alert("Error creating new order, check server status");
