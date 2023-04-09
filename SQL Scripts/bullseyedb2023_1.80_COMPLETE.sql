@@ -1,6 +1,6 @@
 -- Bullseye DB SQL Script
--- version 1.71
--- February 28, 2023
+-- version 1.8_COMPLETE
+-- March 22, 2023
 -- 
 
 -- ********************************************
@@ -198,7 +198,7 @@ CREATE TABLE `txn` (
   `createdDate` datetime NOT NULL,
   `deliveryID` int(11) DEFAULT NULL,
   `emergencyDelivery` tinyint(1) DEFAULT NULL,
-  `notes` varchar(255) NOT NULL,
+  `notes` varchar(255) DEFAULT NULL,
   FOREIGN KEY (`siteIDTo`) REFERENCES `site` (`siteID`),
   FOREIGN KEY (`siteIDFrom`) REFERENCES `site` (`siteID`),
   FOREIGN KEY (`status`) REFERENCES `txnstatus` (`statusName`),
@@ -1501,6 +1501,252 @@ INSERT INTO `item` (`itemID`, `name`, `sku`, `description`, `category`, `weight`
 (10996, 'Nike Lanyard - Blue / Yellow', '70116', 'Nike Lanyard - Blue / Yellow', 'Sports Equipment', '0.01', '1.99', '9.99', 44444, 1, 'Nike Lanyard - Blue / Yellow', 6),
 (10997, 'Nike Lanyard - Black / White', '70117', 'Nike Lanyard - Black / White', 'Sports Equipment', '0.01', '1.99', '9.99', 44444, 1, 'Nike Lanyard - Black / White', 6),
 (10998, 'Nike Lanyard - Green / White', '70118', 'Nike Lanyard - Green / White', 'Sports Equipment', '0.01', '1.99', '9.99', 44444, 1, 'Nike Lanyard - Green / White', 6);
+
+DROP TABLE IF EXISTS `inventory`;
+
+CREATE TABLE `inventory` (
+    `itemID` INT(11),
+    `siteID` INT(11) DEFAULT NULL,
+    `quantity` INT(11),
+    `itemLocation` VARCHAR(20),
+    `reorderThreshold` INT(11)
+); 
+
+-- Warehouse
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 1, quantity = 25, itemLocation = 'Stock', reorderThreshold = 25
+WHERE siteID is null;
+
+-- Saint John
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 4, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+-- Sussex
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 5, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+-- Moncton
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 6, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+-- Dieppe
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 7, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+-- Oromocto
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 8, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+-- Fredericton
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 9, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+-- Miramichi
+insert into `inventory` (itemID) select itemID from item;
+UPDATE `inventory`
+SET siteID = 10, quantity = 5, itemLocation = 'Shelf', reorderThreshold = 5
+WHERE siteID is null;
+
+ALTER TABLE `inventory` 
+ADD FOREIGN KEY (siteID) REFERENCES `site` (`siteID`);
+
+ALTER TABLE `inventory`
+ADD FOREIGN KEY (itemID) REFERENCES `item` (`itemID`);
+
+ALTER TABLE `inventory`
+ADD PRIMARY KEY (itemID, siteID);
+
+-- Clear out current permissions
+DELETE FROM user_permission;
+
+--
+-- ADMIN
+--
+INSERT INTO user_permission (employeeID, permissionID) VALUES
+(1, 'ACCEPTSTOREORDER'),
+(1, 'ADDITEMTOBACKORDER'),
+(1, 'ADDNEWPRODUCT'),
+(1, 'ADDSITE'),
+(1, 'ADDUSER'),
+(1, 'CREATEBACKORDER'),
+(1, 'CREATELOSS'),
+(1, 'CREATEREPORT'),
+(1, 'CREATESTOREORDER'),
+(1, 'CREATESUPPLIERORDER'),
+(1, 'DELETELOCATION'),
+(1, 'DELETEUSER'),
+(1, 'DELIVERY'),
+(1, 'EDITINVENTORY'),
+(1, 'EDITITEM'),
+(1, 'EDITPRODUCT'),
+(1, 'EDITSITE'),
+(1, 'EDITUSER'),
+(1, 'FULFILSTOREORDER'),
+(1, 'MODIFYRECORD'),
+(1, 'MOVEINVENTORY'),
+(1, 'PREPARESTOREORDER'),
+(1, 'PROCESSRETURN'),
+(1, 'READUSER'),
+(1, 'RECEIVESTOREORDER'),
+(1, 'SETPERMISSION'),
+(1, 'VIEWORDERS');
+
+--
+-- WAREHOUSE MANAGER PERMISSIONS
+--
+INSERT INTO user_permission (employeeID, permissionID) VALUES
+(1003, 'ACCEPTSTOREORDER'),
+(1003, 'ADDITEMTOBACKORDER'),
+(1003, 'ADDNEWPRODUCT'),
+(1003, 'CREATEBACKORDER'),
+(1003, 'CREATELOSS'),
+(1003, 'CREATEREPORT'),
+(1003, 'CREATESTOREORDER'),
+(1003, 'CREATESUPPLIERORDER'),
+(1003, 'EDITINVENTORY'),
+(1003, 'EDITITEM'),
+(1003, 'EDITPRODUCT'),
+(1003, 'FULFILSTOREORDER'),
+(1003, 'MOVEINVENTORY'),
+(1003, 'PREPARESTOREORDER'),
+(1003, 'PROCESSRETURN'),
+(1003, 'READUSER'),
+(1003, 'RECEIVESTOREORDER'),
+(1003, 'VIEWORDERS');
+
+--
+-- WAREHOUSE WORKER PERMISSIONS
+--
+INSERT INTO user_permission (employeeID, permissionID) VALUES
+(1012,'CREATELOSS'),
+(1012,'FULFILSTOREORDER'),
+(1012,'MOVEINVENTORY'),
+(1012,'PREPARESTOREORDER'),
+(1012,'VIEWORDERS'),
+(1013,'CREATELOSS'),
+(1013,'FULFILSTOREORDER'),
+(1013,'MOVEINVENTORY'),
+(1013,'PREPARESTOREORDER'),
+(1013,'VIEWORDERS'),
+(1014,'CREATELOSS'),
+(1014,'FULFILSTOREORDER'),
+(1014,'MOVEINVENTORY'),
+(1014,'PREPARESTOREORDER'),
+(1014,'VIEWORDERS');
+
+--
+-- STORE MANAGER PERMISSIONS
+--
+INSERT INTO user_permission (employeeID, permissionID) VALUES
+(1002,'ACCEPTSTOREORDER'),
+(1002,'CREATELOSS'),
+(1002,'CREATEREPORT'),
+(1002,'CREATESTOREORDER'),
+(1002,'EDITINVENTORY'),
+(1002,'MOVEINVENTORY'),
+(1002,'PREPARESTOREORDER'),
+(1002,'PROCESSRETURN'),
+(1002,'READUSER'),
+(1002,'RECEIVESTOREORDER'),
+(1002,'VIEWORDERS'),
+
+(1005,'ACCEPTSTOREORDER'),
+(1005,'CREATELOSS'),
+(1005,'CREATEREPORT'),
+(1005,'CREATESTOREORDER'),
+(1005,'EDITINVENTORY'),
+(1005,'MOVEINVENTORY'),
+(1005,'PREPARESTOREORDER'),
+(1005,'PROCESSRETURN'),
+(1005,'READUSER'),
+(1005,'RECEIVESTOREORDER'),
+(1005,'VIEWORDERS'),
+
+(1006,'ACCEPTSTOREORDER'),
+(1006,'CREATELOSS'),
+(1006,'CREATEREPORT'),
+(1006,'CREATESTOREORDER'),
+(1006,'EDITINVENTORY'),
+(1006,'MOVEINVENTORY'),
+(1006,'PREPARESTOREORDER'),
+(1006,'PROCESSRETURN'),
+(1006,'READUSER'),
+(1006,'RECEIVESTOREORDER'),
+(1006,'VIEWORDERS'),
+
+(1007,'ACCEPTSTOREORDER'),
+(1007,'CREATELOSS'),
+(1007,'CREATEREPORT'),
+(1007,'CREATESTOREORDER'),
+(1007,'EDITINVENTORY'),
+(1007,'MOVEINVENTORY'),
+(1007,'PREPARESTOREORDER'),
+(1007,'PROCESSRETURN'),
+(1007,'READUSER'),
+(1007,'RECEIVESTOREORDER'),
+(1007,'VIEWORDERS'),
+
+(1008,'ACCEPTSTOREORDER'),
+(1008,'CREATELOSS'),
+(1008,'CREATEREPORT'),
+(1008,'CREATESTOREORDER'),
+(1008,'EDITINVENTORY'),
+(1008,'MOVEINVENTORY'),
+(1008,'PREPARESTOREORDER'),
+(1008,'PROCESSRETURN'),
+(1008,'READUSER'),
+(1008,'RECEIVESTOREORDER'),
+(1008,'VIEWORDERS'),
+
+(1009,'ACCEPTSTOREORDER'),
+(1009,'CREATELOSS'),
+(1009,'CREATEREPORT'),
+(1009,'CREATESTOREORDER'),
+(1009,'EDITINVENTORY'),
+(1009,'MOVEINVENTORY'),
+(1009,'PREPARESTOREORDER'),
+(1009,'PROCESSRETURN'),
+(1009,'READUSER'),
+(1009,'RECEIVESTOREORDER'),
+(1009,'VIEWORDERS'),
+
+(1010,'ACCEPTSTOREORDER'),
+(1010,'CREATELOSS'),
+(1010,'CREATEREPORT'),
+(1010,'CREATESTOREORDER'),
+(1010,'EDITINVENTORY'),
+(1010,'MOVEINVENTORY'),
+(1010,'PREPARESTOREORDER'),
+(1010,'PROCESSRETURN'),
+(1010,'READUSER'),
+(1010,'RECEIVESTOREORDER'),
+(1010,'VIEWORDERS');
+
+
+--
+-- CORPORATE MANAGER PERMISSIONS
+--
+INSERT INTO user_permission (employeeID, permissionID) VALUES
+(1000,'CREATEREPORT'),
+(1000,'READUSER'),
+(1000,'VIEWORDERS'),
+(1001,'CREATEREPORT'),
+(1001,'READUSER'),
+(1001,'VIEWORDERS');
+
 
 COMMIT;
 

@@ -17,6 +17,8 @@ INSERT INTO txn (txnID, siteIDTo, siteIDFrom, status, shipDate, txnType,createdD
 VALUES
 	(1001,6,1,'READY','2023-03-21','Store Order',CURDATE(),''),
 	(1002,7,1,'READY','2023-03-21','Store Order',CURDATE(),'');
+call OpenDelivery(1001, 4960);
+call OpenDelivery(1002, 4000);
 
 --
 -- Insert test records into txnItems table
