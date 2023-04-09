@@ -164,9 +164,7 @@ async function updateThreshold(){
 //Check permissions for processing returns/loss. Can be admin or the site of the current employee
 function checkReturnLossPermission(){
     let button = document.querySelector("#btnLossReturn");
-    console.log(`currentSite: ${currentSite}, employeeSite: ${currentEmployee.siteID}`);
     if(currentEmployee.positionID === 99999999 || +currentEmployee.siteID === +currentSite){
-        console.log("In condition");
         button.hidden = false;
     }
     else {

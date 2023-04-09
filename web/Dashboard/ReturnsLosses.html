@@ -28,6 +28,7 @@
             <div class="row">
                 <a href="ViewInventory.html" class="col-3 btn btn-primary"><i class="bi bi-arrow-return-left" id="togglePassword"></i>    Return to Inventory</a>
             </div>
+            <form id="processReturnLoss">
             <div class="card">
                 <div class="card-title text-center">
                     <h3>Process Return or Loss</h3>
@@ -43,40 +44,22 @@
                                             <input id="itemID" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
-                                            <label><b>Creation Date:</b></label>
-                                            <input id="creationDate" class="form-control" readonly/>
+                                            <label><b>Name:</b></label>
+                                            <input id="name" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
-                                            <label><b>Total Items Ordered:</b></label>
-                                            <input id="totalQtyOrdered" class="form-control" readonly/>
-                                        </div>
-                                    </div>
-                                    <div class="col createOrderPanelCol">
-                                        <div class="form-group">
-                                            <label><b>Site of Origin:</b></label>
-                                            <input id="originSite" class="form-control" readonly/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><b>Destination Site:</b></label>
-                                            <input id="destinationSite" class="form-control" readonly/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><b>Total Weight(kg):</b></label>
-                                            <input id="totalWeight" class="form-control" readonly/>
+                                            <label><b>Description:</b></label>
+                                            <input id="description" class="form-control" readonly/>
                                         </div>
                                     </div>
                                     <div class="col createOrderPanelCol">
                                         <div class="form-group">
-                                            <label><b>Status:</b></label>
-                                            <input id="status" class="form-control" readonly/>
+                                            <label><b>Quantity On-Hand:</b></label>
+                                            <input id="quantity" class="form-control" readonly/>
                                         </div>
                                         <div class="form-group">
-                                            <label><b>Ship Date:</b></label>
-                                            <input type="date" id="shipDate" class="form-control" readonly/>
-                                        </div>
-                                        <div class="form-group">
-                                            <label><b>Delivery ID:</b></label>
-                                            <input id="deliveryID" class="form-control" readonly/>
+                                            <label><b>SKU:</b></label>
+                                            <input id="sku" class="form-control" readonly/>
                                         </div>
                                     </div>
                                 </div>
@@ -84,29 +67,37 @@
                             </div>
                         </div>
                     </div>
-                    <div class= "prevent-select">
-                        <table class="table table-bordered table-striped ">
-                            <thead>
-                                <tr>
-                                    <th>Item ID</th>
-                                    <th>Description</th>
-                                    <th>Weight(kg)</th>
-                                    <th># Cases Ordered</th>
-                                    <th>Item Loaded</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orderTable">
-
-                            </tbody>
-                        </table>
+                    <div class= "card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="form-group col-6">
+                                    <label><b>Type:</b></label>
+                                    <select class="form-select" id="typeSelect">
+                                        <option value="Loss">Loss</option>
+                                        <option value="Return">Return</option>
+                                    </select>
+                                </div>
+                            <div class="form-check ms-5 pt-4 col-3">
+                              <input class="form-check-input" type="checkbox" value="" id="returnCheck" disabled>
+                              <label class="form-check-label" for="flexCheckDefault">
+                                  <b>Return to Inventory</b>
+                              </label>
+                            </div>
+                            </div>
+                            <div class="form-group">
+                                <label><b>Notes:</b></label>
+                                <textarea id="notes" class="form-control"  rows="3" required></textarea>
+                            </div>
+                        </div>
                     </div>
                     
                 </div>
             </div>
             <br>
             <div id="processOrderPanel" class="row justify-content-center">
-                <button id="completeFulfillment" type="button" class="btn btn-success col-5 btnSpacing" disabled>Complete Order Fulfillment</button>
+                <button id="submitReturnLoss" type="submit" class="btn btn-primary col-5 btnSpacing">Submit</button>
             </div>
+            </form>
             <!-- Button trigger modal -->
 
 
