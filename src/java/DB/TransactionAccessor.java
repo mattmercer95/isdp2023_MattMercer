@@ -41,6 +41,9 @@ public class TransactionAccessor {
     private static PreparedStatement getOnlineOrderIDs = null;
     private static PreparedStatement moveInventoryFromCurb = null;
     private static PreparedStatement cancelTransaction = null;
+    private static PreparedStatement returnLoss = null;
+    private static PreparedStatement incrementInventory = null;
+    private static PreparedStatement reduceInventory = null;
     
     private TransactionAccessor(){
         //no instant
@@ -83,6 +86,10 @@ public class TransactionAccessor {
                 getOnlineOrderIDs = conn.prepareStatement("call GetOpenOnlineIDs()");
                 moveInventoryFromCurb = conn.prepareStatement("call MoveInventoryFromCurb(?,?,?)");
                 cancelTransaction = conn.prepareStatement("update txn set status = 'CANCELLED' where txnID = ?");
+                returnLoss = conn.prepareStatement("insert into txn(siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, notes)"
+                        + "values(?, ?, 'CLOSED', now(), ?, 'X', now(), null, false, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                incrementInventory = conn.prepareStatement("update inventory set quantity = quantity + 1 where itemID = ? and siteID = ?");
+                reduceInventory = conn.prepareStatement("update inventory set quantity = quantity - 1 where itemID = ? and siteID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -93,6 +100,73 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean returnLoss(Transaction t){
+        boolean result = false;
+        
+        try {
+            if (!init()) {
+                return result;
+            }
+            //move items to store
+            returnLoss.setInt(1, t.getSiteIDFrom());
+            returnLoss.setInt(2, t.getSiteIDFrom());
+            returnLoss.setString(3, t.getTransactionType());
+            returnLoss.setString(4, t.getNotes());
+            int rc = returnLoss.executeUpdate();
+            if(rc <= 0){
+                return result;
+            }
+            //get generated key from insert
+            ResultSet rs = returnLoss.getGeneratedKeys();
+            rs.next();
+            int txnID = rs.getInt(1);
+            String type = t.getTransactionType();
+            //get the item affected, should only be 1 in list
+            TransactionItem item = t.getTransactionItems().get(0);
+            //update transaction items table
+            PreparedStatement insertTxnItem = conn.prepareStatement("insert into txnitems(txnID, ItemID, quantity) values (?, ?, 1)");
+            insertTxnItem.setInt(1, txnID);
+            insertTxnItem.setInt(2, item.getItemID());
+            rc = insertTxnItem.executeUpdate();
+            if(rc <= 0){
+                //failed update, return
+                return result;
+            }
+            
+            //check if inventory needs to be adjusted on a Loss or Return
+            if(type.equals("Return")){
+                incrementInventory.setInt(1, item.getItemID());
+                incrementInventory.setInt(2, t.getSiteIDFrom());
+                rc = incrementInventory.executeUpdate();
+                if(rc <= 0){
+                    //failed incremenet, return
+                    return result;
+                }
+            }
+            if(type.equals("Loss")){
+                reduceInventory.setInt(1, item.getItemID());
+                reduceInventory.setInt(2, t.getSiteIDFrom());
+                rc = reduceInventory.executeUpdate();
+                if(rc <= 0){
+                    //failed reduce, return
+                    return result;
+                }
+            }
+            
+            //update completed successfuly
+            result = true;
+            
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Processing Return/Loss");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        return result;
     }
     
     public static boolean cancelTransaction(Transaction t){

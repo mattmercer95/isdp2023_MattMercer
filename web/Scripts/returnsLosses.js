@@ -52,16 +52,11 @@ async function processReturnLoss(e){
 async function submitReturnLoss(type){
     //get notes
     let notes = document.querySelector("#notes").value;
-    console.log(currentItem);
+    let items = [currentItem];
     let obj = {
-        siteIDTo: currentItem.siteID,
         siteIDFrom: currentItem.siteID,
-        shipDate: null,
-        status: "CLOSED",
-        txnType: type,
-        barCode: "X",
-        deliveryID: null,
-        emergencyDelivery: false,
+        transactionType: type,
+        items: items,
         notes: notes
     };
     
@@ -70,8 +65,14 @@ async function submitReturnLoss(type){
         method: 'POST',
         body: JSON.stringify(obj)
     });
-    let respText = await resp.text;
-    console.log(respText);
+    let respText = await resp.json();
+    if(respText){
+        alert(`${type} recorded successfully for ${currentItem.name}.`);
+        window.location.href = "ViewInventory.html";
+    }
+    else {
+        alert("Something went wrong, please check server");
+    }
 }
 
 //checks if return or loss, disables return to inventory checkbox accordingly
