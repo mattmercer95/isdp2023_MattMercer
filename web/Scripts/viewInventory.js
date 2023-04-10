@@ -183,6 +183,10 @@ function checkPermissions(){
         if(p === "EDITITEM"){
             document.querySelector("#btnEditItemDetails").classList.remove("d-none");
         }
+        if(p === "ADDNEWPRODUCT"){
+            console.log("Remove");
+            document.querySelector("#btnAddNewProduct").hidden = false;
+        }
     });
 }
 

@@ -618,6 +618,33 @@ end if;
 end; //
 delimiter ;
 
+drop trigger if exists add_new_product;
+delimiter //
+create trigger add_new_product
+after insert
+on item for each row
+begin
+	DECLARE curSiteID INTEGER DEFAULT 0;
+	DECLARE finished INTEGER DEFAULT 0;
+	DEClARE curSite 
+			CURSOR FOR 
+				SELECT siteID FROM site where siteID not in (1,2,3,11,9999);
+	DECLARE CONTINUE HANDLER 
+			FOR NOT FOUND SET finished = 1;
+
+	insert into inventory(itemID, siteID, quantity, itemLocation, reorderThreshold) values (new.itemID, 1, 25, 'Shelf', 25);
+
+	Open curSite;
+	getSite: LOOP
+		FETCH curSite into curSiteID;
+        IF finished = 1 then
+			LEAVE getSite;
+        end if;
+        insert into inventory(itemID, siteID, quantity, itemLocation, reorderThreshold) values (new.itemID, curSiteID, 0, 'Shelf', 5);
+	end loop getSite;
+    close curSite;
+end; //
+delimiter ;
 /*
 	Add day of week numbers to locations
 */

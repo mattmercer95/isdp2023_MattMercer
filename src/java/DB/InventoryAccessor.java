@@ -26,6 +26,7 @@ public class InventoryAccessor {
     private static PreparedStatement updateThreshold = null;
     private static PreparedStatement updateItemDetails = null;
     private static PreparedStatement getOnlineInventory = null;
+    private static PreparedStatement addNewProduct = null;
     
     private InventoryAccessor(){
         
@@ -46,6 +47,8 @@ public class InventoryAccessor {
                 updateThreshold = conn.prepareStatement("update inventory set reorderThreshold = ? where itemID = ? and siteID = ?");
                 updateItemDetails = conn.prepareStatement("update item set name = ?, sku = ?, description = ?, category = ?, weight = ?, costPrice = ?, retailPrice = ?, supplierID = ?, active = ?, notes = ?, caseSize = ? where itemID = ?");
                 getOnlineInventory = conn.prepareStatement("call GetAvailableOnlineInventory(?)");
+                addNewProduct = conn.prepareStatement("insert into item (name, sku, description, category, weight, costPrice, retailPrice, supplierID, active, notes, caseSize)"
+                        + "values (?, ?, ?, ?, ?, ?, ?, ?, true, null, ?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -56,6 +59,37 @@ public class InventoryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static boolean addNewProduct(Item item){
+        boolean result = false;
+        
+        try{
+            if (!init())
+                return result;
+            addNewProduct.setString(1, item.getName());
+            addNewProduct.setString(2, item.getSKU());
+            addNewProduct.setString(3, item.getDescription());
+            addNewProduct.setString(4, item.getCategory());
+            addNewProduct.setDouble(5, item.getWeight());
+            addNewProduct.setDouble(6, item.getCostPrice());
+            addNewProduct.setDouble(7, item.getRetailPrice());
+            addNewProduct.setInt(8, item.getSupplierID());
+            addNewProduct.setInt(9, item.getCaseSize());
+            int rc = addNewProduct.executeUpdate();
+            if(rc > 0){
+                //successful call
+                result = true;
+            }
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error Adding New Product");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        return result;
     }
     
     public static ArrayList<Inventory> getOnlineInventory(int siteID){
