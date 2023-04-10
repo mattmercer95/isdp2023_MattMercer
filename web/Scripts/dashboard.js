@@ -33,6 +33,9 @@ window.onload = function () {
     document.querySelector("#deliveries").addEventListener('click', ()=>{
         window.location.href = "Dashboard/Deliveries.html";
     });
+    document.querySelector("#reports").addEventListener('click', ()=>{
+        window.location.href = "Dashboard/CreateReport.html";
+    });
     //initialize idle timeout
     resetIdleTimeout();
     checkPermissions();
@@ -52,6 +55,9 @@ function checkPermissions(){
         }
         if(p === "DELIVERY"){
             document.querySelector("#deliveries").hidden = false;
+        }
+        if(p === "CREATEREPORT"){
+            document.querySelector("#reports").hidden = false;
         }
     });
 }
