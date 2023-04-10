@@ -50,6 +50,13 @@ public class DeliveryService extends HttpServlet {
                 }
                 out.println(g.toJson(transactions));
             }
+            else if(uri.equals("/deliveryReport")){
+                Scanner sc = new Scanner(request.getReader());
+                String shipDate = sc.nextLine();
+                Delivery d = DeliveryAccessor.getDeliveryByShipDate(shipDate);
+                d.setTransactions(TransactionAccessor.getOrdersByDeliveryID(d.getDeliveryID()));
+                out.println(g.toJson(d));
+            }
             else if(uri.equals("/pickupDelivery")){
                 Scanner sc = new Scanner(request.getReader());
                 Delivery d = g.fromJson(sc.nextLine(), Delivery.class);

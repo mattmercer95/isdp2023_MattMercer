@@ -185,6 +185,15 @@ public class TransactionService extends HttpServlet {
                 ArrayList<OnlineOrderID> onlineOrderIDs = TransactionAccessor.getOnlineOrderIDs();
                 out.println(g.toJson(onlineOrderIDs));
             }
+            else if(uri.equals("/storeOrderReport")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactionsInRange(startDate, endDate);
+                out.println(g.toJson(transactions));
+            }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
                 //get zero item orders and add to list

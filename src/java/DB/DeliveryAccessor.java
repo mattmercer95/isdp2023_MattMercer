@@ -26,7 +26,8 @@ public class DeliveryAccessor {
     private static PreparedStatement pickupDelivery = null;
     private static PreparedStatement moveInventoryFromBayToTruck = null;
     private static PreparedStatement setDeliveredTime = null;
-    
+    private static PreparedStatement getDeliveryByShipDate = null;
+
     private DeliveryAccessor(){
         
     }
@@ -44,6 +45,7 @@ public class DeliveryAccessor {
                 pickupDelivery = conn.prepareStatement("call SetDeliveryPickupTime(?)");
                 moveInventoryFromBayToTruck = conn.prepareStatement("call MoveInventoryFromBayToTruck(?,?,?,?)");
                 setDeliveredTime = conn.prepareStatement("call SetDeliveredTime(?)");
+                getDeliveryByShipDate = conn.prepareStatement("call GetDeliveryByShipDate(?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -54,6 +56,45 @@ public class DeliveryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static Delivery getDeliveryByShipDate(String shipDate) {
+        Delivery result = null;
+        ResultSet rs;
+        try{
+            if (!init())
+                return result;
+            getDeliveryByShipDate.setString(1, shipDate);
+            rs = getDeliveryByShipDate.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Delivery");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+        
+        try {
+            rs.next();
+            result = new Delivery();
+            result.setDeliveryID(rs.getInt("deliveryID"));
+            result.setNumLocations(rs.getInt("numLocations"));
+            result.setDistanceCost(rs.getDouble("distanceCost"));
+            result.setWeight(rs.getDouble("totalWeight"));
+            result.setTruckSize(rs.getString("vehicleType"));
+            String shipDateString = rs.getString("shipDate");
+            result.setDeliveryDate(shipDateString.substring(0, shipDateString.length() - 9));
+            String pickupTime = (rs.getTime("deliveryStart") == null) ? "N/A" : rs.getTime("deliveryStart").toString();
+            result.setPickupTime(pickupTime);
+            String deliveredTime = (rs.getTime("deliveryEnd") == null) ? "N/A" : rs.getTime("deliveryEnd").toString();
+            result.setDeliveredTime(deliveredTime);
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Delivery Object");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        return result;
     }
     
     public static boolean pickupDelivery(Delivery d){

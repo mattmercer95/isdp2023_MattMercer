@@ -193,6 +193,16 @@ BEGIN
 END //
 DELIMITER ;
 
+drop procedure if exists GetDeliveryByShipDate;
+DELIMITER //
+create procedure GetDeliveryByShipDate(in inShipDate date)
+BEGIN
+	select deliveryID, status, count(siteIDTo) as numLocations, distanceCost, totalWeight, shipDate, deliveryStart, deliveryEnd, vehicleType 
+    from delivery inner join txn using (deliveryID) where shipDate = inShipDate 
+	group by deliveryID;
+END //
+DELIMITER ;
+
 /*
 Gets the items for a transaction by transactionID
 */
@@ -443,6 +453,19 @@ create procedure GetAllOrders()
 BEGIN
     Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
     from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID
+    group by txnID;
+END //
+DELIMITER ;
+
+/*
+Retreives the Information needed to display orders
+*/
+drop procedure if exists GetAllOrdersInDateRange;
+DELIMITER //
+create procedure GetAllOrdersInDateRange(in inStartDate date, in inEndDate date)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Store Order"
     group by txnID;
 END //
 DELIMITER ;
