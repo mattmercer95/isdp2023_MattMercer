@@ -191,7 +191,46 @@ public class TransactionService extends HttpServlet {
                 String[] pieces = dates.split(":");
                 String startDate = pieces[0];
                 String endDate = pieces[1];
-                ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactionsInRange(startDate, endDate);
+                int siteID = Integer.parseInt(pieces[2]);
+                ArrayList<Transaction> transactions;
+                if(siteID == 0){
+                    transactions = TransactionAccessor.getAllTransactionsInRange(startDate, endDate);
+                }
+                else {
+                    transactions = TransactionAccessor.getTransactionsInRangeBySiteID(startDate, endDate, siteID);
+                }
+                out.println(g.toJson(transactions));
+            }
+            else if(uri.equals("/regularOrders")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                int siteID = Integer.parseInt(pieces[2]);
+                ArrayList<Transaction> transactions;
+                if(siteID == 0){
+                    transactions = TransactionAccessor.getAllRegularOrdersInRange(startDate, endDate);
+                }
+                else {
+                    transactions = TransactionAccessor.getRegularOrdersInRangeBySiteID(startDate, endDate, siteID);
+                }
+                out.println(g.toJson(transactions));
+            }
+            else if(uri.equals("/emergencyOrders")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                int siteID = Integer.parseInt(pieces[2]);
+                ArrayList<Transaction> transactions;
+                if(siteID == 0){
+                    transactions = TransactionAccessor.getAllEmergencyOrdersInRange(startDate, endDate);
+                }
+                else {
+                    transactions = TransactionAccessor.getEmergencyOrdersInRangeBySiteID(startDate, endDate, siteID);
+                }
                 out.println(g.toJson(transactions));
             }
             else {

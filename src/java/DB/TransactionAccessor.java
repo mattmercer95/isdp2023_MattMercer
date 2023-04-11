@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 public class TransactionAccessor {
     private static Connection conn = null;
+    private static PreparedStatement getTransactionsInRangeBySiteID = null;
     private static PreparedStatement getAllTransactions = null;
     private static PreparedStatement getAllTransactionsInRange = null;
     private static PreparedStatement getAllOpenStoreOrders = null;
@@ -46,7 +47,11 @@ public class TransactionAccessor {
     private static PreparedStatement returnLoss = null;
     private static PreparedStatement incrementInventory = null;
     private static PreparedStatement reduceInventory = null;
-    
+    private static PreparedStatement allRegularOrders = null;
+    private static PreparedStatement regularOrdersBySiteID = null;
+    private static PreparedStatement allEmergencyOrders = null;
+    private static PreparedStatement emergencyOrdersBySiteID = null;
+
     private TransactionAccessor(){
         //no instant
     }
@@ -66,8 +71,13 @@ public class TransactionAccessor {
         if (conn != null)            
             try {
                 System.out.println("Connection was not null");
+                allRegularOrders = conn.prepareStatement("call GetAllRegularOrdersInDateRange(?,?)");
+                regularOrdersBySiteID = conn.prepareStatement("call GetRegularOrdersInDateRangeBySite(?,?,?)");
+                allEmergencyOrders = conn.prepareStatement("call GetAllEmergencyOrdersInDateRange(?,?)");
+                emergencyOrdersBySiteID = conn.prepareStatement("call GetEmergencyOrdersInDateRangeBySite(?,?,?)");
                 getAllTransactions = conn.prepareStatement("call GetAllOrders()");
                 getAllTransactionsInRange = conn.prepareStatement("call GetAllOrdersInDateRange(?,?)");
+                getTransactionsInRangeBySiteID = conn.prepareStatement("call GetOrdersInDateRangeBySite(?,?,?)");
                 getAllOpenStoreOrders = conn.prepareStatement("call GetOpenStoreOrderCount(?)");
                 getAllOpenEmergencyStoreOrders = conn.prepareStatement("call GetOpenEmergencyStoreOrderCount(?)");
                 createNewStoreOrder = conn.prepareStatement("call CreateNewStoreOrder(?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
@@ -104,6 +114,192 @@ public class TransactionAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+
+    public static ArrayList<Transaction> getAllEmergencyOrdersInRange(String startDate, String endDate) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            allEmergencyOrders.setString(1, startDate);
+            allEmergencyOrders.setString(2, endDate);
+            rs = allEmergencyOrders.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+
+    public static ArrayList<Transaction> getEmergencyOrdersInRangeBySiteID(String startDate, String endDate, int siteID) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            emergencyOrdersBySiteID.setString(1, startDate);
+            emergencyOrdersBySiteID.setString(2, endDate);
+            emergencyOrdersBySiteID.setInt(3, siteID);
+            rs = emergencyOrdersBySiteID.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+    
+    public static ArrayList<Transaction> getAllRegularOrdersInRange(String startDate, String endDate) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            allRegularOrders.setString(1, startDate);
+            allRegularOrders.setString(2, endDate);
+            rs = allRegularOrders.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+
+    public static ArrayList<Transaction> getRegularOrdersInRangeBySiteID(String startDate, String endDate, int siteID) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            regularOrdersBySiteID.setString(1, startDate);
+            regularOrdersBySiteID.setString(2, endDate);
+            regularOrdersBySiteID.setInt(3, siteID);
+            rs = regularOrdersBySiteID.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
     }
     
     public static boolean returnLoss(Transaction t){
@@ -925,6 +1121,53 @@ public class TransactionAccessor {
             getAllTransactionsInRange.setString(1, startDate);
             getAllTransactionsInRange.setString(2, endDate);
             rs = getAllTransactionsInRange.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+    
+    public static ArrayList<Transaction> getTransactionsInRangeBySiteID(String startDate, String endDate, int siteID){
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            getTransactionsInRangeBySiteID.setString(1, startDate);
+            getTransactionsInRangeBySiteID.setString(2, endDate);
+            getTransactionsInRangeBySiteID.setInt(3, siteID);
+            rs = getTransactionsInRangeBySiteID.executeQuery();
         } catch(SQLException ex){
             System.err.println("************************");
             System.err.println("** Error retreiving Transaction List");

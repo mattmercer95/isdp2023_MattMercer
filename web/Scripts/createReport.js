@@ -22,8 +22,24 @@ window.onload = async function(){
     document.querySelector("#reportSelect").addEventListener('input', toggleInputs);
     document.querySelector("#frmCreateReport").addEventListener('submit', submitReport);
     resetIdleTimeout();
+    await loadLocations();
     toggleInputs();
 };
+
+async function loadLocations(){
+    let url = `../SiteService/retailLocations`;
+    let resp = await fetch(url, {
+        method: 'GET'
+    });
+    let locations = await resp.json();
+    let selector = document.querySelector("#locationSelect");
+    locations.forEach((l)=>{
+        let optionEle = document.createElement("option");
+        optionEle.value = l.siteID;
+        optionEle.innerHTML = l.name;
+        selector.appendChild(optionEle);
+    });
+}
 
 async function deliveryReportAPI(date){
     let url = `../DeliveryService/deliveryReport`;
@@ -53,11 +69,11 @@ async function submitDeliveryReport(){
     }
 }
 
-async function storeOrderReportAPI(startDate, endDate){
+async function storeOrderReportAPI(startDate, endDate, location){
     let url = `../TransactionService/storeOrderReport`;
     let resp = await fetch(url, {
         method: 'POST',
-        body: startDate + ":" + endDate
+        body: startDate + ":" + endDate + ":" + location 
     });
     let reportData = await resp.json();
     let report = {
@@ -71,14 +87,162 @@ async function submitStoreOrderReport(){
     //get date range
     let startDate = document.querySelector("#startDate").value;
     let endDate = document.querySelector("#endDate").value;
-    let report = await storeOrderReportAPI(startDate, endDate);
+    let location = document.querySelector("#locationSelect").value;
+    let report = await storeOrderReportAPI(startDate, endDate, location);
     if(report.success){
+        report.type = "storeOrderReport";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
         //window.location.href = "SelectReport.html";
         console.log(report.reportData);
     }
     else {
         alert("Error: No store orders found in this date range.");
+    }
+}
+
+async function submitShippingReceiptReport(){
+    //get date range
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let report = await storeOrderReportAPI(startDate, endDate, 0);
+    if(report.success){
+        report.type = "shippingReceiptReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No store orders found in this date range.");
+    }
+}
+
+async function inventoryReportAPI(location){
+    let url = "../InventoryService/";
+    if(+location === 0){
+        url += "allDetailed";
+    }
+    else {
+        url += "detailedBySite";
+    }
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: location 
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitInventoryReport(){
+    let location = document.querySelector("#locationSelect").value;
+    let report = await inventoryReportAPI(location);
+    if(report.success){
+        report.type = "inventory";
+        report.location = location;
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        sessionStorage.setItem("reportLocation", report.location);
+        //window.location.href = "ViewReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No store orders found in this date range.");
+    }
+}
+
+async function regularOrderReportAPI(startDate, endDate, location){
+    let url = "../TransactionService/regularOrders";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: startDate + ":" + endDate + ":" + location 
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitRegularOrderReport(){
+    //get date range
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let location = document.querySelector("#locationSelect").value;
+    let report = await regularOrderReportAPI(startDate, endDate, location);
+    if(report.success){
+        report.type = "regularOrderReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No regular store orders found in this date range.");
+    }
+}
+
+async function emergencyOrderReportAPI(startDate, endDate, location){
+    let url = "../TransactionService/emergencyOrders";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: startDate + ":" + endDate + ":" + location 
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitEmergencyOrderReport(){
+    //get date range
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let location = document.querySelector("#locationSelect").value;
+    let report = await emergencyOrderReportAPI(startDate, endDate, location);
+    if(report.success){
+        report.type = "emergencyOrderReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No emergency store orders found in this date range.");
+    }
+}
+
+async function userReportAPI(){
+    let url = "../UserService/all";
+    let resp = await fetch(url, {
+        method: 'GET'
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitUserReport(){
+    let report = await userReportAPI();
+    if(report.success){
+        report.type = "user";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: Something went wrong, please check server.");
     }
 }
 
@@ -93,14 +257,19 @@ async function submitReport(e){
             await submitStoreOrderReport();
             break;
         case "shippingReceipt":
+            await submitStoreOrderReport(); //Going to use the same, user picks which order to view on the next screen
             break;
         case "inventory":
+            await submitInventoryReport();
             break;
         case "orders":
+            await submitRegularOrderReport();
             break;
         case "emergencyOrders":
+            await submitEmergencyOrderReport();
             break;
         case "users":
+            await submitUserReport();
             break;
         case "backorders":
             break;

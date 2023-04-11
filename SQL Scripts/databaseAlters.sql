@@ -470,6 +470,55 @@ BEGIN
 END //
 DELIMITER ;
 
+drop procedure if exists GetOrdersInDateRangeBySite;
+DELIMITER //
+create procedure GetOrdersInDateRangeBySite(in inStartDate date, in inEndDate date, in inSiteID int)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Store Order" and siteIDTo = inSiteID
+    group by txnID;
+END //
+DELIMITER ;
+
+drop procedure if exists GetAllRegularOrdersInDateRange;
+DELIMITER //
+create procedure GetAllRegularOrdersInDateRange(in inStartDate date, in inEndDate date)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Store Order" and emergencyDelivery = false
+    group by txnID;
+END //
+DELIMITER ;
+
+drop procedure if exists GetRegularOrdersInDateRangeBySite;
+DELIMITER //
+create procedure GetRegularOrdersInDateRangeBySite(in inStartDate date, in inEndDate date, in inSiteID int)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Store Order" and siteIDTo = inSiteID and emergencyDelivery = false
+    group by txnID;
+END //
+DELIMITER ;
+
+drop procedure if exists GetAllEmergencyOrdersInDateRange;
+DELIMITER //
+create procedure GetAllEmergencyOrdersInDateRange(in inStartDate date, in inEndDate date)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Store Order" and emergencyDelivery = true
+    group by txnID;
+END //
+DELIMITER ;
+
+drop procedure if exists GetEmergencyOrdersInDateRangeBySite;
+DELIMITER //
+create procedure GetEmergencyOrdersInDateRangeBySite(in inStartDate date, in inEndDate date, in inSiteID int)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Store Order" and siteIDTo = inSiteID and emergencyDelivery = true
+    group by txnID;
+END //
+DELIMITER ;
 /*
 Retreives the Information needed to display orders
 */
