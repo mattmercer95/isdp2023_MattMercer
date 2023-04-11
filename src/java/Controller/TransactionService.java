@@ -233,6 +233,22 @@ public class TransactionService extends HttpServlet {
                 }
                 out.println(g.toJson(transactions));
             }
+            else if(uri.equals("/backorders")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                int siteID = Integer.parseInt(pieces[2]);
+                ArrayList<Transaction> transactions;
+                if(siteID == 0){
+                    transactions = TransactionAccessor.getAllBackordersInRange(startDate, endDate);
+                }
+                else {
+                    transactions = TransactionAccessor.getBackordersInRangeBySiteID(startDate, endDate, siteID);
+                }
+                out.println(g.toJson(transactions));
+            }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();
                 //get zero item orders and add to list

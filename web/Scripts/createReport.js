@@ -1,6 +1,6 @@
 let currentEmployee;
 const idleDurationMins = 15;
-const redirectUrl = "index.html";
+const redirectUrl = "../index.html";
 let idleTimeout;
 
 window.onload = async function(){
@@ -246,6 +246,38 @@ async function submitUserReport(){
     }
 }
 
+async function backorderReportAPI(startDate, endDate, location){
+    let url = "../TransactionService/backorders";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: startDate + ":" + endDate + ":" + location 
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitBackorderReport(){
+    //get date range
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let location = document.querySelector("#locationSelect").value;
+    let report = await backorderReportAPI(startDate, endDate, location);
+    if(report.success){
+        report.type = "backorderReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No backorders found in this date range.");
+    }
+}
+
 async function submitReport(e){
     e.preventDefault();
     let value = document.querySelector("#reportSelect").value;
@@ -272,6 +304,7 @@ async function submitReport(e){
             await submitUserReport();
             break;
         case "backorders":
+            await submitBackorderReport();
             break;
         case "supplierOrder":
             break;
