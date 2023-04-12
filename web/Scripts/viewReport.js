@@ -30,8 +30,8 @@ window.onload = async function(){
 
 function generatePDF(){
     // Choose the element that your content will be rendered to.
-    console.log(reportType);
     const element = document.getElementById(`card${reportType}`);
+    console.log(`card${reportType}`);
     var opt = {
         margin:0,
         filename: `${reportType} Report ${Date.now()}`,
@@ -39,7 +39,6 @@ function generatePDF(){
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    console.log("hello");
     // Choose the element and save the PDF for your user.
     html2pdf().set(opt).from(element).save();
 }
@@ -124,6 +123,66 @@ async function loadDeliveryReport(){
     console.log(route);
 }
 
+async function loadInventoryReport(){
+    //load data panel
+    document.querySelector("#cardInventory").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#invItemsTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    document.querySelector("#invLocation").innerHTML = currentlocation;
+    currentReport.forEach((item)=>{
+        //create row and data cells
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        idCell.innerHTML = item.itemID;
+        row.appendChild(idCell);
+        const activeCell = document.createElement("td");
+        const activeBadge = document.createElement("span");
+        activeBadge.classList.add("badge");
+        if(item.active){
+            activeBadge.innerHTML = "Active";
+            activeBadge.classList.add("text-bg-success");
+        }
+        else {
+            activeBadge.innerHTML = "Inactive";
+            activeBadge.classList.add("text-bg-danger");
+        }
+        activeCell.appendChild(activeBadge);
+        row.appendChild(activeCell);
+        const siteCell = document.createElement("td");
+        siteCell.innerHTML = item.siteName;
+        row.appendChild(siteCell);
+        const nameCell = document.createElement("td");
+        row.appendChild(nameCell);
+        const descriptionCell = document.createElement("td");
+        descriptionCell.innerHTML = item.description;
+        row.appendChild(descriptionCell);
+        const catCell = document.createElement("td");
+        catCell.innerHTML = item.category;
+        row.appendChild(catCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = item.weight.toFixed(2);
+        row.appendChild(weightCell);
+        const costCell = document.createElement("td");
+        costCell.innerHTML = item.costPrice.toFixed(2);
+        row.appendChild(costCell);
+        const retailCell = document.createElement("td");
+        retailCell.innerHTML = item.retailPrice.toFixed(2);
+        row.appendChild(retailCell);
+        const qtyCell = document.createElement("td");
+        qtyCell.innerHTML = item.itemQuantityOnHand;
+        row.appendChild(qtyCell);
+        const reorderCell = document.createElement("td");
+        reorderCell.innerHTML = item.reorderThreshold;
+        row.appendChild(reorderCell);
+        const caseSizeCell = document.createElement("td");
+        caseSizeCell.innerHTML = item.caseSize;
+        row.appendChild(caseSizeCell);
+        //add row to table
+        table.appendChild(row);
+    });
+}
+
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -131,6 +190,9 @@ async function loadReportType(){
     switch(reportType){
         case "Delivery":
             await loadDeliveryReport();
+            break;
+        case "Inventory":
+            await loadInventoryReport();
             break;
         default:
             break;

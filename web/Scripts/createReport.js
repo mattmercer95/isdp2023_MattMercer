@@ -35,7 +35,7 @@ async function loadLocations(){
     let selector = document.querySelector("#locationSelect");
     locations.forEach((l)=>{
         let optionEle = document.createElement("option");
-        optionEle.value = l.siteID;
+        optionEle.value = l.siteID + "," + l.name;
         optionEle.innerHTML = l.name;
         selector.appendChild(optionEle);
     });
@@ -139,16 +139,16 @@ async function inventoryReportAPI(location){
 }
 
 async function submitInventoryReport(){
-    let location = document.querySelector("#locationSelect").value;
-    let report = await inventoryReportAPI(location);
+    let locationCSV = document.querySelector("#locationSelect").value;
+    let pieces = locationCSV.split(",");
+    let report = await inventoryReportAPI(+pieces[0]);
     if(report.success){
-        report.type = "inventory";
+        report.type = "Inventory";
         report.location = location;
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
-        sessionStorage.setItem("reportLocation", report.location);
-        //window.location.href = "ViewReport.html";
-        console.log(report.reportData);
+        sessionStorage.setItem("reportLocation", pieces[1]);
+        window.location.href = "ViewReport.html";
     }
     else {
         alert("Error: No store orders found in this date range.");
@@ -173,12 +173,15 @@ async function submitRegularOrderReport(){
     //get date range
     let startDate = document.querySelector("#startDate").value;
     let endDate = document.querySelector("#endDate").value;
-    let location = document.querySelector("#locationSelect").value;
+    let locationCSV = document.querySelector("#locationSelect").value;
+    let pieces = locationCSV.split(",");
+    let location = +pieces[0];
     let report = await regularOrderReportAPI(startDate, endDate, location);
     if(report.success){
-        report.type = "regularOrderReport";
+        report.type = "Regular Order";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
+        sessionStorage.setItem("reportLocation", pieces[1]);
         //window.location.href = "SelectReport.html";
         console.log(report.reportData);
     }

@@ -91,6 +91,39 @@
                     
                 </div>
             </div>
+            <div id="cardInventory" class="card" hidden>
+                <div class="card-title text-center">
+                    <h3>Inventory Report</h3>
+                    <h4>Location: <span id="invLocation"></span></h4>
+                </div>
+                <div class="card-body">
+                    <div class=" prevent-select row">
+                        <table  class="table table-bordered table-striped ">
+                            <thead>
+                                <tr>
+                                    <th>Item ID</th>
+                                    <th>Active/Inactive</th>
+                                    <th>Site</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Weight(Kg)</th>
+                                    <th>Cost($)</th>
+                                    <th>Price($)</th>
+                                    <th># On-Hand</th>
+                                    <th>Reorder Threshold</th>
+                                    <th>Case Size</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="invItemsTable">
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
             <!-- Button trigger modal -->
 
 
