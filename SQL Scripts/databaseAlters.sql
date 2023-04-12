@@ -770,10 +770,15 @@ delimiter ;
 
 drop view if exists auditReport;
 create view auditReport as 
-SELECT txnaudit.*, employee.firstName, employee.lastName, posn.permissionLevel, site.name
-FROM bullseyedb2023.txnaudit inner join employee using (employeeID) inner join posn using (positionID) inner join site using(siteID)
+SELECT txnaudit.*, employee.firstName, employee.lastName, posn.permissionLevel, site.name as siteName
+FROM bullseyedb2023.txnaudit inner join employee using (employeeID) inner join posn using (positionID) inner join site on site.siteID = employee.siteID
 order by txnAuditID;
 
+drop view if exists deliveryRoute;
+create view deliveryRoute as
+select delivery.*, txn.txnID, txn.shipDate, site.name as Location, site.distanceFromWH 
+from txn inner join delivery using (deliveryID) inner join site on txn.siteIDTo = site.siteID
+order by distanceFromWH;
 
 /*
 	Add day of week numbers to locations

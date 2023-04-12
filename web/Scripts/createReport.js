@@ -60,9 +60,9 @@ async function submitDeliveryReport(){
     let date = document.querySelector("#singleDate").value;
     let report = await deliveryReportAPI(date);
     if(report.success){
+        sessionStorage.setItem("reportType", "Delivery");
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
-        //window.location.href = "ViewReport.html";
-        console.log(report.reportData);
+        window.location.href = "ViewReport.html";
     }
     else {
         alert("Error: No delivery reports found for this date.");

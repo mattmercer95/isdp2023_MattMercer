@@ -7,6 +7,7 @@ package Controller;
 import DB.DeliveryAccessor;
 import DB.TransactionAccessor;
 import Entity.Delivery;
+import Entity.RouteItem;
 import Entity.Transaction;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -68,6 +69,12 @@ public class DeliveryService extends HttpServlet {
                 int transactionID = Integer.parseInt(sc.nextLine());
                 boolean result = TransactionAccessor.changeStatusToDelivered(transactionID);
                 out.println(g.toJson(result));
+            }
+            else if(uri.equals("/getRoute")){
+                Scanner sc = new Scanner(request.getReader());
+                int deliveryID = Integer.parseInt(sc.nextLine());
+                ArrayList<RouteItem> route = DeliveryAccessor.getRoute(deliveryID);
+                out.println(g.toJson(route));
             }
             else if(uri.equals("/checkIfComplete")){
                 Scanner sc = new Scanner(request.getReader());

@@ -6,6 +6,7 @@ package DB;
 
 import Entity.Delivery;
 import Entity.Item;
+import Entity.RouteItem;
 import Entity.Transaction;
 import Entity.TransactionItem;
 import java.sql.Connection;
@@ -27,6 +28,7 @@ public class DeliveryAccessor {
     private static PreparedStatement moveInventoryFromBayToTruck = null;
     private static PreparedStatement setDeliveredTime = null;
     private static PreparedStatement getDeliveryByShipDate = null;
+    private static PreparedStatement getRoute = null;
 
     private DeliveryAccessor(){
         
@@ -46,6 +48,7 @@ public class DeliveryAccessor {
                 moveInventoryFromBayToTruck = conn.prepareStatement("call MoveInventoryFromBayToTruck(?,?,?,?)");
                 setDeliveredTime = conn.prepareStatement("call SetDeliveredTime(?)");
                 getDeliveryByShipDate = conn.prepareStatement("call GetDeliveryByShipDate(?)");
+                getRoute = conn.prepareStatement("select deliveryID, txnID, distanceFromWH, Location, address from deliveryRoute where deliveryID = ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -56,6 +59,43 @@ public class DeliveryAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<RouteItem> getRoute(int deliveryID){
+        ArrayList<RouteItem> route = new ArrayList<RouteItem>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return route;
+            getRoute.setInt(1, deliveryID);
+            rs = getRoute.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Route");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return route;
+        }
+        
+        try {
+            while (rs.next()) {
+                RouteItem temp = new RouteItem();
+                temp.setDeliveryID(rs.getInt(1));
+                temp.setOrderID(rs.getInt(2));
+                temp.setDistanceFromWH(rs.getInt(3));
+                temp.setLocation(rs.getString(4));
+                temp.setAddress(rs.getString(5));
+                route.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Transaction List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return route;
     }
     
     public static Delivery getDeliveryByShipDate(String shipDate) {
