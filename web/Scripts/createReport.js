@@ -87,13 +87,18 @@ async function submitStoreOrderReport(){
     //get date range
     let startDate = document.querySelector("#startDate").value;
     let endDate = document.querySelector("#endDate").value;
-    let location = document.querySelector("#locationSelect").value;
+    let locationCSV = document.querySelector("#locationSelect").value;
+    let pieces = locationCSV.split(",");
+    let location = +pieces[0];
     let report = await storeOrderReportAPI(startDate, endDate, location);
     if(report.success){
-        report.type = "storeOrderReport";
+        report.type = "Store Order";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
-        //window.location.href = "SelectReport.html";
+        sessionStorage.setItem("reportLocation", pieces[1]);
+        sessionStorage.setItem("reportStart", startDate);
+        sessionStorage.setItem("reportEnd", endDate);
+        window.location.href = "SelectReport.html";
         console.log(report.reportData);
     }
     else {
