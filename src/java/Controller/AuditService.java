@@ -63,6 +63,9 @@ public class AuditService extends HttpServlet {
             else if(uri.equals("/received")){
                 Scanner sc = new Scanner(request.getReader());
                 TxnAudit auditItem = g.fromJson(sc.nextLine(), TxnAudit.class);
+                if(auditItem.getTxnDate().equals("-1")){
+                    auditItem.setTxnDate(getCurrentTimeStamp());
+                }
                 boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
                 out.println(g.toJson(result));
             }
@@ -77,7 +80,13 @@ public class AuditService extends HttpServlet {
             }
         }
     }
-
+    //Helper function for getting the current time in the MySQL datetime format
+    private String getCurrentTimeStamp(){
+        java.util.Date dt = new java.util.Date();
+        java.text.SimpleDateFormat sdf = 
+             new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(dt);
+    }
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

@@ -140,7 +140,7 @@ public class TransactionService extends HttpServlet {
             else if(uri.equals("/returnLoss")){
                 Scanner sc = new Scanner(request.getReader());
                 Transaction t = g.fromJson(sc.nextLine(), Transaction.class);
-                boolean submitted = TransactionAccessor.returnLoss(t);
+                int submitted = TransactionAccessor.returnLoss(t);
                 out.println(g.toJson(submitted));
             }
             else if(uri.equals("/newOnlineOrder")){

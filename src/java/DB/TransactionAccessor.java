@@ -596,8 +596,8 @@ public class TransactionAccessor {
         return transactions;
     }
     
-    public static boolean returnLoss(Transaction t){
-        boolean result = false;
+    public static int returnLoss(Transaction t){
+        int result = 0;
         
         try {
             if (!init()) {
@@ -616,6 +616,7 @@ public class TransactionAccessor {
             ResultSet rs = returnLoss.getGeneratedKeys();
             rs.next();
             int txnID = rs.getInt(1);
+            result = txnID;
             String type = t.getTransactionType();
             //get the item affected, should only be 1 in list
             TransactionItem item = t.getTransactionItems().get(0);
@@ -648,9 +649,7 @@ public class TransactionAccessor {
                     return result;
                 }
             }
-            
-            //update completed successfuly
-            result = true;
+           
             
         } catch (SQLException ex) {
             System.err.println("************************");

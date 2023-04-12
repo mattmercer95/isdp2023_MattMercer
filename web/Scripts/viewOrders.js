@@ -93,6 +93,7 @@ async function createNewSupplierOrder(){
     if(newOrderID > 0){
         //successful order creation
         sessionStorage.setItem("currentOrderID", newOrderID);
+        await logTransaction(newOrderID, -1, 1);
         window.location.href = "CreateOrder.html";
     }
     else {
@@ -231,11 +232,17 @@ async function logTransaction(orderID, emergencyOrder, origin){
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
-
+    let txnType;
+    if(emergencyOrder === -1){
+        txnType = "Supplier Order";
+    }
+    else {
+        txnType = (emergencyOrder) ? 'Emergency' : 'Regular'
+    }
     today = `${yyyy}-${mm}-${dd}`;
     let obj = {
         txnID: orderID,
-        txnType: (emergencyOrder) ? 'Emergency' : 'Regular',
+        txnType: txnType,
         status: "NEW",
         txnDate: today,
         siteID: +origin,

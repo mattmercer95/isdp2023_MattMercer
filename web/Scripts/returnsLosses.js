@@ -66,13 +66,30 @@ async function submitReturnLoss(type){
         body: JSON.stringify(obj)
     });
     let respText = await resp.json();
-    if(respText){
+    if(respText > 0){
         alert(`${type} recorded successfully for ${currentItem.name}.`);
-        window.location.href = "ViewInventory.html";
+        await LogTransaction(obj, respText);
+        //window.location.href = "ViewInventory.html";
     }
     else {
         alert("Something went wrong, please check server");
     }
+}
+
+async function LogTransaction(obj, id){
+    obj.txnDate = "-1";
+    obj.txnType = obj.transactionType;
+    obj.status = "CLOSED";
+    obj.txnID = id;
+    obj.deliveryID = 0;
+    obj.employeeID = currentEmployee.employeeID;
+    obj.siteID = currentItem.siteID;
+    let url = `../AuditService/received`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    });
+    console.log(await resp.text());
 }
 
 //checks if return or loss, disables return to inventory checkbox accordingly
