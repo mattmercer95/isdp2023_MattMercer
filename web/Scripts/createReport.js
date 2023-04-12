@@ -326,13 +326,17 @@ async function submitSupplierOrderReport(){
 async function submitReturnsDamageLossReport(){
     let startDate = document.querySelector("#startDate").value;
     let endDate = document.querySelector("#endDate").value;
-    let location = document.querySelector("#locationSelect").value;
-    let report = await returnsDamageLossReportAPI(startDate, endDate, location);
+    let locationCSV = document.querySelector("#locationSelect").value;
+    let pieces = locationCSV.split(",");
+    let report = await returnsDamageLossReportAPI(startDate, endDate, +pieces[0]);
     if(report.success){
-        report.type = "returnsDamageLossReport";
+        report.type = "Returns Damages Losses";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
-        //window.location.href = "SelectReport.html";
+        sessionStorage.setItem("reportLocation", pieces[1]);
+        sessionStorage.setItem("reportStart", startDate);
+        sessionStorage.setItem("reportEnd", endDate);
+        window.location.href = "ViewReport.html";
         console.log(report.reportData);
     }
     else {
@@ -364,7 +368,7 @@ async function submitAuditReport(){
         sessionStorage.setItem("reportType", report.type);
         sessionStorage.setItem("reportStart", startDate);
         sessionStorage.setItem("reportEnd", endDate);
-        window.location.href = "ViewReport.html";
+            window.location.href = "ViewReport.html";
         console.log(report.reportData);
     }
     else {

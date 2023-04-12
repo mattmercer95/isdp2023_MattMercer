@@ -11,15 +11,23 @@ import java.util.ArrayList;
  * @author mattm
  */
 public class Transaction {
-    private int transactionID, siteIDTo, siteIDFrom, deliveryID, quantity;
+    private int transactionID, siteIDTo, siteIDFrom, deliveryID, quantity, itemID;
     private double totalWeight;
     private String origin, destination, destinationAddress, status, shipDate, transactionType, barCode, 
-            createdDate, notes;
+            createdDate, notes, itemName;
     private boolean emergencyDelivery;
     private ArrayList<TransactionItem> items;
 
     public boolean isEmergencyDelivery() {
         return emergencyDelivery;
+    }
+
+    public void setItemID(int itemID) {
+        this.itemID = itemID;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
     
     public Transaction(){

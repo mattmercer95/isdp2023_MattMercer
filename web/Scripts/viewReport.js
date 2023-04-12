@@ -525,6 +525,52 @@ async function loadAuditReport(){
         table.appendChild(row);
     });
 }
+
+async function loadReturnsDamagesLossesReport(){
+    //load data panel
+    document.querySelector("#cardReturnsDamageLoss").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#boOrdersTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    document.querySelector("#rdlLocation").innerHTML = currentlocation;
+    document.querySelector("#rdlStart").innerHTML = sessionStorage.getItem("reportStart");
+    document.querySelector("#rdlEnd").innerHTML = sessionStorage.getItem("reportEnd");
+    let returnsTable = document.querySelector("#returnTable");
+    buildSubTable(returnsTable, currentReport.returns);
+    let damagesTable = document.querySelector("#damageTable");
+    buildSubTable(damagesTable, currentReport.damage);
+    let lossTable = document.querySelector("#lossTable");
+    buildSubTable(lossTable, currentReport.loss);
+}
+
+function buildSubTable(table, data){
+    data.forEach((item)=>{
+        let row = document.createElement("tr");
+        let idCell = document.createElement("td");
+        idCell.innerHTML = item.transactionID;
+        row.appendChild(idCell);
+        let dateCell = document.createElement("td");
+        dateCell.innerHTML = item.shipDate;
+        row.appendChild(dateCell);
+        let locationCell = document.createElement("td");
+        locationCell.innerHTML = item.destination;
+        row.appendChild(locationCell);
+        let typeCell = document.createElement("td");
+        typeCell.innerHTML = item.transactionType;
+        row.appendChild(typeCell);
+        let statusCell = document.createElement("td");
+        statusCell.innerHTML = item.status;
+        row.appendChild(statusCell);
+        let itemIDCell = document.createElement("td");
+        itemIDCell.innerHTML = item.itemID;
+        row.appendChild(itemIDCell);
+        let itemNameCell = document.createElement("td");
+        itemNameCell.innerHTML = item.itemName;
+        row.appendChild(itemNameCell);
+        table.appendChild(row);
+    });
+}
+
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -550,6 +596,9 @@ async function loadReportType(){
             break;
         case "Audit":
             await loadAuditReport();
+            break;
+        case "Returns Damages Losses":
+            await loadReturnsDamagesLossesReport();
             break;
         default:
             break;

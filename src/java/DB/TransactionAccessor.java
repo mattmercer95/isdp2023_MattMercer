@@ -161,6 +161,8 @@ public class TransactionAccessor {
                 temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
                 temp.setQuantity(rs.getInt("quantity"));
                 temp.setTotalWeight(rs.getInt("totalWeight"));
+                temp.setItemID(rs.getInt("itemID"));
+                temp.setItemName(rs.getString("name"));
                 transactions.add(temp);
             }
         } catch(SQLException ex) {
@@ -207,6 +209,8 @@ public class TransactionAccessor {
                 temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
                 temp.setQuantity(rs.getInt("quantity"));
                 temp.setTotalWeight(rs.getInt("totalWeight"));
+                temp.setItemID(rs.getInt("itemID"));
+                temp.setItemName(rs.getString("name"));
                 transactions.add(temp);
             }
         } catch(SQLException ex) {

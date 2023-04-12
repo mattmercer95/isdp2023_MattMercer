@@ -494,7 +494,7 @@ drop procedure if exists GetReturnsLossDamageInDateRange;
 DELIMITER //
 create procedure GetReturnsLossDamageInDateRange(in inStartDate date, in inEndDate date)
 BEGIN
-    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight, item.name, item.itemID
     from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType in ("Damage", "Loss", "Return")
     group by txnID;
 END //
@@ -504,7 +504,7 @@ drop procedure if exists GetReturnsLossDamageInDateRangeBySite;
 DELIMITER //
 create procedure GetReturnsLossDamageInDateRangeBySite(in inStartDate date, in inEndDate date, in inSiteID int)
 BEGIN
-    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight, item.name, item.itemID
     from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType in ("Damage", "Loss", "Return") and siteIDTo = inSiteID
     group by txnID;
 END //
