@@ -359,10 +359,12 @@ async function submitAuditReport(){
     let endDate = document.querySelector("#endDate").value;
     let report = await auditReportAPI(startDate, endDate);
     if(report.success){
-        report.type = "auditReport";
+        report.type = "Audit";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
-        //window.location.href = "SelectReport.html";
+        sessionStorage.setItem("reportStart", startDate);
+        sessionStorage.setItem("reportEnd", endDate);
+        window.location.href = "ViewReport.html";
         console.log(report.reportData);
     }
     else {

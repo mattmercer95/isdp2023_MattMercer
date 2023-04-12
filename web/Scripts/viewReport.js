@@ -37,7 +37,7 @@ function generatePDF(){
         filename: `${type} Report ${Date.now()}`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' }
     };
     // Choose the element and save the PDF for your user.
     html2pdf().set(opt).from(element).save();
@@ -488,6 +488,43 @@ async function loadUserReport(){
     });
 }
 
+async function loadAuditReport(){
+    //load data panel
+    document.querySelector("#cardAudit").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#audTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    document.querySelector("#audStart").innerHTML = sessionStorage.getItem("reportStart");
+    document.querySelector("#audEnd").innerHTML = sessionStorage.getItem("reportEnd");
+    currentReport.forEach((item)=>{
+        let row = document.createElement("tr");
+        let idCell = document.createElement("td");
+        idCell.innerHTML = item.txnAuditID;
+        row.appendChild(idCell);
+        let dateCell = document.createElement("td");
+        dateCell.innerHTML = item.txnDate;
+        row.appendChild(dateCell);
+        let txnIDCell = document.createElement("td");
+        txnIDCell.innerHTML = +item.txnID === 0 ? "-" : item.txnID;
+        row.appendChild(txnIDCell);
+        let typeCell = document.createElement("td");
+        typeCell.innerHTML = item.txnType;
+        row.appendChild(typeCell);
+        let statusCell = document.createElement("td");
+        statusCell.innerHTML = item.status;
+        row.appendChild(statusCell);
+        let empCell = document.createElement("td");
+        empCell.innerHTML = item.employeeName === "Admin Admin" ? "Admin" : item.employeeName;
+        row.appendChild(empCell);
+        let posCell = document.createElement("td");
+        posCell.innerHTML = item.position;
+        row.appendChild(posCell);
+        let locCell = document.createElement("td");
+        locCell.innerHTML = item.siteName;
+        row.appendChild(locCell);
+        table.appendChild(row);
+    });
+}
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -510,6 +547,9 @@ async function loadReportType(){
             break;
         case "Backorder":
             await loadBackorderReport();
+            break;
+        case "Audit":
+            await loadAuditReport();
             break;
         default:
             break;
