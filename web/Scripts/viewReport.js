@@ -355,6 +355,139 @@ async function loadEmergencyOrderReport(){
     });
 }
 
+async function loadBackorderReport(){
+    //load data panel
+    document.querySelector("#cardBackorder").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#boOrdersTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    document.querySelector("#boLocation").innerHTML = currentlocation;
+    document.querySelector("#boStart").innerHTML = sessionStorage.getItem("reportStart");
+    document.querySelector("#boEnd").innerHTML = sessionStorage.getItem("reportEnd");
+    currentReport.forEach((order)=>{
+        //create row and data cells
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        const boldID = document.createElement("b");
+        boldID.innerHTML = order.transactionID;
+        idCell.appendChild(boldID);
+        row.appendChild(idCell);
+        const locationCell = document.createElement("td");
+        locationCell.innerHTML = order.destination;
+        row.appendChild(locationCell);
+        const typeCell = document.createElement("td");
+        const typePill = document.createElement("b");
+        if(order.emergencyDelivery === true){
+            typePill.style.color = "red";
+            typePill.innerHTML = "Emergency";
+        }
+        else if(order.transactionType === "Back Order"){
+            typePill.style.color = "blue";
+            typePill.innerHTML = order.transactionType;
+        }
+        else if(order.transactionType === "Return"){
+            typePill.innerHTML = "Return";
+        }
+        else if(order.transactionType === "Loss"){
+            typePill.innerHTML = "Loss";
+        }
+        else if(order.transactionType === "Damage"){
+            typePill.innerHTML = "Damage";
+        }
+        else if(order.transactionType === "Supplier Order"){
+            typePill.innerHTML = "Supplier Order";
+        }
+        else {
+            typePill.innerHTML = "Regular";
+        }
+        typeCell.appendChild(typePill);
+        row.appendChild(typeCell);
+        const statusCell = document.createElement("td");
+        const statusPill = document.createElement("span");
+        statusPill.classList.add("badge");
+        if(order.status === "NEW"){
+            statusPill.classList.add("text-bg-success");
+        }
+        else if(order.status === "CLOSED" || order.status === "CANCELLED" || order.status === "REJECTED"){
+            statusPill.classList.add("text-bg-secondary");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else if(order.status === "BACKORDER"){
+            statusPill.classList.add("text-bg-dark");
+        }
+        else {
+            statusPill.classList.add("text-bg-primary");
+        }
+        statusPill.innerHTML = order.status;
+        statusCell.appendChild(statusPill);
+        row.appendChild(statusCell);
+        const itemsCell = document.createElement("td");
+        itemsCell.innerHTML = order.quantity;
+        row.appendChild(itemsCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = order.totalWeight;
+        row.appendChild(weightCell);
+        const deliveryDateCell = document.createElement("td");
+        deliveryDateCell.innerHTML = order.shipDate;
+        row.appendChild(deliveryDateCell);
+        //add row to table
+        table.appendChild(row);
+    });
+}
+
+async function loadUserReport(){
+    //load data panel
+    document.querySelector("#cardUser").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#userTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    let date = new Date();
+    document.querySelector("#userDate").innerHTML = date;
+    currentReport.forEach((emp)=>{
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        const boldID = document.createElement("b");
+        boldID.innerHTML = emp.employeeID;
+        idCell.appendChild(boldID);
+        row.appendChild(idCell);
+        const usernameCell = document.createElement("td");
+        usernameCell.innerHTML = emp.username;
+        row.appendChild(usernameCell);
+        const firstNameCell = document.createElement("td");
+        firstNameCell.innerHTML = emp.firstName;
+        row.appendChild(firstNameCell);
+        const lastNameCell = document.createElement("td");
+        lastNameCell.innerHTML = emp.lastName;
+        row.appendChild(lastNameCell);
+        const emailCell = document.createElement("td");
+        emailCell.innerHTML = emp.email;
+        row.appendChild(emailCell);
+        const activeCell = document.createElement("td");
+        const activeSpan = document.createElement("span");
+        if(emp.active === true){
+            activeSpan.classList.add("badge", "bg-success");
+        }
+        else {
+            activeSpan.classList.add("badge", "bg-danger");
+        }
+        activeSpan.innerHTML = emp.active;
+        activeCell.appendChild(activeSpan);
+        row.appendChild(activeCell);
+        const positionCell = document.createElement("td");
+        positionCell.innerHTML = emp.position;
+        row.appendChild(positionCell);
+        const siteCell = document.createElement("td");
+        siteCell.innerHTML = emp.site;
+        row.appendChild(siteCell);
+        table.appendChild(row);
+    });
+}
+
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -371,6 +504,12 @@ async function loadReportType(){
             break;
         case "Emergency Order":
             await loadEmergencyOrderReport();
+            break;
+        case "User":
+            await loadUserReport();
+            break;
+        case "Backorder":
+            await loadBackorderReport();
             break;
         default:
             break;
