@@ -31,9 +31,59 @@ window.onload = async function () {
     buildTable();
 };
 
+async function loadStoreOrder(selectedOrder){
+    let orderItems = await getOrderItems(selectedOrder.transactionID);
+    selectedOrder.items = orderItems;
+    sessionStorage.setItem("currentReport", JSON.stringify(selectedOrder));
+    window.location.href = "ViewReport.html";
+}
+
+async function getOrderItems(id){
+    console.log(id);
+    let url = `../TransactionService/getItems`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(id)
+    });
+    return await resp.json();
+}
+
+async function loadSupplierOrder(selectedOrder){
+    let supplierContacts = await getSupplierContacts(selectedOrder.transactionID);
+    let report = {
+        orderID: selectedOrder.transactionID,
+        contacts: supplierContacts
+    }
+    sessionStorage.setItem("currentReport", JSON.stringify(report));
+    window.location.href = "ViewReport.html";
+}
+
+async function getSupplierContacts(id){
+    let url = `../SupplierService/contactsByTxn`;
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(id)
+    });
+    return await resp.json();
+}
+
 async function viewReport(){
     let selectedOrder = getSelectedOrder();
     console.log(selectedOrder);
+    let type = sessionStorage.getItem("reportType");
+    switch(type){
+        case "Store Order":
+            await loadStoreOrder(selectedOrder);
+            break;
+        case "Shipping Receipt":
+            await loadStoreOrder(selectedOrder);
+            break;
+        case "Supplier Order":
+            await loadSupplierOrder(selectedOrder);
+            break;
+        default:
+            break;
+    }
 }
 
 function getSelectedOrder(){

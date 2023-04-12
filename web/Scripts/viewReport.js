@@ -571,6 +571,89 @@ function buildSubTable(table, data){
     });
 }
 
+async function loadStoreOrderReport(){
+    //load data panel
+    document.querySelector("#cardStoreOrder").hidden = false;
+    let currentOrder = currentReport;
+    //populate inventory table
+    let table = document.querySelector("#soOrderTable");
+    document.querySelector("#soOrderID").value = currentOrder.transactionID;
+    document.querySelector("#soCreationDate").value = currentOrder.createdDate;
+    document.querySelector("#soOriginSite").value = "Warehouse";
+    document.querySelector("#soDestinationSite").value = currentOrder.destination;
+    document.querySelector("#soStatus").value = currentOrder.status;
+    document.querySelector("#soShipDate").value = currentOrder.shipDate;
+    document.querySelector("#soDeliveryID").value = (currentOrder.deliveryID === 0) ? "N/A" : currentOrder.deliveryID;
+    document.querySelector("#soTotalQtyOrdered").value = currentOrder.quantity;
+    document.querySelector("#soTotalWeight").value = currentOrder.totalWeight.toFixed(2);
+    
+    let typeLabel = document.querySelector("#soTypeLabel");
+    const typeBadge = document.createElement("span");
+    typeBadge.classList.add("badge");
+    if(currentOrder.emergencyDelivery){
+        typeBadge.classList.add("text-bg-danger");
+        typeBadge.innerHTML = "Emergency";
+    }
+    else if(currentOrder.transactionType === "Back Order"){
+        typeBadge.classList.add("bg-dark");
+        typeBadge.innerHTML = currentOrder.transactionType;
+    }
+    else {
+        typeBadge.classList.add("text-bg-primary");
+        typeBadge.innerHTML = "Regular";
+    }
+    typeLabel.appendChild(typeBadge);
+   
+    //load cart
+    cart = currentOrder.items;
+    buildSOCart(cart);
+}
+
+function buildSOCart(card){
+    const table = document.querySelector("#soOrderTable");
+    table.innerHTML = "";
+    cart.forEach((item)=>{
+        //create row and data cells
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        idCell.innerHTML = item.itemID;
+        row.appendChild(idCell);
+        const nameCell = document.createElement("td");
+        nameCell.innerHTML = item.name;
+        row.appendChild(nameCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = (item.weight * item.caseQuantityOrdered * item.caseSize).toFixed(2);
+        weightCell.id = `weight${item.itemID}`;
+        row.appendChild(weightCell);
+        const qtyCell = document.createElement("td");
+        qtyCell.innerHTML = item.itemQuantityOnHand;
+        row.appendChild(qtyCell);
+        const reorderCell = document.createElement("td");
+        reorderCell.innerHTML = item.reorderThreshold;
+        row.appendChild(reorderCell);
+        const caseSizeCell = document.createElement("td");
+        caseSizeCell.innerHTML = item.caseSize;
+        row.appendChild(caseSizeCell);
+        const itemsOrderedCell = document.createElement("td");
+        itemsOrderedCell.id = "qty" + item.itemID;
+        itemsOrderedCell.innerHTML = `<b>${item.caseSize * item.caseQuantityOrdered}</b>`;
+        row.appendChild(itemsOrderedCell);
+        const qtyOrderedCell = document.createElement("td");
+        const qtyUpDown = document.createElement("input");
+        qtyUpDown.type = "number";
+        qtyUpDown.classList.add("form-control");
+        qtyUpDown.increment = 1;
+        qtyUpDown.min = 1;
+        qtyUpDown.id = `cases${item.itemID}`;
+        qtyUpDown.value = item.caseQuantityOrdered;
+        qtyUpDown.disabled = true;
+        qtyOrderedCell.appendChild(qtyUpDown);
+        row.appendChild(qtyOrderedCell);
+        //add row to table
+        table.appendChild(row);
+    });
+}
+
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -599,6 +682,12 @@ async function loadReportType(){
             break;
         case "Returns Damages Losses":
             await loadReturnsDamagesLossesReport();
+            break;
+        case "Store Order":
+            await loadStoreOrderReport();
+            break;
+        case "Shipping Receipt":
+            await loadStoreOrderReport();
             break;
         default:
             break;

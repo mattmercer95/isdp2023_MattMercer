@@ -8,9 +8,11 @@ import DB.DeliveryAccessor;
 import DB.InventoryAccessor;
 import DB.SiteAccessor;
 import DB.TransactionAccessor;
+import Entity.Item;
 import Entity.OnlineOrderID;
 import Entity.ReturnsDamageLossReport;
 import Entity.Transaction;
+import Entity.TransactionItem;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -104,6 +106,12 @@ public class TransactionService extends HttpServlet {
                 result.setItems(TransactionAccessor.getTransactionItems(result.getTransactionID()));
                 result.calculateStats();
                 out.println(g.toJson(result));
+            }
+            else if(uri.equals("/getItems")){
+                Scanner sc = new Scanner(request.getReader());
+                int transactionID = Integer.parseInt(sc.nextLine());
+                ArrayList<TransactionItem> items = TransactionAccessor.getTransactionItems(transactionID);
+                out.println(g.toJson(items));
             }
             else if(uri.equals("/getDetails")){
                 Scanner sc = new Scanner(request.getReader());

@@ -11,7 +11,19 @@ package Entity;
 public class Supplier {
 
     private int supplierID;
-    private String name;
+    private String name, address, contact, phone;
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
     
     public Supplier() {
     }

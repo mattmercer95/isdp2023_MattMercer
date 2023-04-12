@@ -92,7 +92,8 @@ async function submitStoreOrderReport(){
     let location = +pieces[0];
     let report = await storeOrderReportAPI(startDate, endDate, location);
     if(report.success){
-        report.type = "Store Order";
+        let value = document.querySelector("#reportSelect").value;
+        report.type = (value === "shippingReceipt") ? "Shipping Receipt" : "Store Order";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
         sessionStorage.setItem("reportLocation", pieces[1]);
@@ -317,10 +318,12 @@ async function submitSupplierOrderReport(){
     let endDate = document.querySelector("#endDate").value;
     let report = await supplierOrderReportAPI(startDate, endDate);
     if(report.success){
-        report.type = "supplierOrderReport";
+        report.type = "Supplier Order";
         sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
         sessionStorage.setItem("reportType", report.type);
-        //window.location.href = "SelectReport.html";
+        sessionStorage.setItem("reportStart", startDate);
+        sessionStorage.setItem("reportEnd", endDate);
+        window.location.href = "SelectReport.html";
         console.log(report.reportData);
     }
     else {

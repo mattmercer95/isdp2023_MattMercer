@@ -19,6 +19,45 @@ public class SupplierAccessor {
 
     private static Connection conn = null;
     private static PreparedStatement getAllSuppliers = null;
+    private static PreparedStatement getSuppliersByTxnID = null;
+
+    public static ArrayList<Supplier> getSuppliersByTxnID(int txnID) {
+        ArrayList<Supplier> suppliers = new ArrayList<Supplier>();
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return suppliers;
+            }
+            getSuppliersByTxnID.setInt(1, txnID);
+            rs = getSuppliersByTxnID.executeQuery();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error retreiving Supplier List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return suppliers;
+        }
+
+        try {
+            while (rs.next()) {
+                Supplier temp = new Supplier();
+                temp.setSupplierID(rs.getInt("supplierID"));
+                temp.setName(rs.getString("name"));
+                temp.setAddress(rs.getString("address"));
+                temp.setPhone(rs.getString("phone"));
+                temp.setContact(rs.getString("contact"));
+                suppliers.add(temp);
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Supplier List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+
+        return suppliers;
+    }
     
     private SupplierAccessor() {
     }
@@ -32,7 +71,8 @@ public class SupplierAccessor {
             try {
             System.out.println("Connection was not null");
             getAllSuppliers = conn.prepareStatement("select supplierID, name from supplier");
-            
+            getSuppliersByTxnID = conn.prepareStatement("select distinct supplierID, supplier.name, contact,concat_ws(\", \", address1, address2, city, province, postalCode) as address, phone "
+                    + "from txnitems inner join (item) using (itemID) inner join supplier using(supplierID) where txnID = ?");
             return true;
         } catch (SQLException ex) {
             System.err.println("************************");

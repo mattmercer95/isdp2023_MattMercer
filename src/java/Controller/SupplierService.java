@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Matt
  */
-@WebServlet(name = "SupplierService", urlPatterns = {"/SupplierService"})
+@WebServlet(name = "SupplierService", urlPatterns = {"/SupplierService/*"})
 public class SupplierService extends HttpServlet {
 
     /**
@@ -35,10 +36,20 @@ public class SupplierService extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        String uri = request.getPathInfo();
         try ( PrintWriter out = response.getWriter()) {
             Gson g = new Gson();
-            ArrayList<Supplier> suppliers = SupplierAccessor.getAllSuppliers();
-            out.println(g.toJson(suppliers));
+            if(uri.equals("/contactsByTxn")){
+                Scanner sc = new Scanner(request.getReader());
+                int txnID = Integer.parseInt(sc.nextLine());
+                ArrayList<Supplier> suppliers = SupplierAccessor.getSuppliersByTxnID(txnID);
+                out.println(g.toJson(suppliers));
+            }
+            else {
+                ArrayList<Supplier> suppliers = SupplierAccessor.getAllSuppliers();
+                out.println(g.toJson(suppliers));
+            }
+           
         }
     }
 
