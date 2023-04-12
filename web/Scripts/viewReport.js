@@ -654,6 +654,60 @@ function buildSOCart(card){
     });
 }
 
+async function loadSupplierOrderReport(){
+    //load data panel
+    document.querySelector("#cardSupplierOrder").hidden = false;
+    let currentOrder = currentReport.order;
+    //populate inventory table
+    let table = document.querySelector("#soOrderTable");
+    document.querySelector("#supOrderID").value = currentOrder.transactionID;
+    document.querySelector("#supCreationDate").value = currentOrder.createdDate;
+    document.querySelector("#soOriginSite").value = "Warehouse";
+    document.querySelector("#supDestinationSite").value = currentOrder.destination;
+    document.querySelector("#supStatus").value = currentOrder.status;
+    document.querySelector("#supShipDate").value = currentOrder.shipDate;
+    document.querySelector("#soDeliveryID").value = (currentOrder.deliveryID === 0) ? "N/A" : currentOrder.deliveryID;
+    document.querySelector("#supTotalQtyOrdered").value = currentOrder.quantity;
+    document.querySelector("#supTotalWeight").value = currentOrder.totalWeight.toFixed(2);
+    await buildSupplierCards();
+}
+
+async function buildSupplierCards(){
+    let contacts = currentReport.contacts;
+    let containerEle = document.querySelector("#supplierCards");
+    contacts.forEach((t)=>{
+        let transactionCard = `<div class= "card transaction-card page-break" id="Card"> <div class="card-body"> 
+<div class="row justify-content-center"> <h3 class="card-title col" id="Name">${t.name}
+</h3></div> 
+<div class="row"><div class="form-group col"><label><b>Contact:  </b>${t.contact}</label></div>
+<div class="form-group col"><label><b>Phone:  </b>${t.phone}</label></div></div>
+<div class="row"> <div class="form-group col"> <label><b>Address:   </b>${t.address}</label></div> 
+</div> <table class="table table-bordered table-striped "> <thead> <tr> <th>#</th> 
+<th>Item Name</th> <th># Cases</th> <th># Items</th> <th>Weight</th> </tr> </thead> 
+<tbody id="${t.supplierID}Items"> </tbody> </table> </div> </div>`;
+        containerEle.innerHTML += transactionCard;
+    });
+    await loadSupplierOrderItems(contacts);
+}
+
+async function loadSupplierOrderItems(contacts){
+    let url = `../TransactionService/getItemsBySupplier`;
+    contacts.forEach(async (c)=>{
+        console.log(c.supplierID);
+        let items = await supplierOrderItemsAPI(c.supplierID, currentReport.orderID);
+        console.log(items);
+    });
+}
+
+async function supplierOrderItemsAPI(supplierID, orderID){
+    let url = `../TransactionService/getItemsBySupplier`;
+    console.log(supplierID + "," + orderID);
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: supplierID + "," + orderID
+    });
+    return await resp.json();
+}
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -688,6 +742,9 @@ async function loadReportType(){
             break;
         case "Shipping Receipt":
             await loadStoreOrderReport();
+            break;
+        case "Supplier Order":
+            await loadSupplierOrderReport();
             break;
         default:
             break;

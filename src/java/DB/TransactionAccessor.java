@@ -56,6 +56,53 @@ public class TransactionAccessor {
     private static PreparedStatement supplierOrdersInRange = null;
     private static PreparedStatement returnsDamangeLoss = null;
     private static PreparedStatement returnsDamangeLossBySite = null;
+    private static PreparedStatement itemsBySupplier = null;
+
+    public static ArrayList<TransactionItem> getTransactionItemsBySupplier(int supplierID, int transactionID) {
+        ArrayList<TransactionItem> result = null;
+        
+        ResultSet rs;
+        try {
+            if (!init()) {
+                return result;
+            }
+            itemsBySupplier.setInt(1, supplierID);
+            itemsBySupplier.setInt(2, transactionID);
+            rs = itemsBySupplier.executeQuery();
+            result = new ArrayList<TransactionItem>();
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Retrieving Transaction Items");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return result;
+        }
+
+        try {
+            while (rs.next()) {
+                if(result != null){
+                    TransactionItem item = new TransactionItem();
+                    item.setItemID(rs.getInt("itemID"));
+                    item.setTxnID(rs.getInt("txnID"));
+                    item.setCaseQuantityOrdered(rs.getInt(3));
+                    item.setName(rs.getString("name"));
+                    item.setWeight(rs.getFloat("weight"));
+                    item.setCaseSize(rs.getInt("caseSize"));
+                    item.setCategory(rs.getString("category"));
+                    item.setDescription(rs.getString("description"));
+                    item.setRetailPrice(rs.getDouble("retailPrice"));
+                    result.add(item);
+                };
+            }
+        } catch (SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error Populating Transaction Item list");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return result;
+    }
 
     private TransactionAccessor(){
         //no instant
@@ -76,6 +123,7 @@ public class TransactionAccessor {
         if (conn != null)            
             try {
                 System.out.println("Connection was not null");
+                itemsBySupplier = conn.prepareStatement("call GetTransactionItemsBySupplier(?,?)");
                 allBackorders = conn.prepareStatement("call GetAllBackordersInDateRange(?,?)");
                 backordersBySiteID = conn.prepareStatement("call GetBackordersInDateRangeBySite(?,?,?)");
                 allRegularOrders = conn.prepareStatement("call GetAllRegularOrdersInDateRange(?,?)");

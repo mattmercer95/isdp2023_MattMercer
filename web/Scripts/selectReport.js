@@ -52,6 +52,7 @@ async function loadSupplierOrder(selectedOrder){
     let supplierContacts = await getSupplierContacts(selectedOrder.transactionID);
     let report = {
         orderID: selectedOrder.transactionID,
+        order: selectedOrder,
         contacts: supplierContacts
     }
     sessionStorage.setItem("currentReport", JSON.stringify(report));

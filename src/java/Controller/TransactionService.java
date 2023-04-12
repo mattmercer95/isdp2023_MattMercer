@@ -113,6 +113,15 @@ public class TransactionService extends HttpServlet {
                 ArrayList<TransactionItem> items = TransactionAccessor.getTransactionItems(transactionID);
                 out.println(g.toJson(items));
             }
+            else if(uri.equals("/getItemsBySupplier")){
+                Scanner sc = new Scanner(request.getReader());
+                String csv = sc.nextLine();
+                String[] pieces = csv.split(",");
+                int supplierID = Integer.parseInt(pieces[0]);
+                int transactionID = Integer.parseInt(pieces[1]);
+                ArrayList<TransactionItem> items = TransactionAccessor.getTransactionItemsBySupplier(supplierID, transactionID);
+                out.println(g.toJson(items));
+            }
             else if(uri.equals("/getDetails")){
                 Scanner sc = new Scanner(request.getReader());
                 int transactionID = Integer.parseInt(sc.nextLine());

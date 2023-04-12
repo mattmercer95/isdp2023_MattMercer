@@ -215,6 +215,14 @@ BEGIN
 END //
 DELIMITER ;
 
+drop procedure if exists GetTransactionItemsBySupplier;
+DELIMITER //
+create procedure GetTransactionItemsBySupplier(in inSupplierID int, in inOrderID int)
+BEGIN
+	select * from txnitems inner join item using (itemID) inner join supplier using (supplierID) where txnID = inOrderID and supplierID = inSupplierID;
+END //
+DELIMITER ;
+
 /*
 Gets the online ids for all open orders
 */
