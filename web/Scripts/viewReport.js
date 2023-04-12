@@ -30,11 +30,11 @@ window.onload = async function(){
 
 function generatePDF(){
     // Choose the element that your content will be rendered to.
-    const element = document.getElementById(`card${reportType}`);
-    console.log(`card${reportType}`);
+    let type = reportType.replace(/\s/g, '');
+    const element = document.getElementById(`card${type}`);
     var opt = {
         margin:0,
-        filename: `${reportType} Report ${Date.now()}`,
+        filename: `${type} Report ${Date.now()}`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -130,6 +130,8 @@ async function loadInventoryReport(){
     let table = document.querySelector("#invItemsTable");
     let currentlocation = sessionStorage.getItem("reportLocation");
     document.querySelector("#invLocation").innerHTML = currentlocation;
+    const date = new Date();
+    document.querySelector("#invDate").innerHTML = date;
     currentReport.forEach((item)=>{
         //create row and data cells
         const row = document.createElement("tr");
@@ -183,6 +185,176 @@ async function loadInventoryReport(){
     });
 }
 
+async function loadRegularOrderReport(){
+    //load data panel
+    document.querySelector("#cardRegularOrder").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#roOrdersTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    document.querySelector("#roLocation").innerHTML = currentlocation;
+    document.querySelector("#roStart").innerHTML = sessionStorage.getItem("reportStart");
+    document.querySelector("#roEnd").innerHTML = sessionStorage.getItem("reportEnd");
+    currentReport.forEach((order)=>{
+        //create row and data cells
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        const boldID = document.createElement("b");
+        boldID.innerHTML = order.transactionID;
+        idCell.appendChild(boldID);
+        row.appendChild(idCell);
+        const locationCell = document.createElement("td");
+        locationCell.innerHTML = order.destination;
+        row.appendChild(locationCell);
+        const typeCell = document.createElement("td");
+        const typePill = document.createElement("b");
+        if(order.emergencyDelivery === true){
+            typePill.style.color = "red";
+            typePill.innerHTML = "Emergency";
+        }
+        else if(order.transactionType === "Back Order"){
+            typePill.style.color = "blue";
+            typePill.innerHTML = order.transactionType;
+        }
+        else if(order.transactionType === "Return"){
+            typePill.innerHTML = "Return";
+        }
+        else if(order.transactionType === "Loss"){
+            typePill.innerHTML = "Loss";
+        }
+        else if(order.transactionType === "Damage"){
+            typePill.innerHTML = "Damage";
+        }
+        else if(order.transactionType === "Supplier Order"){
+            typePill.innerHTML = "Supplier Order";
+        }
+        else {
+            typePill.innerHTML = "Regular";
+        }
+        typeCell.appendChild(typePill);
+        row.appendChild(typeCell);
+        const statusCell = document.createElement("td");
+        const statusPill = document.createElement("span");
+        statusPill.classList.add("badge");
+        if(order.status === "NEW"){
+            statusPill.classList.add("text-bg-success");
+        }
+        else if(order.status === "CLOSED" || order.status === "CANCELLED" || order.status === "REJECTED"){
+            statusPill.classList.add("text-bg-secondary");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else if(order.status === "BACKORDER"){
+            statusPill.classList.add("text-bg-dark");
+        }
+        else {
+            statusPill.classList.add("text-bg-primary");
+        }
+        statusPill.innerHTML = order.status;
+        statusCell.appendChild(statusPill);
+        row.appendChild(statusCell);
+        const itemsCell = document.createElement("td");
+        itemsCell.innerHTML = order.quantity;
+        row.appendChild(itemsCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = order.totalWeight;
+        row.appendChild(weightCell);
+        const deliveryDateCell = document.createElement("td");
+        deliveryDateCell.innerHTML = order.shipDate;
+        row.appendChild(deliveryDateCell);
+        //add row to table
+        table.appendChild(row);
+    });
+}
+
+async function loadEmergencyOrderReport(){
+    //load data panel
+    document.querySelector("#cardEmergencyOrder").hidden = false;
+    //populate inventory table
+    let table = document.querySelector("#eoOrdersTable");
+    let currentlocation = sessionStorage.getItem("reportLocation");
+    document.querySelector("#eoLocation").innerHTML = currentlocation;
+    document.querySelector("#eoStart").innerHTML = sessionStorage.getItem("reportStart");
+    document.querySelector("#eoEnd").innerHTML = sessionStorage.getItem("reportEnd");
+    currentReport.forEach((order)=>{
+        //create row and data cells
+        const row = document.createElement("tr");
+        const idCell = document.createElement("td");
+        const boldID = document.createElement("b");
+        boldID.innerHTML = order.transactionID;
+        idCell.appendChild(boldID);
+        row.appendChild(idCell);
+        const locationCell = document.createElement("td");
+        locationCell.innerHTML = order.destination;
+        row.appendChild(locationCell);
+        const typeCell = document.createElement("td");
+        const typePill = document.createElement("b");
+        if(order.emergencyDelivery === true){
+            typePill.style.color = "red";
+            typePill.innerHTML = "Emergency";
+        }
+        else if(order.transactionType === "Back Order"){
+            typePill.style.color = "blue";
+            typePill.innerHTML = order.transactionType;
+        }
+        else if(order.transactionType === "Return"){
+            typePill.innerHTML = "Return";
+        }
+        else if(order.transactionType === "Loss"){
+            typePill.innerHTML = "Loss";
+        }
+        else if(order.transactionType === "Damage"){
+            typePill.innerHTML = "Damage";
+        }
+        else if(order.transactionType === "Supplier Order"){
+            typePill.innerHTML = "Supplier Order";
+        }
+        else {
+            typePill.innerHTML = "Regular";
+        }
+        typeCell.appendChild(typePill);
+        row.appendChild(typeCell);
+        const statusCell = document.createElement("td");
+        const statusPill = document.createElement("span");
+        statusPill.classList.add("badge");
+        if(order.status === "NEW"){
+            statusPill.classList.add("text-bg-success");
+        }
+        else if(order.status === "CLOSED" || order.status === "CANCELLED" || order.status === "REJECTED"){
+            statusPill.classList.add("text-bg-secondary");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else if(order.status === "SUBMITTED"){
+            statusPill.classList.add("text-bg-warning");
+        }
+        else if(order.status === "BACKORDER"){
+            statusPill.classList.add("text-bg-dark");
+        }
+        else {
+            statusPill.classList.add("text-bg-primary");
+        }
+        statusPill.innerHTML = order.status;
+        statusCell.appendChild(statusPill);
+        row.appendChild(statusCell);
+        const itemsCell = document.createElement("td");
+        itemsCell.innerHTML = order.quantity;
+        row.appendChild(itemsCell);
+        const weightCell = document.createElement("td");
+        weightCell.innerHTML = order.totalWeight;
+        row.appendChild(weightCell);
+        const deliveryDateCell = document.createElement("td");
+        deliveryDateCell.innerHTML = order.shipDate;
+        row.appendChild(deliveryDateCell);
+        //add row to table
+        table.appendChild(row);
+    });
+}
+
 async function loadReportType(){
     reportType = sessionStorage.getItem("reportType");
     currentReport = JSON.parse(sessionStorage.getItem("currentReport"));
@@ -193,6 +365,12 @@ async function loadReportType(){
             break;
         case "Inventory":
             await loadInventoryReport();
+            break;
+        case "Regular Order":
+            await loadRegularOrderReport();
+            break;
+        case "Emergency Order":
+            await loadEmergencyOrderReport();
             break;
         default:
             break;

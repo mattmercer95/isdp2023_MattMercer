@@ -95,6 +95,7 @@
                 <div class="card-title text-center">
                     <h3>Inventory Report</h3>
                     <h4>Location: <span id="invLocation"></span></h4>
+                    <h5>Date: <span id="invDate"></span></h5>
                 </div>
                 <div class="card-body">
                     <div class=" prevent-select row">
@@ -120,6 +121,60 @@
 
                             </tbody>
 
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="cardRegularOrder" class="card" hidden>
+                <div class="card-title text-center">
+                    <h3>Regular Store Order Report</h3>
+                    <h4>Location: <span id="roLocation"></span></h4>
+                    <h4>From: <span id="roStart"></span> To: <span id="roEnd"></span></h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive prevent-select row ">
+                        <table class="table table-bordered table-striped ">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Items</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Delivery Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roOrdersTable">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="cardEmergencyOrder" class="card" hidden>
+                <div class="card-title text-center">
+                    <h3>Regular Store Order Report</h3>
+                    <h4>Location: <span id="eoLocation"></span></h4>
+                    <h4>From: <span id="eoStart"></span> To: <span id="eoEnd"></span></h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive prevent-select row ">
+                        <table class="table table-bordered table-striped ">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Items</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Delivery Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eoOrdersTable">
+
+                            </tbody>
                         </table>
                     </div>
                 </div>
