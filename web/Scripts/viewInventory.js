@@ -41,7 +41,7 @@ window.onload = async function () {
     });
     document.querySelector("#btnEditThreshold").addEventListener('click', editThreshold);
     document.querySelector("#roSaveChanges").addEventListener('click', updateThreshold);
-    document.querySelector("#detailsSaveChanges").addEventListener('click', updateDetails);
+    document.querySelector("#frmEditProduct").addEventListener('submit', updateDetails);
     document.querySelector("#btnEditItemDetails").addEventListener('click', editDetails);
     
     checkPermissions();
@@ -63,19 +63,20 @@ async function editDetails(){
     document.querySelector("#detailsCost").value = selected.costPrice.toFixed(2);
     document.querySelector("#detailsPrice").value = selected.retailPrice.toFixed(2);
     //Warehouse manager can only set active
-    if(currentEmployee.positionID === 4){
-        document.querySelector("#detailsName").disabled = true;
-        document.querySelector("#detailsDesc").disabled = true;
-        document.querySelector("#detailsCat").disabled = true;
-        document.querySelector("#detailsNotes").disabled = true;
-        document.querySelector("#detailsCaseSize").disabled = true;
-        document.querySelector("#detailsWeight").disabled = true;
-        document.querySelector("#detailsCost").disabled = true;
-        document.querySelector("#detailsPrice").disabled = true;
-    }
+//    if(currentEmployee.positionID === 4){
+//        document.querySelector("#detailsName").disabled = true;
+//        document.querySelector("#detailsDesc").disabled = true;
+//        document.querySelector("#detailsCat").disabled = true;
+//        document.querySelector("#detailsNotes").disabled = true;
+//        document.querySelector("#detailsCaseSize").disabled = true;
+//        document.querySelector("#detailsWeight").disabled = true;
+//        document.querySelector("#detailsCost").disabled = true;
+//        document.querySelector("#detailsPrice").disabled = true;
+//    }
 }   
 
-async function updateDetails(){
+async function updateDetails(e){
+    e.preventDefault();
     let confirmDet = confirm("Save changes to Item Details?");
     if(!confirmDet){
         return;

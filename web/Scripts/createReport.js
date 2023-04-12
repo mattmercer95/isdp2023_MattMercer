@@ -33,11 +33,22 @@ async function loadLocations(){
     });
     let locations = await resp.json();
     let selector = document.querySelector("#locationSelect");
+    
     locations.forEach((l)=>{
         let optionEle = document.createElement("option");
         optionEle.value = l.siteID + "," + l.name;
         optionEle.innerHTML = l.name;
         selector.appendChild(optionEle);
+    });
+    let currentSite = currentEmployee.siteID;
+    let options = selector.querySelectorAll("option");
+    options.forEach((o)=>{
+        let csv = o.value;
+        let pieces = csv.split(",");
+        let siteID = +pieces[0];
+        if(siteID === currentSite){
+            o.selected = true;
+        }
     });
 }
 
@@ -510,13 +521,13 @@ function resetIdleTimeout(){
 
 //removes current employee from session storage and redirects user to sign-in page
 async function logout(){
-    let url = `LogOutService/logout`;
+    let url = `../LogOutService/logout`;
     let resp = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(currentEmployee)
     });
     sessionStorage.setItem("employeeInfo", null);
-    window.location.href = "index.html";
+    window.location.href = "../index.html";
 }
 
 function hideAllInputs(){
