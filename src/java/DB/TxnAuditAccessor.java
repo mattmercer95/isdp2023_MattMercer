@@ -4,11 +4,13 @@
  */
 package DB;
 
+import Entity.Transaction;
 import Entity.TxnAudit;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -21,6 +23,7 @@ public class TxnAuditAccessor {
     private static PreparedStatement insertLogOutTransactionStatement = null;
     private static PreparedStatement insertPasswordResetTransactionStatement = null;
     private static PreparedStatement insertStoreOrderTransaction = null;
+    private static PreparedStatement auditReportByDateRange = null;
     
     private TxnAuditAccessor(){
         //no instantiation
@@ -40,6 +43,7 @@ public class TxnAuditAccessor {
                         + "?, ?, null, ?, null)");
                 insertStoreOrderTransaction = conn.prepareStatement(insertStatementRoot +
                         "values(?, ?, ?, ?, ?, ?, ?, null)");
+                auditReportByDateRange = conn.prepareStatement("select * from auditReport where txnDate between ? and ?");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -50,6 +54,51 @@ public class TxnAuditAccessor {
             }
         System.out.println("Connection was null");
         return false;
+    }
+    
+    public static ArrayList<TxnAudit> auditReportInRange(String startDate, String endDate) {
+        ArrayList<TxnAudit> audit = new ArrayList<TxnAudit>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return audit;
+            auditReportByDateRange.setString(1, startDate);
+            auditReportByDateRange.setString(2, endDate);
+            rs = auditReportByDateRange.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Audit Report");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return audit;
+        }
+        
+        try {
+            while (rs.next()) {
+                TxnAudit temp = new TxnAudit();
+                temp.setTxnAuditID(rs.getInt(1));
+                temp.setTxnID(rs.getInt(2));
+                temp.setTxnType(rs.getString(3));
+                temp.setStatus(rs.getString(4));
+                temp.setTxnDate(rs.getDate(5).toString());
+                temp.setSiteID(rs.getInt(6));
+                temp.setDeliveryID(rs.getInt(7));
+                temp.setEmployeeID(rs.getInt(8));
+                temp.setEmployeeName(rs.getString(10) + " " + rs.getString(11));
+                temp.setPosition(rs.getString(12));
+                temp.setSiteName(rs.getString(13));
+                
+                audit.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Audit Report");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return audit;
     }
     
     public static boolean passwordResetTransaction(TxnAudit txnToBeLogged){

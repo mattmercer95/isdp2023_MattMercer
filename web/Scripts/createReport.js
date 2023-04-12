@@ -278,6 +278,97 @@ async function submitBackorderReport(){
     }
 }
 
+async function supplierOrderReportAPI(startDate, endDate){
+    let url = "../TransactionService/supplierOrders";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: startDate + ":" + endDate 
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitSupplierOrderReport(){
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let report = await supplierOrderReportAPI(startDate, endDate);
+    if(report.success){
+        report.type = "supplierOrderReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No supplier orders found in this date range.");
+    }
+}
+
+async function submitReturnsDamageLossReport(){
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let location = document.querySelector("#locationSelect").value;
+    let report = await returnsDamageLossReportAPI(startDate, endDate, location);
+    if(report.success){
+        report.type = "returnsDamageLossReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No Returns/Damage/Loss records found in this date range.");
+    }
+}
+
+async function returnsDamageLossReportAPI(startDate, endDate, location){
+    let url = "../TransactionService/returnsDamageLoss";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: startDate + ":" + endDate + ":" + location
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
+async function submitAuditReport(){
+    let startDate = document.querySelector("#startDate").value;
+    let endDate = document.querySelector("#endDate").value;
+    let report = await auditReportAPI(startDate, endDate);
+    if(report.success){
+        report.type = "auditReport";
+        sessionStorage.setItem("currentReport", JSON.stringify(report.reportData));
+        sessionStorage.setItem("reportType", report.type);
+        //window.location.href = "SelectReport.html";
+        console.log(report.reportData);
+    }
+    else {
+        alert("Error: No audit records found in this date range.");
+    }
+}
+
+async function auditReportAPI(startDate, endDate){
+    let url = "../AuditService/report";
+    let resp = await fetch(url, {
+        method: 'POST',
+        body: startDate + ":" + endDate
+    });
+    let reportData = await resp.json();
+    let report = {
+        success: (reportData.length == 0) ? false : true,
+        reportData: reportData
+    }
+    return report;
+}
+
 async function submitReport(e){
     e.preventDefault();
     let value = document.querySelector("#reportSelect").value;
@@ -307,10 +398,13 @@ async function submitReport(e){
             await submitBackorderReport();
             break;
         case "supplierOrder":
+            await submitSupplierOrderReport();
             break;
         case "lossDamageReturn":
+            await submitReturnsDamageLossReport();
             break;
         case "audit":
+            await submitAuditReport();
             break;
         default:
             break;

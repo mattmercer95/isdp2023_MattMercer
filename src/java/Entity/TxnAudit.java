@@ -10,10 +10,22 @@ package Entity;
  */
 public class TxnAudit {
     private int txnAuditID, txnID, siteID, deliveryID, employeeID;
-    private String txnType, status, txnDate, notes;
+    private String txnType, status, txnDate, notes, employeeName, position, siteName;
     
     public TxnAudit(){
         
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
     
     public TxnAudit(int txnAuditID, int txnID, String txnType, String status,

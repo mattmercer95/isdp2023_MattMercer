@@ -480,6 +480,36 @@ BEGIN
 END //
 DELIMITER ;
 
+drop procedure if exists GetSupplierOrdersInDateRange;
+DELIMITER //
+create procedure GetSupplierOrdersInDateRange(in inStartDate date, in inEndDate date)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType = "Supplier Order" and siteIDTo = 1
+    group by txnID;
+END //
+DELIMITER ;
+
+drop procedure if exists GetReturnsLossDamageInDateRange;
+DELIMITER //
+create procedure GetReturnsLossDamageInDateRange(in inStartDate date, in inEndDate date)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType in ("Damage", "Loss", "Return")
+    group by txnID;
+END //
+DELIMITER ;
+
+drop procedure if exists GetReturnsLossDamageInDateRangeBySite;
+DELIMITER //
+create procedure GetReturnsLossDamageInDateRangeBySite(in inStartDate date, in inEndDate date, in inSiteID int)
+BEGIN
+    Select txnID, site.name as Location, siteIDTo, siteIDFrom, status, shipDate, txnType, barCode, createdDate, deliveryID, emergencyDelivery, sum(quantity * caseSize) as quantity, sum(weight * quantity * caseSize) as totalWeight
+    from txn inner join txnitems using (txnID) inner join item using (itemID) inner join site where siteIDTo = siteID and createdDate between inStartDate and inEndDate and txnType in ("Damage", "Loss", "Return") and siteIDTo = inSiteID
+    group by txnID;
+END //
+DELIMITER ;
+
 drop procedure if exists GetOrdersInDateRangeBySite;
 DELIMITER //
 create procedure GetOrdersInDateRangeBySite(in inStartDate date, in inEndDate date, in inSiteID int)
@@ -737,6 +767,14 @@ begin
     close curSite;
 end; //
 delimiter ;
+
+drop view if exists auditReport;
+create view auditReport as 
+SELECT txnaudit.*, employee.firstName, employee.lastName, posn.permissionLevel, site.name
+FROM bullseyedb2023.txnaudit inner join employee using (employeeID) inner join posn using (positionID) inner join site using(siteID)
+order by txnAuditID;
+
+
 /*
 	Add day of week numbers to locations
 */

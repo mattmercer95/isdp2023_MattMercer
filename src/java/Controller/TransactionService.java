@@ -9,6 +9,7 @@ import DB.InventoryAccessor;
 import DB.SiteAccessor;
 import DB.TransactionAccessor;
 import Entity.OnlineOrderID;
+import Entity.ReturnsDamageLossReport;
 import Entity.Transaction;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -248,6 +249,53 @@ public class TransactionService extends HttpServlet {
                     transactions = TransactionAccessor.getBackordersInRangeBySiteID(startDate, endDate, siteID);
                 }
                 out.println(g.toJson(transactions));
+            }
+            else if(uri.equals("/supplierOrders")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                ArrayList<Transaction> transactions;
+                transactions = TransactionAccessor.getAllSupplierOrdersInRange(startDate, endDate);
+                out.println(g.toJson(transactions));
+            }
+            else if(uri.equals("/returnsDamageLoss")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                int siteID = Integer.parseInt(pieces[2]);
+                ArrayList<Transaction> transactions;
+                if(siteID == 0){
+                    //get all
+                    transactions = TransactionAccessor.getReturnsDamageLossInRange(startDate, endDate);
+                }
+                else {
+                    transactions = TransactionAccessor.getReturnsDamageLossInRangeBySite(startDate, endDate, siteID);
+                }
+                ArrayList<Transaction> returns = new ArrayList<Transaction>();
+                ArrayList<Transaction> damage = new ArrayList<Transaction>();
+                ArrayList<Transaction> loss = new ArrayList<Transaction>();
+                for(Transaction t : transactions){
+                    String type = t.getTransactionType();
+                    switch(type){
+                        case "Return":
+                            returns.add(t);
+                            break;
+                        case "Damage":
+                            damage.add(t);
+                            break;
+                        case "Loss":
+                            loss.add(t);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                ReturnsDamageLossReport report = new ReturnsDamageLossReport(returns, damage, loss);
+                out.println(g.toJson(report));
             }
             else {
                 ArrayList<Transaction> transactions = TransactionAccessor.getAllTransactions();

@@ -9,6 +9,7 @@ import Entity.TxnAudit;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -49,6 +50,15 @@ public class AuditService extends HttpServlet {
                 TxnAudit auditItem = g.fromJson(sc.nextLine(), TxnAudit.class);
                 boolean result = TxnAuditAccessor.insertOrderTransaction(auditItem);
                 out.println(g.toJson(result));
+            }
+            else if(uri.equals("/report")){
+                Scanner sc = new Scanner(request.getReader());
+                String dates = sc.nextLine();
+                String[] pieces = dates.split(":");
+                String startDate = pieces[0];
+                String endDate = pieces[1];
+                ArrayList<TxnAudit> auditReport = TxnAuditAccessor.auditReportInRange(startDate, endDate);
+                out.println(g.toJson(auditReport));
             }
             else if(uri.equals("/received")){
                 Scanner sc = new Scanner(request.getReader());

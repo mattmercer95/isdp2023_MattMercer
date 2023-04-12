@@ -53,6 +53,9 @@ public class TransactionAccessor {
     private static PreparedStatement emergencyOrdersBySiteID = null;
     private static PreparedStatement allBackorders = null;
     private static PreparedStatement backordersBySiteID = null;
+    private static PreparedStatement supplierOrdersInRange = null;
+    private static PreparedStatement returnsDamangeLoss = null;
+    private static PreparedStatement returnsDamangeLossBySite = null;
 
     private TransactionAccessor(){
         //no instant
@@ -108,6 +111,9 @@ public class TransactionAccessor {
                         + "values(?, ?, 'CLOSED', now(), ?, 'X', now(), null, false, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
                 incrementInventory = conn.prepareStatement("update inventory set quantity = quantity + 1 where itemID = ? and siteID = ?");
                 reduceInventory = conn.prepareStatement("update inventory set quantity = quantity - 1 where itemID = ? and siteID = ?");
+                supplierOrdersInRange = conn.prepareStatement("call GetSupplierOrdersInDateRange(?,?)");
+                returnsDamangeLoss = conn.prepareStatement("call GetReturnsLossDamageInDateRange(?,?)");
+                returnsDamangeLossBySite = conn.prepareStatement("call GetReturnsLossDamageInDateRangeBySite(?,?,?)");
                 return true;
             } catch (SQLException ex) {
                 System.err.println("************************");
@@ -120,6 +126,145 @@ public class TransactionAccessor {
         return false;
     }
     
+    public static ArrayList<Transaction> getReturnsDamageLossInRangeBySite(String startDate, String endDate, int siteID) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            returnsDamangeLossBySite.setString(1, startDate);
+            returnsDamangeLossBySite.setString(2, endDate);
+            returnsDamangeLossBySite.setInt(3, siteID);
+            rs = returnsDamangeLossBySite.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Supplier Order List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Supplier Order List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+            
+    public static ArrayList<Transaction> getReturnsDamageLossInRange(String startDate, String endDate) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            returnsDamangeLoss.setString(1, startDate);
+            returnsDamangeLoss.setString(2, endDate);
+            rs = returnsDamangeLoss.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Supplier Order List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Supplier Order List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+    
+    public static ArrayList<Transaction> getAllSupplierOrdersInRange(String startDate, String endDate) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        
+        ResultSet rs;
+        try{
+            if (!init())
+                return transactions;
+            supplierOrdersInRange.setString(1, startDate);
+            supplierOrdersInRange.setString(2, endDate);
+            rs = supplierOrdersInRange.executeQuery();
+        } catch(SQLException ex){
+            System.err.println("************************");
+            System.err.println("** Error retreiving Supplier Order List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+            return transactions;
+        }
+        
+        try {
+            while (rs.next()) {
+                Transaction temp = new Transaction();
+                temp.setTransactionID(rs.getInt("txnID"));
+                temp.setDestination(rs.getString("Location"));
+                temp.setSiteIDTo(rs.getInt("siteIDTo"));
+                temp.setSiteIDFrom(rs.getInt("siteIDFrom"));
+                temp.setStatus(rs.getString("status"));
+                temp.setShipDate(rs.getDate("shipDate").toString());
+                temp.setTransactionType(rs.getString("txnType"));
+                temp.setBarCode(rs.getString("barCode"));
+                temp.setCreatedDate(rs.getDate("createdDate").toString());
+                temp.setDeliveryID(rs.getInt("deliveryID"));
+                temp.setEmergencyDelivery(rs.getBoolean("emergencyDelivery"));
+                temp.setQuantity(rs.getInt("quantity"));
+                temp.setTotalWeight(rs.getInt("totalWeight"));
+                transactions.add(temp);
+            }
+        } catch(SQLException ex) {
+            System.err.println("************************");
+            System.err.println("** Error populating Supplier Order List");
+            System.err.println("** " + ex.getMessage());
+            System.err.println("************************");
+        }
+        
+        return transactions;
+    }
+
     public static ArrayList<Transaction> getAllBackordersInRange(String startDate, String endDate) {
         ArrayList<Transaction> transactions = new ArrayList<Transaction>();
         
